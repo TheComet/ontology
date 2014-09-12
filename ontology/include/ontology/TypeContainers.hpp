@@ -22,7 +22,7 @@ namespace Ontology {
  */
 struct TypeComparator
 {
-    inline bool operator()(const std::type_info* a, const std::type_info* b)
+    inline bool operator()(const std::type_info* a, const std::type_info* b) const
     {
         return a->before(*b);
     }
