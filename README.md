@@ -10,7 +10,7 @@ CMake
 -----
 CMake is a cross-platform, open source build system. You can find more information about CMake [here](http://www.cmake.org/).
 
-It is very simple to compile Artemis-Cpp using CMake. Just follow these steps:
+It is very simple to compile Ontology using CMake. Just follow these steps:
 
 1. Install CMake in your system.
 2. Make sure you have cmake in your $PATH variable.
