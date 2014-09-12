@@ -125,4 +125,4 @@ private:
 
 } // namespace Ontology
 
-#endif / /__ONTOLOGY_ENTITY_HPP__
+#endif //__ONTOLOGY_ENTITY_HPP__
