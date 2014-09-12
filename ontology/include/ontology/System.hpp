@@ -2,6 +2,9 @@
 // System.hpp
 // ----------------------------------------------------------------------------
 
+#ifndef __ONTOLOGY_SYSTEM_HPP__
+#define __ONTOLOGY_SYSTEM_HPP__
+
 // ----------------------------------------------------------------------------
 // include files
 
@@ -90,3 +93,5 @@ private:
 };
 
 } // namespace Ontology
+
+#endif // __ONTOLOGY_SYSTEM_HPP__
