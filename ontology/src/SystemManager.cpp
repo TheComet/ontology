@@ -16,6 +16,13 @@ SystemManager::SystemManager(World* world) :
 }
 
 // ----------------------------------------------------------------------------
+SystemManager::~SystemManager()
+{
+    for(auto it = m_SystemList.rbegin(); it != m_SystemList.rend(); ++it)
+        it->second.reset(nullptr);
+}
+
+// ----------------------------------------------------------------------------
 void SystemManager::initialise()
 {
     for(const auto& it : m_SystemList)

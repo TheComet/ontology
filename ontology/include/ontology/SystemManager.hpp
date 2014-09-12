@@ -82,6 +82,13 @@ public:
     SystemManager(World* world);
 
     /*!
+     * @brief Default destructor.
+     *
+     * Will destroy all systems in reverse order to how they were added.
+     */
+    ~SystemManager();
+
+    /*!
      * @brief Adds a new system to the world.
      *
      * @param system The system to add. SystemManager owns the passed object
@@ -108,6 +115,11 @@ public:
      * In this example, MovementSystem will only process entities that have a
      * Position and Velocity component. AnotherSystem will receive all entities
      * registered to the world (since no supported components were declared).
+     *
+     * @note Systems are stored such that the order in which they are added
+     * to the system manager is the order in which they are initialised and
+     * processed. Their destructors are called in reverse order when destroying
+     * the world.
      *
      * @return Returns itself, allowing the programmer to chain.
      */
@@ -153,6 +165,9 @@ public:
 
     /*!
      * @brief Initialises all currently registered systems.
+     *
+     * @note The order in which the systems are added is the order in which
+     * they are initialised.
      */
     void initialise();
 
@@ -160,6 +175,8 @@ public:
      * @brief Updates all currently registered systems. Don't call this.
      *
      * @note Don't call this manually, use World::update() instead.
+     * The order in which the systems are added to the system manager is the
+     * order in which they are updated.
      */
     void update(const EntityManager&);
 
