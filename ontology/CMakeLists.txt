@@ -10,6 +10,7 @@ set (ontology_HEADERS
 	"include/ontology/SystemManager.hpp"
 	"include/ontology/TypeContainers.hpp"
 	"include/ontology/World.hpp"
+	"include/ontology/Ontology.hpp"
 )
 
 set (ontology_SOURCES

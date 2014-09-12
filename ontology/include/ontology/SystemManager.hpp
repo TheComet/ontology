@@ -146,9 +146,9 @@ public:
      * world.getSystemManager().getSystem<MovementSystem>().doThings();
      */
     template <class T>
-    System& getSystem()
+    T& getSystem()
     {
-        return *m_SystemList.find(&typeid(T))->second.get();
+        return *static_cast<T*>(m_SystemList.find(&typeid(T))->second.get());
     }
 
     /*!
