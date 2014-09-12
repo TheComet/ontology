@@ -32,7 +32,7 @@ Example
 Top Level View
 --------------
 Ontology tries to make it easy to tie different components and systems in a program together. The following demonstrates what a 2D game might look like:
-```
+``` cpp
 int main()
 {
 	// The world holds everything together
@@ -75,7 +75,7 @@ A unique feature of Ontology is the ability to filter which entities are process
 Components
 ----------
 Components hold data and can be added to entities. To create components one must inherit from Ontology::Component:
-```
+``` cpp
 struct Position : public Ontology::Component
 {
 	Position(float x, float y) : x(x), y(y) {}
@@ -87,7 +87,7 @@ struct Position : public Ontology::Component
 Systems
 -------
 Systems manipulate entities and their components. To create a system one must inherit from Ontology::System:
-```
+``` cpp
 class MovementSystem : public Ontology::System
 {
 public:
