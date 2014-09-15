@@ -11,7 +11,8 @@ namespace Ontology {
 
 // ----------------------------------------------------------------------------
 System::System() :
-    world(nullptr)
+    world(nullptr),
+    m_ThisType(nullptr)
 {
 }
 
@@ -30,6 +31,18 @@ void System::setSupportedComponents(const TypeSet& components)
 const TypeSet& System::getSupportedComponents() const
 {
     return m_SupportedComponents;
+}
+
+// ----------------------------------------------------------------------------
+void System::setDependingSystems(const TypeSet& systems)
+{
+    m_DependingSystems = systems;
+}
+
+// ----------------------------------------------------------------------------
+const TypeSet& System::getDependingSystems() const
+{
+    return m_DependingSystems;
 }
 
 // ----------------------------------------------------------------------------

@@ -5,13 +5,13 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/ListenerDispatcher.hxx>
 #include <ontology/System.hpp>
 #include <ontology/TypeContainers.hpp>
 
 #include <iostream>
 #include <set>
 #include <cassert>
-#include <initializer_list>
 
 // ----------------------------------------------------------------------------
 // forward declarations
@@ -23,10 +23,13 @@ namespace Ontology {
 namespace Ontology {
 
 template <class... T>
-inline TypeSet SupportsComponents()
+inline TypeSet TypeSetGenerator()
 {
     return TypeSet({&typeid(T)...});
-}
+};
+
+#define SupportsComponents     TypeSetGenerator
+#define ExecuteAfter           TypeSetGenerator
 
 /*!
  * @brief Used to declare that a system should not receive any entities.
@@ -99,6 +102,12 @@ public:
      * components a system requires to be passed to the system's process loop.
      * If you don't specify anything, the system will receive all entities
      * registered to the world.
+     * @param executesBeforeSystems Declare which systems are required to be
+     * executed before this one. This is especially critical when
+     * multithreading is enabled. If nothing is specified, the default setting
+     * is to execute after the last system that was added. This means that if
+     * no system declares execution dependencies, all systems will be executed
+     * linearly, one after another.
      *
      * Example:
      * @code
@@ -124,15 +133,23 @@ public:
      * @return Returns itself, allowing the programmer to chain.
      */
     template <class T>
-    SystemManager& addSystem(T* system, TypeSet&& supportedComponents = std::forward<TypeSet>(TypeSet()))
+    SystemManager& addSystem(T* system,
+                             TypeSet supportedComponents = TypeSetGenerator(),
+                             TypeSet executesBeforeSystems = TypeSetGenerator())
     {
+        // add to system list
         assert(m_SystemList.find(&typeid(T)) == m_SystemList.end());
         m_SystemList.push_back(std::pair<const std::type_info*, std::unique_ptr<System> >(
             &typeid(T),
             std::unique_ptr<System>(system))
         );
-        system->setSupportedComponents(supportedComponents);
         system->setWorld(m_World);
+        system->setSupportedComponents(supportedComponents);
+        // default behaviour is to depend on previously registered system
+        /*if(!executesBeforeSystems.size() && m_SystemList.size() > 1)
+            executesBeforeSystems = TypeSet({(m_SystemList.end()-2)->first});*/
+        system->setDependingSystems(executesBeforeSystems);
+        event.dispatch(&SystemManagerListener::newSystem, system);
         return *this;
     }
 
@@ -148,6 +165,7 @@ public:
     void removeSystem()
     {
         m_SystemList.erase(m_SystemList.find(&typeid(T)));
+        this->computeExecutionOrder();
     }
 
     /*!
@@ -180,11 +198,23 @@ public:
      */
     void update(const EntityManager&);
 
+    /*!
+     * @brief Register as a SystemManagerListener to listen to SystemManager events.
+     */
+    ListenerDispatcher<SystemManagerListener> event;
+
 private:
 
-    TypeVectorPairSmartPtr<System>  m_SystemList;
-    TypeSet                         m_supportedComponents;
-    World*                          m_World;
+    void computeExecutionOrder();
+    TypeSet::iterator resolveDependencies(const std::type_info* node,
+                             const TypeMap<const System*>& systemLookup,
+                             TypeSet& resolving,
+                             TypeSet& unresolved);
+    bool isInExecutionList(const System* const) const;
+
+    TypeVectorPairSmartPtr<System>              m_SystemList;
+    std::vector< std::vector<const System*> >   m_ExecutionList;
+    World*                                      m_World;
 };
 
 } // namespace Ontology

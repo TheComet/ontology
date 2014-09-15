@@ -1,13 +1,16 @@
 project (ontology)
 
 set (ontology_HEADERS
+	"include/ontology/Config.hpp"
 	"include/ontology/Component.hpp"
 	"include/ontology/Entity.hpp"
 	"include/ontology/EntityManager.hpp"
+	"include/ontology/Export.hpp"
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"
 	"include/ontology/SystemManager.hpp"
+	"include/ontology/SystemManagerListener.hpp"
 	"include/ontology/TypeContainers.hpp"
 	"include/ontology/World.hpp"
 	"include/ontology/Ontology.hpp"
@@ -20,6 +23,12 @@ set (ontology_SOURCES
 	"src/SystemManager.cpp"
 	"src/World.cpp"
 )
+
+if (BUILD_SHARED)
+        add_definitions (-DONTOLOGY_SHARED)
+else ()
+        add_definitions (-DONTOLOGY_STATIC)
+endif ()
 
 if (BUILD_STATIC)
 	add_library (ontology_static STATIC ${ontology_HEADERS} ${ontology_SOURCES})

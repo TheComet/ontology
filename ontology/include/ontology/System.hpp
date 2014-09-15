@@ -72,6 +72,16 @@ public:
     const TypeSet& getSupportedComponents() const;
 
     /*!
+     * @brief Informs the system about which systems need to execute before it.
+     */
+    void setDependingSystems(const TypeSet&);
+
+    /*!
+     * @brief Gets the typeset of depending systems.
+     */
+    const TypeSet& getDependingSystems() const;
+
+    /*!
      * @brief Informs the system of the world it is part of.
      */
     void setWorld(World*);
@@ -89,7 +99,9 @@ protected:
     World* world;
 
 private:
-    TypeSet m_SupportedComponents;
+    TypeSet                 m_SupportedComponents;
+    TypeSet                 m_DependingSystems;
+    const std::type_info*   m_ThisType;
 };
 
 } // namespace Ontology

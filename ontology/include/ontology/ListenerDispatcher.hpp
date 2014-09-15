@@ -58,7 +58,7 @@ namespace Ontology {
  * @endcode
  */
 template <class LISTENER_CLASS>
-class ontology_API ListenerDispatcher
+class ONTOLOGY_API ListenerDispatcher
 {
 public:
 

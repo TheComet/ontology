@@ -9,6 +9,7 @@
 // include files
 
 #include <ontology/Entity.hpp>
+#include <ontology/SystemManagerListener.hpp>
 
 #include <vector>
 #include <memory>
@@ -24,7 +25,8 @@ namespace Ontology {
  * @see Entity
  * @see World
  */
-class EntityManager
+class EntityManager :
+    public SystemManagerListener
 {
 public:
 

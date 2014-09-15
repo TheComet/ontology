@@ -23,6 +23,10 @@ option (BUILD_SHARED "Whether to build a shared version of this library" ON)
 # compiler flags and definitions
 ###############################################################################
 
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	add_definitions (-D_DEBUG -DDEBUG)
+endif ()
+
 if (UNIX)
 	add_definitions (-std=c++11)
 endif (UNIX)
