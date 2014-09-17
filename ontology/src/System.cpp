@@ -11,8 +11,7 @@ namespace Ontology {
 
 // ----------------------------------------------------------------------------
 System::System() :
-    world(nullptr),
-    m_ThisType(nullptr)
+    world(nullptr)
 {
 }
 
@@ -52,7 +51,26 @@ void System::setWorld(World* world)
 }
 
 // ----------------------------------------------------------------------------
-void System::update(const EntityManager::EntityList& entities)
+void System::informNewEntity(Entity* entity)
+{
+    for(const auto& it : m_EntityList)
+        if(it == entity)
+            return;
+
+    if(entity->supportsSystem(*this))
+        m_EntityList.push_back(entity);
+}
+
+// ----------------------------------------------------------------------------
+void System::informDeletedEntity(Entity* entity)
+{
+    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+        if(*it == entity)
+            m_EntityList.erase(it);
+}
+
+// ----------------------------------------------------------------------------
+void System::update(const EntityManager::EntityList& entities) const
 {
     for(const auto& it : entities)
         if(it->supportsSystem(*this))

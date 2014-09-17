@@ -54,7 +54,7 @@ public:
     /*!
      * @brief Called when an entity requires processing. Override this.
      */
-    virtual void processEntity(Entity&) = 0;
+    virtual void processEntity(Entity&) const = 0;
 
     /*!
      * @brief Called when systems should initialise. Override this.
@@ -82,6 +82,12 @@ public:
     const TypeSet& getDependingSystems() const;
 
     /*!
+     * @brief
+     */
+    void informNewEntity(Entity*);
+    void informDeletedEntity(Entity*);
+
+    /*!
      * @brief Informs the system of the world it is part of.
      */
     void setWorld(World*);
@@ -89,7 +95,7 @@ public:
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update(const EntityManager::EntityList& entityList);
+    void update(const EntityManager::EntityList& entityList) const;
 
 protected:
 
@@ -101,7 +107,7 @@ protected:
 private:
     TypeSet                 m_SupportedComponents;
     TypeSet                 m_DependingSystems;
-    const std::type_info*   m_ThisType;
+    std::vector<Entity*>    m_EntityList;
 };
 
 } // namespace Ontology

@@ -40,10 +40,11 @@ namespace Ontology{
  * creation of entities is through chaining. The following is an example
  * demonstrating this:
  * @code
- * world.getEntityManager().createEntity("My Entity")
- *     .addComponent(new Position(0, 0))
- *     .addComponent(new Velocity(1, 2))
- *     .addComponent(new Sprite("player.png"))
+ * world.getEntityManager()
+ *     .createEntity("My Entity"
+ *         Position(0, 0),
+ *         Velocity(1, 2),
+ *         Sprite("player.png"))
  *     ;
  * @endcode
  * @see Component

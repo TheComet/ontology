@@ -1,26 +1,26 @@
 // ----------------------------------------------------------------------------
-// SystemManagerListener.hpp
+// EntityManagerListener.hpp
 // ----------------------------------------------------------------------------
 
-#ifndef __ONTOLOGY_SYSTEM_MANAGER_LISTENER_HPP__
-#define __ONTOLOGY_SYSTEM_MANAGER_LISTENER_HPP__
+#ifndef __ONTOLOGY_ENTITY_MANAGER_LISTENER_HPP__
+#define __ONTOLOGY_ENTITY_MANAGER_LISTENER_HPP__
 
 // ----------------------------------------------------------------------------
 // forward declarations
 
 namespace Ontology {
-    class System;
+    class Entity;
 }
 
 namespace Ontology {
 
-class SystemManagerListener
+class EntityManagerListener
 {
 public:
-    virtual void newSystem(System* system)
+    virtual void newEntity(Entity*)
     {}
 };
 
 } // namespace Ontology
 
-#endif // __ONTOLOGY_SYSTEM_MANAGER_LISTENER_HPP__
+#endif // __ONTOLOGY_ENTITY_MANAGER_LISTENER_HPP__

@@ -17,7 +17,7 @@ World::World() :
     m_SystemManager(new SystemManager(this)),
     m_DeltaTime(0.0)
 {
-    m_SystemManager->event.addListener(m_EntityManager.get(), "EntityManager");
+    m_EntityManager->event.addListener(m_SystemManager.get(), "SystemManager");
 }
 
 // ----------------------------------------------------------------------------

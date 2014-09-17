@@ -9,10 +9,17 @@
 // include files
 
 #include <ontology/Entity.hpp>
-#include <ontology/SystemManagerListener.hpp>
+#include <ontology/ListenerDispatcher.hxx>
 
 #include <vector>
 #include <memory>
+
+// ----------------------------------------------------------------------------
+// forward declarations
+
+namespace Ontology {
+    class EntityManagerListener;
+}
 
 namespace Ontology {
 
@@ -25,8 +32,7 @@ namespace Ontology {
  * @see Entity
  * @see World
  */
-class EntityManager :
-    public SystemManagerListener
+class EntityManager
 {
 public:
 
@@ -60,6 +66,11 @@ public:
      * @brief Gets a list of entities of type EntityManager::EntityList.
      */
     const EntityList& getEntityList() const;
+
+    /*!
+     * @brief Register as an EntityManagerListener to listen to EntityManager events.
+     */
+    ListenerDispatcher<EntityManagerListener> event;
 
 private:
 

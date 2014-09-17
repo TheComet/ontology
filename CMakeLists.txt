@@ -29,6 +29,7 @@ endif ()
 
 if (UNIX)
 	add_definitions (-std=c++11)
+	add_definitions (-pthread)
 endif (UNIX)
 
 ###############################################################################
@@ -38,3 +39,4 @@ endif (UNIX)
 include_directories ("ontology/include")
 
 add_subdirectory ("ontology")
+add_subdirectory ("app")

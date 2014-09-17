@@ -6,6 +6,7 @@
 // include files
 
 #include <ontology/SystemManager.hpp>
+#include <ctpl/ctpl_stl.h>
 
 namespace Ontology {
 
@@ -30,11 +31,20 @@ void SystemManager::initialise()
         it.second->initialise();
 }
 
-// ----------------------------------------------------------------------------
-void SystemManager::update(const EntityManager& entityManager)
+void test(int id)
 {
-    for(const auto& it : m_SystemList)
-        it.second->update(entityManager.getEntityList());
+    std::cout << "hello from " << id << std::endl;
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::update(const EntityManager& entityManager) const
+{
+    for(const auto& parallelSystems : m_ExecutionList)
+    {
+        ctpl::thread_pool p(4);
+        for(const auto& system : parallelSystems)
+            p.push([&](int id) { system->update(entityManager.getEntityList()); } );
+    }
 }
 
 // ----------------------------------------------------------------------------

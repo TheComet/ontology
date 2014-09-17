@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/ListenerDispatcher.hxx>
+#include <ontology/EntityManagerListener.hpp>
 #include <ontology/System.hpp>
 #include <ontology/TypeContainers.hpp>
 
@@ -18,6 +18,10 @@
 
 namespace Ontology {
     class System;
+}
+
+namespace ctpl {
+    class thread_pool;
 }
 
 namespace Ontology {
@@ -75,7 +79,8 @@ struct None {};
  * Make sure to call SystemManager::initialise() after adding all of your
  * systems.
  */
-class SystemManager
+class SystemManager :
+    public EntityManagerListener
 {
 public:
 
@@ -149,7 +154,6 @@ public:
         /*if(!executesBeforeSystems.size() && m_SystemList.size() > 1)
             executesBeforeSystems = TypeSet({(m_SystemList.end()-2)->first});*/
         system->setDependingSystems(executesBeforeSystems);
-        event.dispatch(&SystemManagerListener::newSystem, system);
         return *this;
     }
 
@@ -196,12 +200,7 @@ public:
      * The order in which the systems are added to the system manager is the
      * order in which they are updated.
      */
-    void update(const EntityManager&);
-
-    /*!
-     * @brief Register as a SystemManagerListener to listen to SystemManager events.
-     */
-    ListenerDispatcher<SystemManagerListener> event;
+    void update(const EntityManager&) const;
 
 private:
 

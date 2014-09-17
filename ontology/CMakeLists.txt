@@ -5,12 +5,12 @@ set (ontology_HEADERS
 	"include/ontology/Component.hpp"
 	"include/ontology/Entity.hpp"
 	"include/ontology/EntityManager.hpp"
+	"include/ontology/EntityManagerListener.hpp"
 	"include/ontology/Export.hpp"
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"
 	"include/ontology/SystemManager.hpp"
-	"include/ontology/SystemManagerListener.hpp"
 	"include/ontology/TypeContainers.hpp"
 	"include/ontology/World.hpp"
 	"include/ontology/Ontology.hpp"
@@ -37,6 +37,7 @@ if (BUILD_STATIC)
 endif (BUILD_STATIC)
 if (BUILD_SHARED)
 	add_library (ontology_shared SHARED ${ontology_HEADERS} ${ontology_SOURCES})
+	target_link_libraries (ontology_shared pthread)
 	set_target_properties (ontology_shared PROPERTIES OUTPUT_NAME ontology)
 	install (TARGETS ontology_shared DESTINATION "lib")
 endif (BUILD_SHARED)
