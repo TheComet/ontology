@@ -88,10 +88,21 @@ public:
     const TypeSet& getDependingSystems() const;
 
     /*!
-     * @brief
+     * @brief Called by the SystemManager when it receives an update event from an entity.
+     *
+     * This causes the system to reconsider whether or not it can process the
+     * entity in question. If it can, it will add the entity to its internal
+     * list of supported entities.
      */
     void informEntityUpdate(const Entity*);
-    void informDeletedEntity(const Entity*);
+
+    /*!
+     * @brief Called by the SystemManager when it receives an entity destroyed event.
+     *
+     * This causes the system to remove the entity from its internal list of
+     * supported entities, if it exists.
+     */
+    void informDestroyedEntity(const Entity*);
 
     /*!
      * @brief Informs the system of the world it is part of.

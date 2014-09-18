@@ -46,35 +46,40 @@ struct None {};
  * @brief Manages the creation and deletion of systems.
  *
  * The system manager can be retrieved from an instantiated world with
- * World::getSystemManager(). The system is responsible for creating,
+ * World::getSystemManager(). The system manager is responsible for creating,
  * destroying and updating your systems.
  *
  * Systems can be configured to update only a selection of entities based on
- * the requirements of components. See SystemManager::addSystem for more
- * information.
+ * the requirements of components, and can also be configured to execute before
+ * other systems (execution dependencies). See SystemManager::addSystem for
+ * more information.
+ *
  * @note SystemManager supports chaining and the programmer is encouraged to
  * use this feature. The following demonstrates the syntax that should be used:
  * @code
  * world.getSystemManager()
  *     .addSystem(new MainLoop,
- *         Ontology::SupportedComponents<
- *             Ontology::None
- *             >())
+ *         Ontology::SupportsComponents<
+ *             Ontology::None>())
  *     .addSystem(new MovementSystem,
- *         Ontology::SupportedComponents<
+ *         Ontology::SupportsComponents<
  *             Position,
- *             Velocity
- *             >())
+ *             Velocity>(),
+ *         Ontology::ExecuteAfter<
+ *             CollisionSystem>())
  *     .addSystem(new CollisionSystem
- *         Ontology::SupportedComponents<
- *             Position
- *             >())
+ *         Ontology::SupportsComponents<
+ *             Position>())
  *     .initialise()
  *     ;
  * @endcode
- * Here, MainLoop will not receive any entities at all because Ontology::None
- * was declared. MovementSystem will receive entities that have a Position and
- * Velocity. **CollisionSystem* will receive entities that have a Position.
+ * Here, **MainLoop** will not receive any entities at all because
+ * Ontology::None was declared. **MovementSystem** will receive entities that
+ * have a Position and Velocity. **CollisionSystem* will receive entities that
+ * have a Position.
+ *
+ * Also note the use of **Ontology::ExecutesAfter**, which guarantees
+ * CollisionSystem to be executed **before** MovementSystem.
  *
  * Make sure to call SystemManager::initialise() after adding all of your
  * systems.
@@ -187,13 +192,26 @@ private:
     void onAddComponent(const Entity*, const Component*);
     void onRemoveComponent(const Entity*, const Component*);
 
+    /*!
+     * @brief Triggers dependency resolution of the system execution order.
+     *
+     * Systems are able to define which other systems should be executed before
+     * them. This method resolves these dependencies so the execution order
+     * becomes known.
+     */
     void computeExecutionOrder();
 
+    /*!
+     * @brief Resolves system dependencies.
+     */
     TypeSet::iterator resolveDependencies(const std::type_info* node,
                              const TypeMap<const System*>& systemLookup,
                              TypeSet& resolving,
                              TypeSet& unresolved);
 
+    /*!
+     * @brief Returns true if the specified system is part of the execution list.
+     */
     bool isInExecutionList(const System* const) const;
 
     TypeVectorPairSmartPtr<System>  m_SystemList;

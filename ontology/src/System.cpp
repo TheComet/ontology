@@ -67,7 +67,7 @@ void System::informEntityUpdate(const Entity* entity)
 }
 
 // ----------------------------------------------------------------------------
-void System::informDeletedEntity(const Entity* entity)
+void System::informDestroyedEntity(const Entity* entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
         if(*it == entity)

@@ -199,7 +199,7 @@ void SystemManager::onRemoveComponent(const Entity* entity, const Component* com
 void SystemManager::onDestroyEntity(const Entity* entity)
 {
     for(const auto& it : m_SystemList)
-        it.second->informDeletedEntity(entity);
+        it.second->informDestroyedEntity(entity);
 }
 
 } // namespace Ontology
