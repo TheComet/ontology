@@ -196,10 +196,10 @@ private:
 
     bool isInExecutionList(const System* const) const;
 
-    TypeVectorPairSmartPtr<System>              m_SystemList;
-    std::vector< std::vector<const System*> >   m_ExecutionList;
-    World*                                      m_World;
-    int                                         m_CoreCount;
+    TypeVectorPairSmartPtr<System>  m_SystemList;
+    std::vector<const System*>      m_ExecutionList;
+    World*                          m_World;
+    int                             m_CoreCount;
 };
 
 } // namespace Ontology

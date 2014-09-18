@@ -7,6 +7,7 @@
 
 #include <ontology/Config.hpp>
 #include <ontology/SystemManager.hpp>
+#include <stdexcept>
 
 namespace Ontology {
 
@@ -81,11 +82,8 @@ void SystemManager::initialise()
 // ----------------------------------------------------------------------------
 void SystemManager::update() const
 {
-    for(const auto& parallelSystems : m_ExecutionList)
-    {
-        for(const auto& system : parallelSystems)
-            system->update(m_CoreCount);
-    }
+    for(const auto& system : m_ExecutionList)
+        system->update(m_CoreCount);
 }
 
 // ----------------------------------------------------------------------------
@@ -118,13 +116,12 @@ void SystemManager::computeExecutionOrder()
 #ifdef _DEBUG
     std::cout << "final execution order (" << m_ExecutionList.size() << " systems):" << std::endl;
     for(auto it : m_ExecutionList)
-        for(auto ot : it)
-            for(auto m : systemLookup)
-                if(ot == m.second)
-                {
-                    std::cout << "  " << m.first->name() << std::endl;
-                    break;
-                }
+        for(auto m : systemLookup)
+            if(it == m.second)
+            {
+                std::cout << "  " << m.first->name() << std::endl;
+                break;
+            }
 #endif
 }
 
@@ -171,9 +168,7 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
     }
     resolving.erase(resolving.find(node));
 
-    std::vector<const System*> canBeExecutedInParallel;
-    canBeExecutedInParallel.push_back(system);
-    m_ExecutionList.push_back(std::move(canBeExecutedInParallel));
+    m_ExecutionList.push_back(system);
     return unresolved.erase(unresolved.find(node));
 }
 
@@ -181,9 +176,8 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
 bool SystemManager::isInExecutionList(const System* const system) const
 {
     for(const auto& it : m_ExecutionList)
-        for(const auto& ot : it)
-            if(ot == system)
-                return true;
+        if(it == system)
+            return true;
     return false;
 }
 
