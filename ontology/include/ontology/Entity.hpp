@@ -28,7 +28,7 @@ Entity& Entity::addComponent(T* component)
 template<class T>
 void Entity::removeComponent()
 {
-    auto& it = m_ComponentMap.find(&typeid(T));
+    const auto& it = m_ComponentMap.find(&typeid(T));
     m_Creator->informRemoveComponent(this, it->second.get());
     m_ComponentMap.erase(it);
 }
@@ -37,7 +37,7 @@ void Entity::removeComponent()
 template<class T>
 T& Entity::getComponent()
 {
-    auto it = m_ComponentMap.find(&typeid(T));
+    const auto& it = m_ComponentMap.find(&typeid(T));
     assert(it != m_ComponentMap.end());
     return *static_cast<T*>(it->second.get());
 }

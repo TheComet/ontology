@@ -30,7 +30,7 @@ template <class... T>
 inline TypeSet TypeSetGenerator()
 {
     return TypeSet({&typeid(T)...});
-};
+}
 
 #define SupportsComponents     TypeSetGenerator
 #define ExecuteAfter           TypeSetGenerator

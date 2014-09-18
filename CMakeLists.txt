@@ -29,7 +29,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif ()
 
 if (UNIX)
-	add_definitions (-std=c++11)
+	add_definitions (-std=c++11 -pedantic)
 	if (WITH_MULTITHREADING)
 		add_definitions (-pthread)
 	endif (WITH_MULTITHREADING)

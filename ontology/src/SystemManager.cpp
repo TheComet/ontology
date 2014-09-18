@@ -17,9 +17,9 @@ namespace Ontology {
  * @note see http://www.cprogramming.com/snippets/source-code/find-the-number-of-cpu-cores-for-windows-mac-or-linux
  */
 #ifdef ONTOLOGY_MULTITHREADING
-#   ifdef ONTOLOGY_PLATFORM_WINDOWS
+#   if defined(ONTOLOGY_PLATFORM_WINDOWS)
 #       include <windows.h>
-#   elif ONTOLOGY_PLATFORM_MAC
+#   elif defined(ONTOLOGY_PLATFORM_MAC)
 #       include <sys/param.h>
 #       include <sys/sysctl.h>
 #   else
