@@ -19,6 +19,19 @@ endif()
 option (BUILD_STATIC "Whether to build a static version of this library" OFF)
 option (BUILD_SHARED "Whether to build a shared version of this library" ON)
 option (WITH_MULTITHREADING "Enables entities to be processed by systems in parallel" ON)
+option (BUILD_TESTS "Whether or not to build ontology's tests" OFF)
+
+###############################################################################
+# output directories
+###############################################################################
+
+if (MSVC)
+	set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+else (MSVC)
+	set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+endif (MSVC)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_BINARY_DIR}/lib")
 
 ###############################################################################
 # compiler flags and definitions
@@ -42,3 +55,7 @@ endif (UNIX)
 include_directories ("ontology/include")
 
 add_subdirectory ("ontology")
+
+if (BUILD_TESTS)
+	add_subdirectory ("test")
+endif (BUILD_TESTS)
