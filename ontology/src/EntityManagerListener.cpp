@@ -1,40 +1,32 @@
 // ----------------------------------------------------------------------------
-// Entity.cpp
+// EntityManagerListener.cpp
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Entity.hpp>
-#include <ontology/System.hpp>
+#include <ontology/EntityManagerListener.hpp>
 
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-Entity::Entity(const char* name, const EntityManager* creator) :
-    m_Name(name),
-    m_Creator(creator)
+void EntityManagerListener::onCreateEntity(const Entity*)
 {
 }
 
 // ----------------------------------------------------------------------------
-Entity::~Entity()
+void EntityManagerListener::onDestroyEntity(const Entity*)
 {
 }
 
 // ----------------------------------------------------------------------------
-bool Entity::supportsSystem(const System& system) const
+void EntityManagerListener::onAddComponent(const Entity*, const Component*)
 {
-    for(const auto& it : system.getSupportedComponents())
-        if(m_ComponentMap.find(it) == m_ComponentMap.end())
-            return false;
-    return true;
 }
 
 // ----------------------------------------------------------------------------
-const char* Entity::getName() const
+void EntityManagerListener::onRemoveComponent(const Entity*, const Component*)
 {
-    return m_Name;
 }
 
 } // namespace Ontology

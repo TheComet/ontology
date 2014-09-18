@@ -8,11 +8,17 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/Export.hpp>
 #include <ontology/TypeContainers.hpp>
-#include <ontology/EntityManager.hpp>
 
 // ----------------------------------------------------------------------------
 // forward declarations
+
+#ifdef ONTOLOGY_MULTITHREADING
+namespace ctpl {
+	class thread_pool;
+}
+#endif
 
 namespace Ontology {
     class Entity;
@@ -37,7 +43,7 @@ namespace Ontology {
  * @see World
  * @see SystemManager
  */
-class System
+class ONTOLOGY_API System
 {
 public:
 
@@ -54,7 +60,7 @@ public:
     /*!
      * @brief Called when an entity requires processing. Override this.
      */
-    virtual void processEntity(Entity&) const = 0;
+    virtual void processEntity(const Entity&) const = 0;
 
     /*!
      * @brief Called when systems should initialise. Override this.
@@ -84,8 +90,8 @@ public:
     /*!
      * @brief
      */
-    void informNewEntity(Entity*);
-    void informDeletedEntity(Entity*);
+    void informEntityUpdate(const Entity*);
+    void informDeletedEntity(const Entity*);
 
     /*!
      * @brief Informs the system of the world it is part of.
@@ -95,7 +101,7 @@ public:
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update(const EntityManager::EntityList& entityList) const;
+    void update(int coreCount) const;
 
 protected:
 
@@ -105,9 +111,9 @@ protected:
     World* world;
 
 private:
-    TypeSet                 m_SupportedComponents;
-    TypeSet                 m_DependingSystems;
-    std::vector<Entity*>    m_EntityList;
+    TypeSet                     m_SupportedComponents;
+    TypeSet                     m_DependingSystems;
+    std::vector<const Entity*>  m_EntityList;
 };
 
 } // namespace Ontology

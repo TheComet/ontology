@@ -8,8 +8,9 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Entity.hpp>
-#include <ontology/ListenerDispatcher.hxx>
+#include <ontology/Export.hpp>
+#include <ontology/Entity.hxx>
+#include <ontology/ListenerDispatcher.hpp>
 
 #include <vector>
 #include <memory>
@@ -18,6 +19,7 @@
 // forward declarations
 
 namespace Ontology {
+    class Component;
     class EntityManagerListener;
 }
 
@@ -32,15 +34,10 @@ namespace Ontology {
  * @see Entity
  * @see World
  */
-class EntityManager
+class ONTOLOGY_API EntityManager
 {
 public:
 
-    /*!
-     * @brief The type of the list containing all of the entities.
-     *
-     * See EntityManager::getEntityList()
-     */
     typedef std::vector< std::unique_ptr<Entity> > EntityList;
 
     /*!
@@ -66,6 +63,16 @@ public:
      * @brief Gets a list of entities of type EntityManager::EntityList.
      */
     const EntityList& getEntityList() const;
+
+    /*!
+     * @brief Called by entities when they add a new component.
+     */
+    void informAddComponent(const Entity*, const Component*) const;
+
+    /*!
+     * @brief Called by entities when they remove a component.
+     */
+    void informRemoveComponent(const Entity*, const Component*) const;
 
     /*!
      * @brief Register as an EntityManagerListener to listen to EntityManager events.

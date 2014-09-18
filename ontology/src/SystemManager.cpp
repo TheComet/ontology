@@ -5,15 +5,62 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/Config.hpp>
 #include <ontology/SystemManager.hpp>
-#include <ctpl/ctpl_stl.h>
 
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
+/*!
+ * @brief Gets the number of cores on this machine.
+ * @note see http://www.cprogramming.com/snippets/source-code/find-the-number-of-cpu-cores-for-windows-mac-or-linux
+ */
+#ifdef ONTOLOGY_MULTITHREADING
+#   ifdef ONTOLOGY_PLATFORM_WINDOWS
+#       include <windows.h>
+#   elif ONTOLOGY_PLATFORM_MAC
+#       include <sys/param.h>
+#       include <sys/sysctl.h>
+#   else
+#       include <unistd.h>
+#   endif
+
+int getNumberOfCores() {
+#   ifdef ONTOLOGY_PLATFORM_WINDOWS
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    return sysinfo.dwNumberOfProcessors;
+#   elif ONTOLOGY_PLATFORM_MAC
+    int nm[2];
+    size_t len = 4;
+    uint32_t count;
+
+    nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
+    sysctl(nm, 2, &count, &len, NULL, 0);
+
+    if(count < 1) {
+    nm[1] = HW_NCPU;
+    sysctl(nm, 2, &count, &len, NULL, 0);
+    if(count < 1) { count = 1; }
+    }
+    return count;
+#   else
+    return sysconf(_SC_NPROCESSORS_ONLN);
+#   endif
+}
+#endif
+
+// ----------------------------------------------------------------------------
 SystemManager::SystemManager(World* world) :
-    m_World(world)
+    m_World(world),
+    m_CoreCount(1)
 {
+#ifdef ONTOLOGY_MULTITHREADING
+    m_CoreCount = getNumberOfCores();
+#   ifdef _DEBUG
+    std::cout << "Number of cores: " << m_CoreCount << std::endl;
+#   endif
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -31,19 +78,13 @@ void SystemManager::initialise()
         it.second->initialise();
 }
 
-void test(int id)
-{
-    std::cout << "hello from " << id << std::endl;
-}
-
 // ----------------------------------------------------------------------------
-void SystemManager::update(const EntityManager& entityManager) const
+void SystemManager::update() const
 {
     for(const auto& parallelSystems : m_ExecutionList)
     {
-        ctpl::thread_pool p(4);
         for(const auto& system : parallelSystems)
-            p.push([&](int id) { system->update(entityManager.getEntityList()); } );
+            system->update(m_CoreCount);
     }
 }
 
@@ -144,6 +185,27 @@ bool SystemManager::isInExecutionList(const System* const system) const
             if(ot == system)
                 return true;
     return false;
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::onAddComponent(const Entity* entity, const Component* component)
+{
+    for(const auto& it : m_SystemList)
+        it.second->informEntityUpdate(entity);
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::onRemoveComponent(const Entity* entity, const Component* component)
+{
+    for(const auto& it : m_SystemList)
+        it.second->informEntityUpdate(entity);
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::onDestroyEntity(const Entity* entity)
+{
+    for(const auto& it : m_SystemList)
+        it.second->informDeletedEntity(entity);
 }
 
 } // namespace Ontology

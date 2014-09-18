@@ -5,7 +5,12 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/Entity.hpp>
 #include <ontology/System.hpp>
+
+#ifdef ONTOLOGY_MULTITHREADING
+#include <ctpl/ctpl_stl.h>
+#endif
 
 namespace Ontology {
 
@@ -51,7 +56,7 @@ void System::setWorld(World* world)
 }
 
 // ----------------------------------------------------------------------------
-void System::informNewEntity(Entity* entity)
+void System::informEntityUpdate(const Entity* entity)
 {
     for(const auto& it : m_EntityList)
         if(it == entity)
@@ -62,7 +67,7 @@ void System::informNewEntity(Entity* entity)
 }
 
 // ----------------------------------------------------------------------------
-void System::informDeletedEntity(Entity* entity)
+void System::informDeletedEntity(const Entity* entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
         if(*it == entity)
@@ -70,11 +75,16 @@ void System::informDeletedEntity(Entity* entity)
 }
 
 // ----------------------------------------------------------------------------
-void System::update(const EntityManager::EntityList& entities) const
+void System::update(int coreCount) const
 {
-    for(const auto& it : entities)
-        if(it->supportsSystem(*this))
-            this->processEntity(*it.get());
+#ifdef ONTOLOGY_MULTITHREADING
+    ctpl::thread_pool p(coreCount);
+    for(const auto& it : m_EntityList)
+        p.push([&](int id) { this->processEntity(*it); });
+#else
+    for(const auto& it : m_EntityList)
+        this->processEntity(*it);
+#endif
 }
 
 } // namespace Ontology

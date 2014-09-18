@@ -18,6 +18,7 @@ endif()
 
 option (BUILD_STATIC "Whether to build a static version of this library" OFF)
 option (BUILD_SHARED "Whether to build a shared version of this library" ON)
+option (WITH_MULTITHREADING "Enables entities to be processed by systems in parallel" ON)
 
 ###############################################################################
 # compiler flags and definitions
@@ -29,7 +30,9 @@ endif ()
 
 if (UNIX)
 	add_definitions (-std=c++11)
-	add_definitions (-pthread)
+	if (WITH_MULTITHREADING)
+		add_definitions (-pthread)
+	endif (WITH_MULTITHREADING)
 endif (UNIX)
 
 ###############################################################################
@@ -39,4 +42,3 @@ endif (UNIX)
 include_directories ("ontology/include")
 
 add_subdirectory ("ontology")
-add_subdirectory ("app")

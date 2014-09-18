@@ -1,140 +1,140 @@
 // ----------------------------------------------------------------------------
-// ListenerDispatcher.hpp
+// ListenerDispatcher.hxx
 // ----------------------------------------------------------------------------
+
+#ifndef __ONTOLOGY_LISTENER_DISPATCHER__
+#define __ONTOLOGY_LISTENER_DISPATCHER__
 
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/ListenerDispatcher.hxx>
 
-#include <map>
-#include <string>
+#ifdef _DEBUG
+#   include <iostream>
+#   include <typeinfo>
+#endif // _DEBUG
 
 namespace Ontology {
 
-/*!
- * @brief Generic class for handling dispatching messages to listeners.
- * A listener (or better known as an **observer**) is an object which can
- * register itself to a dispatcher in order to receive notifications of
- * specific events by using callback functions.
- *
- * For this to work, three classes need to exist. The **Listener Interface**,
- * the **Listener** - which must inherit the listener interface and implement
- * its abstract methods - and a **dispatcher**.
- *
- * The dispatcher holds a list of objects inheriting the listener interface,
- * and provides functions through which the programmer can dispatch an event
- * to all registered objects.
- *
- * The following code example demonstrates this behaviour.
- * @code
- * struct ListenerInterface {
- *     virtual void printMessage(std::string message) = 0;
- * }
- *
- * struct Listener : public ListenerInterface {
- *     virtual void printMessage(std::string message) { std::cout << "received: " << message << std::endl; }
- * }
- *
- * int main() {
- *
- *     // instantiate the dispatcher object. The template argument specifies
- *     // the type of listener objects it should manage.
- *     ListenerDispatcher<ListenerInterface> dispatcher;
- *
- *     // instantiate some objects derived from the "ListenerInterface" class
- *     // and register them to the dispatcher object so they can receive
- *     // notifications
- *     Listener a, b;
- *     dispatcher.addListener(&a, "listener 1");
- *     dispatcher.addListener(&b, "listener 2");
- *
- *     // dispatch a message using the dispatcher. All registered objects
- *     // will receive this message
- *     dispatcher.dispatch(&ListenerInterface::printMessage, "hello world!");
- *
- *     return 0;
- * }
- * @endcode
- */
+// ----------------------------------------------------------------------------
 template <class LISTENER_CLASS>
-class ONTOLOGY_API ListenerDispatcher
+ListenerDispatcher<LISTENER_CLASS>::ListenerDispatcher()
 {
-public:
+}
 
-    /*!
-     * @brief Default constructor
-     */
-    ListenerDispatcher();
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+ListenerDispatcher<LISTENER_CLASS>::~ListenerDispatcher()
+{
+#ifdef _DEBUG
+    for(auto it : m_Listeners)
+        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+                << ">::~ListenerDispatcher] Warning: Listener \"" << it.first
+                << "\" still registered, yet dispatcher is being destroyed!"
+                << std::endl;
+#endif // _DEBUG
+}
 
-    /*!
-     * @brief Default destructor
-     */
-    ~ListenerDispatcher();
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+void ListenerDispatcher<LISTENER_CLASS>::addListener(LISTENER_CLASS* listener, std::string listenerName)
+{
+#ifdef _DEBUG
+    if(m_Listeners.find(listenerName) != m_Listeners.end())
+    {
+        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+                  << ">::::addListener] Warning: listenerName \""
+                  << listenerName << "\" already registered" << std::endl;
+        return;
+    }
+    for(auto it : m_Listeners)
+    {
+        if(it.second == listener)
+        {
+            std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+                      << ">::addListener] Warning: listener pointer already registered"
+                      << std::endl;
+            return;
+        }
+    }
+#endif // _DEBUG
 
-    /*!
-     * @brief Registers a listener to be notified on events.
-     * The listener object must derive from the listener interface.
-     * @note If the listener is already registered, this method will silently
-     * fail.
-     * @param listener A pointer to the listener object to register.
-     * @param listenerName A globally unique identifier string for this
-     * listener.
-     */
-    void addListener(LISTENER_CLASS* listener, std::string listenerName);
+    m_Listeners[listenerName] = listener;
+}
 
-    /*!
-     * @brief Unregisters a listener by pointer
-     * @note If the listener is not registered to begin with, this method will
-     * silently fail.
-     * @param listener A pointer to a listener to unregister
-     */
-    void removeListener(LISTENER_CLASS* listener);
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+void ListenerDispatcher<LISTENER_CLASS>::removeListener(LISTENER_CLASS* listener)
+{
+    for(auto it = std::begin(m_Listeners); it != std::end(m_Listeners); ++it)
+    {
+        if(it->second == listener)
+        {
+            m_Listeners.erase(it);
+            return;
+        }
+    }
+#ifdef _DEBUG
+    std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+              << ">::removeListener] Warning: listener pointer not registered"
+              << std::endl;
+#endif // _DEBUG
+}
 
-    /*!
-     * @brief Unregisters a listener by name
-     * @note If the listener is not registered to begin with, this method will
-     * silently fail.
-     * @param listenerName A unique string identifying the listener.
-     */
-    void removeListener(std::string listenerName);
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+void ListenerDispatcher<LISTENER_CLASS>::removeListener(std::string listenerName)
+{
+    auto it = m_Listeners.find(listenerName);
+    if(it == m_Listeners.end())
+    {
+#ifdef _DEBUG
+        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+                  << ">::removeListener] Warning: listener \"" << listenerName
+                  << "\" not registered" << std::endl;
+#endif // _DEBUG
+        return;
+    }
+    m_Listeners.erase(it);
+}
 
-    /*!
-     * @brief Removes all listeners
-     */
-    void removeAllListeners();
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+void ListenerDispatcher<LISTENER_CLASS>::removeAllListeners()
+{
+#ifdef _DEBUG
+    for(auto it : m_Listeners)
+        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+                << ">::removeAllListeners] Warning: Listener \"" << it.first
+                << "\" still registered" << std::endl;
+#endif // _DEBUG
 
-    /*!
-     * @brief Dispatches a message to all listeners
-     * @param func A pointer to a member function of the listener interface class.
-     * For example:
-     * @code &ListenerInterface::doThing @endcode
-     * @param params Parameter list of values to be dispatched to the
-     * listeners. These must map the function signature of the function declared
-     * in the listener interface.
-     */
-    template <class RET_TYPE, class... ARGS, class... PARAMS>
-    void dispatch(RET_TYPE (LISTENER_CLASS::*func)(ARGS...), PARAMS&&... params) const;
+    m_Listeners.clear();
+}
 
-    /*!
-     * @brief Dispatches a message to all listeners
-     * If any of the listeners return false, then this method will return false.
-     * If all listeners return true, then this method will return true.
-     * @note As soon as a listener returns false, this method will return. All
-     * listeners that would have been notified afterwards are skipped.
-     * @param func A pointer to a member function of the listener class.
-     * For example:
-     * @code &ListenerInterface::doThing @endcode
-     * @param params Parameter list of values to be dispatched to the
-     * listeners. These must map the function signature of the function declared
-     * in the listener interface.
-     */
-    template <class... ARGS, class... PARAMS>
-    bool dispatchAndFindFalse(bool (LISTENER_CLASS::*func)(ARGS...), PARAMS&&... params) const;
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+template <class RET_TYPE, class... ARGS, class... PARAMS>
+void ListenerDispatcher<LISTENER_CLASS>::
+    dispatch(RET_TYPE (LISTENER_CLASS::*func)(ARGS...), PARAMS&&... params) const
+{
+    for(auto it : m_Listeners)
+        (it.second->*func)(params...);
+}
 
-private:
-
-    std::map<std::string, LISTENER_CLASS*> m_Listeners;
-};
+// ----------------------------------------------------------------------------
+template <class LISTENER_CLASS>
+template <class... ARGS, class... PARAMS>
+bool ListenerDispatcher<LISTENER_CLASS>::
+    dispatchAndFindFalse(bool (LISTENER_CLASS::*func)(ARGS...), PARAMS&&... params) const
+{
+    for(auto it : m_Listeners)
+        if(!(it.second->*func)(params...))
+            return false;
+    return true;
+}
 
 } // namespace Ontology
+
+#endif // __ONTOLOGY_LISTENER_DISPATCHER__

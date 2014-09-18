@@ -5,6 +5,11 @@
 #ifndef __ONTOLOGY_COMPONENT_HPP__
 #define __ONTOLOGY_COMPONENT_HPP__
 
+// ----------------------------------------------------------------------------
+// include files
+
+#include <ontology/Export.hpp>
+
 namespace Ontology {
 
 /*!
@@ -25,23 +30,21 @@ namespace Ontology {
  * @endcode
  */
 
-class Component
+class ONTOLOGY_API Component
 {
 public:
 
     /*!
      * @brief Allow destruction through base class pointer.
      */
-    virtual ~Component()
-    {}
+    virtual ~Component();
 
 protected:
 
     /*!
      * @brief Disallow construction without inheritance.
      */
-    Component()
-    {}
+    Component();
 };
 
 } // namespace Ontology

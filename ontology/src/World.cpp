@@ -52,7 +52,7 @@ float World::getDeltaTime() const
 // ----------------------------------------------------------------------------
 void World::update()
 {
-    m_SystemManager->update(this->getEntityManager());
+    m_SystemManager->update();
 }
 
 } // namespace Ontology
