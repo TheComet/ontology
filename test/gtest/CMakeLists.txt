@@ -1,0 +1,5 @@
+if (UNIX)
+	add_definitions (-pthread)
+endif (UNIX)
+include_directories ("include" ".")
+add_library (gtest STATIC "src/gtest-all.cc")
