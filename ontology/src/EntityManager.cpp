@@ -22,7 +22,7 @@ Entity& EntityManager::createEntity(const char* name)
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyEntity(const Entity* entity)
+void EntityManager::destroyEntity(Entity* entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
         if(it->get() == entity)
@@ -53,13 +53,13 @@ const EntityManager::EntityList& EntityManager::getEntityList() const
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informAddComponent(const Entity* entity, const Component* component) const
+void EntityManager::informAddComponent(Entity* entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onAddComponent, entity, component);
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informRemoveComponent(const Entity* entity, const Component* component) const
+void EntityManager::informRemoveComponent(Entity* entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onRemoveComponent, entity, component);
 }

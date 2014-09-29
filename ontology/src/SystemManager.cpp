@@ -196,7 +196,7 @@ void SystemManager::onRemoveComponent(Entity* entity, const Component* component
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onDestroyEntity(const Entity* entity)
+void SystemManager::onDestroyEntity(Entity* entity)
 {
     for(const auto& it : m_SystemList)
         it.second->informDestroyedEntity(entity);

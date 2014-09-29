@@ -188,9 +188,9 @@ public:
 private:
 
     // EntityManagerListener methods
-    void onDestroyEntity(const Entity*);
-    void onAddComponent(Entity*, const Component*);
-    void onRemoveComponent(Entity*, const Component*);
+    void onDestroyEntity(Entity*) override;
+    void onAddComponent(Entity*, const Component*) override;
+    void onRemoveComponent(Entity*, const Component*) override;
 
     /*!
      * @brief Triggers dependency resolution of the system execution order.

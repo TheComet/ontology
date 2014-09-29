@@ -53,7 +53,7 @@ public:
      * @brief Destroys an entity by pointer.
      * @param entity The entity to destroy.
      */
-    void destroyEntity(const Entity* entity);
+    void destroyEntity(Entity* entity);
 
     /*!
      * @brief Destroys all entities sharing the specified name.
@@ -71,14 +71,14 @@ public:
      * @param entity The entity adding a new component.
      * @param component The component being added.
      */
-    void informAddComponent(const Entity* entity, const Component* component) const;
+    void informAddComponent(Entity* entity, const Component* component) const;
 
     /*!
      * @brief Called by entities when they remove a component.
      * @param entity The entity removing a component.
      * @param component The component being removed.
      */
-    void informRemoveComponent(const Entity* entity, const Component* component) const;
+    void informRemoveComponent(Entity* entity, const Component* component) const;
 
     /*!
      * @brief Register as an EntityManagerListener to listen to EntityManager events.

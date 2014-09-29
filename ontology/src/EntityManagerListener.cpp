@@ -10,22 +10,22 @@
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-void EntityManagerListener::onCreateEntity(const Entity*)
+void EntityManagerListener::onCreateEntity(Entity*)
 {
 }
 
 // ----------------------------------------------------------------------------
-void EntityManagerListener::onDestroyEntity(const Entity*)
+void EntityManagerListener::onDestroyEntity(Entity*)
 {
 }
 
 // ----------------------------------------------------------------------------
-void EntityManagerListener::onAddComponent(const Entity*, const Component*)
+void EntityManagerListener::onAddComponent(Entity*, const Component*)
 {
 }
 
 // ----------------------------------------------------------------------------
-void EntityManagerListener::onRemoveComponent(const Entity*, const Component*)
+void EntityManagerListener::onRemoveComponent(Entity*, const Component*)
 {
 }
 
