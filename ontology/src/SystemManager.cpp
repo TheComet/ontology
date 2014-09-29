@@ -80,7 +80,7 @@ void SystemManager::initialise()
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::update() const
+void SystemManager::update()
 {
     for(const auto& system : m_ExecutionList)
         system->update(m_CoreCount);
@@ -95,7 +95,7 @@ void SystemManager::computeExecutionOrder()
 
     // create temporary lists holding pointers to all systems so lookup time
     // is faster
-    TypeMap<const System*> systemLookup;
+    TypeMap<System*> systemLookup;
     TypeSet unresolved;
     for(const auto& it : m_SystemList)
     {
@@ -107,7 +107,7 @@ void SystemManager::computeExecutionOrder()
     // see http://www.electricmonk.nl/log/2008/08/07/dependency-resolving-algorithm/
     // make sure starting point has dependencies
     TypeSet resolving;
-    TypeSet::iterator systemIt = unresolved.begin();
+    TypeSet::const_iterator systemIt = unresolved.begin();
     while(systemIt != unresolved.end())
     {
         systemIt = this->resolveDependencies(*systemIt, systemLookup, resolving, unresolved);
@@ -127,12 +127,12 @@ void SystemManager::computeExecutionOrder()
 
 // ----------------------------------------------------------------------------
 TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
-                                        const TypeMap<const System*>& systemLookup,
+                                        const TypeMap<System*>& systemLookup,
                                         TypeSet& resolving,
                                         TypeSet& unresolved)
 {
     // lookup system referred to by node
-    const System* system = systemLookup.find(node)->second;
+    System* system = systemLookup.find(node)->second;
 #ifdef _DEBUG
     std::cout << "Processing dependencies of system " << node->name() << std::endl;
 #endif
@@ -182,14 +182,14 @@ bool SystemManager::isInExecutionList(const System* const system) const
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onAddComponent(const Entity* entity, const Component* component)
+void SystemManager::onAddComponent(Entity* entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onRemoveComponent(const Entity* entity, const Component* component)
+void SystemManager::onRemoveComponent(Entity* entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);

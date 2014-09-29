@@ -56,7 +56,7 @@ void System::setWorld(World* world)
 }
 
 // ----------------------------------------------------------------------------
-void System::informEntityUpdate(const Entity* entity)
+void System::informEntityUpdate(Entity* entity)
 {
     for(const auto& it : m_EntityList)
         if(it == entity)
@@ -75,14 +75,14 @@ void System::informDestroyedEntity(const Entity* entity)
 }
 
 // ----------------------------------------------------------------------------
-void System::update(int coreCount) const
+void System::update(int coreCount)
 {
 #ifdef ONTOLOGY_MULTITHREADING
     ctpl::thread_pool p(coreCount);
-    for(const auto& it : m_EntityList)
+    for(auto& it : m_EntityList)
         p.push([&](int id) { this->processEntity(*it); });
 #else
-    for(const auto& it : m_EntityList)
+    for(auto& it : m_EntityList)
         this->processEntity(*it);
 #endif
 }

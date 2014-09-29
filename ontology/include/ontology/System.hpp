@@ -60,7 +60,7 @@ public:
     /*!
      * @brief Called when an entity requires processing. Override this.
      */
-    virtual void processEntity(const Entity&) const = 0;
+    virtual void processEntity(Entity&) = 0;
 
     /*!
      * @brief Called when systems should initialise. Override this.
@@ -94,7 +94,7 @@ public:
      * entity in question. If it can, it will add the entity to its internal
      * list of supported entities.
      */
-    void informEntityUpdate(const Entity*);
+    void informEntityUpdate(Entity*);
 
     /*!
      * @brief Called by the SystemManager when it receives an entity destroyed event.
@@ -112,7 +112,7 @@ public:
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update(int coreCount) const;
+    void update(int coreCount);
 
 protected:
 
@@ -124,7 +124,7 @@ protected:
 private:
     TypeSet                     m_SupportedComponents;
     TypeSet                     m_DependingSystems;
-    std::vector<const Entity*>  m_EntityList;
+    std::vector<Entity*>        m_EntityList;
 };
 
 } // namespace Ontology

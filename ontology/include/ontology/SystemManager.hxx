@@ -183,14 +183,14 @@ public:
      * The order in which the systems are added to the system manager is the
      * order in which they are updated.
      */
-    void update() const;
+    void update();
 
 private:
 
     // EntityManagerListener methods
     void onDestroyEntity(const Entity*);
-    void onAddComponent(const Entity*, const Component*);
-    void onRemoveComponent(const Entity*, const Component*);
+    void onAddComponent(Entity*, const Component*);
+    void onRemoveComponent(Entity*, const Component*);
 
     /*!
      * @brief Triggers dependency resolution of the system execution order.
@@ -205,7 +205,7 @@ private:
      * @brief Resolves system dependencies.
      */
     TypeSet::iterator resolveDependencies(const std::type_info* node,
-                             const TypeMap<const System*>& systemLookup,
+                             const TypeMap<System*>& systemLookup,
                              TypeSet& resolving,
                              TypeSet& unresolved);
 
@@ -215,7 +215,7 @@ private:
     bool isInExecutionList(const System* const) const;
 
     TypeVectorPairSmartPtr<System>  m_SystemList;
-    std::vector<const System*>      m_ExecutionList;
+    std::vector<System*>            m_ExecutionList;
     World*                          m_World;
     int                             m_CoreCount;
 };
