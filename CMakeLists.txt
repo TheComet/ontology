@@ -55,5 +55,5 @@ include_directories ("ontology/include")
 add_subdirectory ("ontology")
 
 if (BUILD_TESTS)
-	add_subdirectory ("test")
+	add_subdirectory ("tests")
 endif (BUILD_TESTS)

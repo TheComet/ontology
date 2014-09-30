@@ -9,7 +9,7 @@
     // build settings
     // --------------------------------------------------------------
 
-#define ONTOLOGY_MULTITHREADING
+/* #undef ONTOLOGY_MULTITHREADING */
 #define ONTOLOGY_SHARED
 /* #undef ONTOLOGY_STATIC */
 
