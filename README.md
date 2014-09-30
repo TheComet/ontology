@@ -14,7 +14,7 @@ It is very simple to compile Ontology using CMake. Just follow these steps:
 
 1. Install CMake in your system.
 2. Make sure you have cmake in your $PATH variable.
-3. Open a new terminal and go to Artemis-Cpp's folder.
+3. Open a new terminal and go to ontology's folder.
 4. Run this code:
    ```
    mkdir build.
