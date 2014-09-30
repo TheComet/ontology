@@ -1,5 +1,26 @@
 project (ontology)
 
+###############################################################################
+# generate build configuration
+###############################################################################
+
+if (WITH_MULTITHREADING)
+	set (ONTOLOGY_MULTITHREADING 1)
+endif ()
+if (BUILD_SHARED)
+	set (ONTOLOGY_SHARED 1)
+else ()
+	set (ONTOLOGY_STATIC 1)
+endif ()
+configure_file (
+	"${CMAKE_CURRENT_LIST_DIR}/include/ontology/Config.hpp.in"
+	"${CMAKE_CURRENT_LIST_DIR}/include/ontology/Config.hpp"
+)
+
+###############################################################################
+# source and header files
+###############################################################################
+
 set (ontology_HEADERS
 	"include/ontology/Config.hpp"
 	"include/ontology/Component.hpp"
@@ -28,13 +49,9 @@ set (ontology_SOURCES
 	"src/World.cpp"
 )
 
-# handle multithreading option
-if (WITH_MULTITHREADING)
-	find_package (Boost REQUIRED COMPONENTS
-		system
-		thread
-	)
-endif (WITH_MULTITHREADING)
+###############################################################################
+# create target
+###############################################################################
 
 if (BUILD_SHARED)
 	add_library (ontology SHARED ${ontology_HEADERS} ${ontology_SOURCES})
@@ -42,7 +59,16 @@ else ()
 	add_library (ontology STATIC ${ontology_HEADERS} ${ontology_SOURCES})
 endif ()
 
+###############################################################################
+# handle multithreading option - boost is required if enabled
+###############################################################################
+
 if (WITH_MULTITHREADING)
+	find_package (Boost REQUIRED COMPONENTS
+		system
+		thread
+	)
+
 	target_link_libraries (ontology
 		${Boost_SYSTEM_LIBRARY}
 		${Boost_THREAD_LIBRARY}
@@ -54,6 +80,10 @@ if (WITH_MULTITHREADING)
 		target_link_libraries (ontology pthread)
 	endif ()
 endif (WITH_MULTITHREADING)
+
+###############################################################################
+# install targets
+###############################################################################
 
 install (TARGETS ontology DESTINATION "lib")
 install (FILES ${ontology_HEADERS} DESTINATION "include/ontology")

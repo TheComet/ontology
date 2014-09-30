@@ -9,9 +9,9 @@
     // build settings
     // --------------------------------------------------------------
 
-#define ONTOLOGY_MULTITHREADING
-#define ONTOLOGY_SHARED
-/* #undef ONTOLOGY_STATIC */
+#cmakedefine ONTOLOGY_MULTITHREADING
+#cmakedefine ONTOLOGY_SHARED
+#cmakedefine ONTOLOGY_STATIC
 
     // --------------------------------------------------------------
     // Identify the operating system
