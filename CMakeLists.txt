@@ -53,6 +53,10 @@ else ()
 	add_definitions (-DONTOLOGY_STATIC)
 endif ()
 
+if (WITH_MULTITHREADING)
+	add_definitions (-DONTOLOGY_MULTITHREADING)
+endif ()
+
 ###############################################################################
 # set up project
 ###############################################################################

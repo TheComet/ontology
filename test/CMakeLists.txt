@@ -9,5 +9,6 @@ file (GLOB test_SOURCES "src/*.cpp")
 add_executable (test ${test_HEADERS} ${test_SOURCES})
 target_link_libraries (test
 	ontology
+	gmock
 	gmock_main
 )

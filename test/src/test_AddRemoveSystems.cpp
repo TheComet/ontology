@@ -7,5 +7,5 @@ using namespace Ontology;
 
 TEST(NAME, AddSystem)
 {
-	//World world;
+	World world;
 }

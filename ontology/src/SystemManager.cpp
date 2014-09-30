@@ -8,6 +8,7 @@
 #include <ontology/Config.hpp>
 #include <ontology/SystemManager.hpp>
 #include <ontology/World.hpp>
+#include <stdexcept>
 
 #ifdef ONTOLOGY_MULTITHREADING
 #   include <boost/asio/io_service.hpp>

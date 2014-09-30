@@ -52,23 +52,24 @@ int getNumberOfCores() {
 #endif
 
 // ----------------------------------------------------------------------------
+
 World::World() :
     m_EntityManager(new EntityManager),
     m_SystemManager(new SystemManager(this)),
     m_DeltaTime(0.0)
 #ifdef ONTOLOGY_MULTITHREADING
-    ,m_Work(m_IoService)
-#endif // ONTOLOGY_MULTITHREADING
+   ,m_IoService(),
+    m_ThreadPool(),
+    m_Work(m_IoService)
+#endif
 {
     m_EntityManager->event.addListener(m_SystemManager.get(), "SystemManager");
 
 #ifdef ONTOLOGY_MULTITHREADING
-
     int cores = getNumberOfCores();
 #   ifdef _DEBUG
     std::cout << "Number of cores: " << cores << std::endl;
 #   endif
-
     // populate thread pool with as many threads as there are cores
     for(int i = 0; i != cores; ++i)
         m_ThreadPool.create_thread(
@@ -80,7 +81,12 @@ World::World() :
 // ----------------------------------------------------------------------------
 World::~World()
 {
-	m_EntityManager->event.removeListener("SystemManager");
+#ifdef ONTOLOGY_MULTITHREADING
+    m_IoService.stop();
+    m_ThreadPool.join_all();
+#endif
+
+    m_EntityManager->event.removeListener("SystemManager");
 }
 
 // ----------------------------------------------------------------------------

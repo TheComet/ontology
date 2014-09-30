@@ -30,7 +30,6 @@ set (ontology_SOURCES
 
 # handle multithreading option
 if (WITH_MULTITHREADING)
-	add_definitions (-DONTOLOGY_MULTITHREADING)
 	find_package (Boost REQUIRED COMPONENTS
 		system
 		thread
