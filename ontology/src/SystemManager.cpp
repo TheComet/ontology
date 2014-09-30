@@ -31,7 +31,7 @@ int getNumberOfCores() {
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     return sysinfo.dwNumberOfProcessors;
-#   elif ONTOLOGY_PLATFORM_MAC
+#   elif defined(ONTOLOGY_PLATFORM_MAC)
     int nm[2];
     size_t len = 4;
     uint32_t count;
