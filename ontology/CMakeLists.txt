@@ -28,33 +28,35 @@ set (ontology_SOURCES
 	"src/World.cpp"
 )
 
+# handle multithreading option
+if (WITH_MULTITHREADING)
+	add_definitions (-DONTOLOGY_MULTITHREADING)
+	find_package (Boost REQUIRED COMPONENTS
+		system
+		thread
+	)
+endif (WITH_MULTITHREADING)
+
 if (BUILD_SHARED)
-        add_definitions (-DONTOLOGY_SHARED)
+	add_library (ontology SHARED ${ontology_HEADERS} ${ontology_SOURCES})
 else ()
-        add_definitions (-DONTOLOGY_STATIC)
+	add_library (ontology STATIC ${ontology_HEADERS} ${ontology_SOURCES})
 endif ()
 
 if (WITH_MULTITHREADING)
-	add_definitions (-DONTOLOGY_MULTITHREADING)
+	target_link_libraries (ontology
+		${Boost_SYSTEM_LIBRARY}
+		${Boost_THREAD_LIBRARY}
+	)
+
+	# work around gcc bug on unix where -pthread doesn't link against
+	# pthread
+	if (UNIX)
+		target_link_libraries (ontology pthread)
+	endif ()
 endif (WITH_MULTITHREADING)
 
-if (BUILD_STATIC)
-	add_library (ontology_static STATIC ${ontology_HEADERS} ${ontology_SOURCES})
-	if (WITH_MULTITHREADING AND UNIX)
-		target_link_libraries (ontology_static pthread)
-	endif (WITH_MULTITHREADING AND UNIX)
-	set_target_properties (ontology_static PROPERTIES OUTPUT_NAME ontology_s)
-	install (TARGETS ontology_static DESTINATION "lib")
-endif (BUILD_STATIC)
-if (BUILD_SHARED)
-	add_library (ontology_shared SHARED ${ontology_HEADERS} ${ontology_SOURCES})
-	if (WITH_MULTITHREADING AND UNIX)
-		target_link_libraries (ontology_shared pthread)
-	endif (WITH_MULTITHREADING AND UNIX)
-	set_target_properties (ontology_shared PROPERTIES OUTPUT_NAME ontology)
-	install (TARGETS ontology_shared DESTINATION "lib")
-endif (BUILD_SHARED)
-
+install (TARGETS ontology DESTINATION "lib")
 install (FILES ${ontology_HEADERS} DESTINATION "include/ontology")
 
 

@@ -16,8 +16,7 @@ endif()
 # options
 ###############################################################################
 
-option (BUILD_STATIC "Whether to build a static version of this library" OFF)
-option (BUILD_SHARED "Whether to build a shared version of this library" ON)
+option (BUILD_SHARED "Whether to build a shared or static version of this library" ON)
 option (WITH_MULTITHREADING "Enables entities to be processed by systems in parallel" ON)
 option (BUILD_TESTS "Whether or not to build ontology's tests" OFF)
 
@@ -31,7 +30,7 @@ else (MSVC)
 	set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 endif (MSVC)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_BINARY_DIR}/lib")
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 
 ###############################################################################
 # compiler flags and definitions
@@ -48,12 +47,17 @@ if (UNIX)
 	endif (WITH_MULTITHREADING)
 endif (UNIX)
 
+if (BUILD_SHARED)
+	add_definitions (-DONTOLOGY_SHARED)
+else ()
+	add_definitions (-DONTOLOGY_STATIC)
+endif ()
+
 ###############################################################################
 # set up project
 ###############################################################################
 
 include_directories ("ontology/include")
-
 add_subdirectory ("ontology")
 
 if (BUILD_TESTS)
