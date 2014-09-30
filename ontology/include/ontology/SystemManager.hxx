@@ -217,7 +217,6 @@ private:
     TypeVectorPairSmartPtr<System>  m_SystemList;
     std::vector<System*>            m_ExecutionList;
     World*                          m_World;
-    int                             m_CoreCount;
 };
 
 } // namespace Ontology

@@ -9,8 +9,9 @@
 #include <ontology/System.hpp>
 
 #ifdef ONTOLOGY_MULTITHREADING
-#include <ctpl/ctpl_stl.h>
-#endif
+#   include <boost/asio/io_service.hpp>
+#   include <boost/bind.hpp>
+#endif // ONTOLOGY_MULTITHREADING
 
 namespace Ontology {
 
@@ -75,14 +76,16 @@ void System::informDestroyedEntity(const Entity* entity)
 }
 
 // ----------------------------------------------------------------------------
-void System::update(int coreCount)
-{
+void System::update(
 #ifdef ONTOLOGY_MULTITHREADING
-    ctpl::thread_pool p(coreCount);
+        boost::asio::io_service& ioService
+#endif
+)
+{
     for(auto& it : m_EntityList)
-        p.push([&](int id) { this->processEntity(*it); });
+#ifdef ONTOLOGY_MULTITHREADING
+        ioService.post(boost::bind(&System::processEntity, this, boost::ref(*it)));
 #else
-    for(auto& it : m_EntityList)
         this->processEntity(*it);
 #endif
 }

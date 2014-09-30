@@ -7,61 +7,18 @@
 
 #include <ontology/Config.hpp>
 #include <ontology/SystemManager.hpp>
-#include <stdexcept>
+#include <ontology/World.hpp>
+
+#ifdef ONTOLOGY_MULTITHREADING
+#   include <boost/asio/io_service.hpp>
+#endif // ONTOLOGY_MULTITHREADING
 
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-/*!
- * @brief Gets the number of cores on this machine.
- * @note see http://www.cprogramming.com/snippets/source-code/find-the-number-of-cpu-cores-for-windows-mac-or-linux
- */
-#ifdef ONTOLOGY_MULTITHREADING
-#   if defined(ONTOLOGY_PLATFORM_WINDOWS)
-#       include <windows.h>
-#   elif defined(ONTOLOGY_PLATFORM_MAC)
-#       include <sys/param.h>
-#       include <sys/sysctl.h>
-#   else
-#       include <unistd.h>
-#   endif
-
-int getNumberOfCores() {
-#   ifdef ONTOLOGY_PLATFORM_WINDOWS
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-    return sysinfo.dwNumberOfProcessors;
-#   elif ONTOLOGY_PLATFORM_MAC
-    int nm[2];
-    size_t len = 4;
-    uint32_t count;
-
-    nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
-    sysctl(nm, 2, &count, &len, NULL, 0);
-
-    if(count < 1) {
-    nm[1] = HW_NCPU;
-    sysctl(nm, 2, &count, &len, NULL, 0);
-    if(count < 1) { count = 1; }
-    }
-    return count;
-#   else
-    return sysconf(_SC_NPROCESSORS_ONLN);
-#   endif
-}
-#endif
-
-// ----------------------------------------------------------------------------
 SystemManager::SystemManager(World* world) :
-    m_World(world),
-    m_CoreCount(1)
+    m_World(world)
 {
-#ifdef ONTOLOGY_MULTITHREADING
-    m_CoreCount = getNumberOfCores();
-#   ifdef _DEBUG
-    std::cout << "Number of cores: " << m_CoreCount << std::endl;
-#   endif
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -83,7 +40,15 @@ void SystemManager::initialise()
 void SystemManager::update()
 {
     for(const auto& system : m_ExecutionList)
-        system->update(m_CoreCount);
+    {
+#ifdef ONTOLOGY_MULTITHREADING
+        system->update(m_World->getIoService());
+        m_World->getIoService().poll(); // wait for current system to finish
+                                        // processing all of its entities
+#else
+        system->update();
+#endif
+    }
 }
 
 // ----------------------------------------------------------------------------

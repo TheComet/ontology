@@ -14,16 +14,16 @@
 // ----------------------------------------------------------------------------
 // forward declarations
 
-#ifdef ONTOLOGY_MULTITHREADING
-namespace ctpl {
-	class thread_pool;
-}
-#endif
-
 namespace Ontology {
     class Entity;
     class World;
 }
+
+#ifdef ONTOLOGY_MULTITHREADING
+namespace boost { namespace asio {
+    class io_service;
+}}
+#endif // ONTOLOGY_MULTITHREADING
 
 namespace Ontology {
 
@@ -112,7 +112,11 @@ public:
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update(int coreCount);
+    void update(
+#ifdef ONTOLOGY_MULTITHREADING
+            boost::asio::io_service&
+#endif
+    );
 
 protected:
 
@@ -122,9 +126,9 @@ protected:
     World* world;
 
 private:
-    TypeSet                     m_SupportedComponents;
-    TypeSet                     m_DependingSystems;
-    std::vector<Entity*>        m_EntityList;
+    TypeSet                         m_SupportedComponents;
+    TypeSet                         m_DependingSystems;
+    std::vector<Entity*>            m_EntityList;
 };
 
 } // namespace Ontology

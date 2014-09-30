@@ -10,6 +10,12 @@
 #include <vector>
 #include <memory>
 
+#ifdef ONTOLOGY_MULTITHREADING
+#   include <boost/asio/io_service.hpp>
+#   include <boost/bind.hpp>
+#   include <boost/thread/thread.hpp>
+#endif // ONTOLOGY_MULTITHREADING
+
 // ----------------------------------------------------------------------------
 // forward declarations
 
@@ -78,10 +84,21 @@ public:
      */
     void update();
 
+#ifdef ONTOLOGY_MULTITHREADING
+    boost::asio::io_service& getIoService();
+#endif
+
 private:
     std::unique_ptr<EntityManager>  m_EntityManager;
     std::unique_ptr<SystemManager>  m_SystemManager;
     float                           m_DeltaTime;
+
+    // threading
+#ifdef ONTOLOGY_MULTITHREADING
+    boost::asio::io_service         m_IoService;
+    boost::thread_group             m_ThreadPool;
+    boost::asio::io_service::work   m_Work;
+#endif // ONTOLOGY_MULTITHREADING
 };
 
 } // namespace Ontology
