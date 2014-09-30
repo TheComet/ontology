@@ -11,7 +11,7 @@
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-Entity::Entity(const char* name, const EntityManager* creator) :
+Entity::Entity(const char* name, const EntityManagerInterface* creator) :
     m_Name(name),
     m_Creator(creator)
 {
