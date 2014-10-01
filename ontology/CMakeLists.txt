@@ -1,4 +1,4 @@
-project (ontology)
+project (ontologylib)
 
 ###############################################################################
 # generate build configuration
