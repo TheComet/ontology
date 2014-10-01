@@ -24,8 +24,8 @@ struct Movement : public System
     void initialise() override {}
     void processEntity(Entity& e) override
     {
-        e.getComponent<Position>().x += 2;
-        e.getComponent<Position>().y += 1;
+        //e.getComponent<Position>().x += 2;
+        //e.getComponent<Position>().y += 1;
     }
 };
 

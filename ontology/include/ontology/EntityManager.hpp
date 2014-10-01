@@ -9,7 +9,6 @@
 // include files
 
 #include <ontology/Export.hpp>
-#include <ontology/Entity.hxx>
 #include <ontology/EntityManagerInterface.hpp>
 #include <ontology/ListenerDispatcher.hpp>
 
@@ -21,6 +20,7 @@
 
 namespace Ontology {
     class Component;
+    class Entity;
     class EntityManagerListener;
 }
 
@@ -39,7 +39,12 @@ class ONTOLOGY_API EntityManager : public EntityManagerInterface
 {
 public:
 
-    typedef std::vector< std::unique_ptr<Entity> > EntityList;
+    typedef std::vector<Entity> EntityList;
+
+    /*!
+     * @brief Default constructor
+     */
+    EntityManager();
 
     /*!
      * @brief Creates a new entity and adds it to the world.
@@ -88,7 +93,13 @@ public:
 
 private:
 
+    /*!
+     * @brief Dispatches a reallocation event if the capacity has changed.
+     */
+    void handleEntityReallocation(bool force=false);
+
     EntityList m_EntityList;
+    std::size_t m_EntityListCapacity;
 };
 
 } // namespace Ontology

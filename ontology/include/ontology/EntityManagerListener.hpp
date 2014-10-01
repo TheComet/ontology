@@ -52,6 +52,11 @@ public:
      * @param component The component being removed.
      */
     virtual void onRemoveComponent(Entity* entity, const Component* component);
+
+    /*!
+     * @brief Called when EntityManager has re-allocated the memory for its entities
+     */
+    virtual void onEntitiesReallocated(const std::vector<Entity>& entityList) = 0;
 };
 
 } // namespace Ontology

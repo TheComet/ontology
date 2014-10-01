@@ -104,6 +104,8 @@ public:
      */
     void informDestroyedEntity(const Entity*);
 
+    void informEntitiesReallocated(const std::vector<Entity>&);
+
     /*!
      * @brief Informs the system of the world it is part of.
      */
@@ -128,7 +130,7 @@ protected:
 private:
     TypeSet                         m_SupportedComponents;
     TypeSet                         m_DependingSystems;
-    std::vector<Entity*>            m_EntityList;
+    std::vector<Entity>             m_EntityList;
 };
 
 } // namespace Ontology

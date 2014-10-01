@@ -70,9 +70,17 @@ void System::informEntityUpdate(Entity* entity)
 // ----------------------------------------------------------------------------
 void System::informDestroyedEntity(const Entity* entity)
 {
-    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(*it == entity)
+    for(auto& it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+        if(it == entity)
             m_EntityList.erase(it);
+}
+
+// ----------------------------------------------------------------------------
+void System::informEntitiesReallocated(const std::vector<Entity>& entityList)
+{
+    m_EntityList.clear();
+    for(auto& it : entityList)
+        this->informEntityUpdate(it);
 }
 
 // ----------------------------------------------------------------------------
