@@ -21,7 +21,7 @@
 
 namespace Ontology{
     class Component;
-    class EntityManager;
+    class EntityManagerInterface;
     class System;
 }
 
@@ -56,7 +56,7 @@ public:
     /*!
      * @brief Construct an entity with a name.
      */
-    Entity(const char* name, const EntityManager* creator);
+    Entity(const char* name, const EntityManagerInterface* creator);
 
     /*!
      * @brief Allow destruction through base class pointer.
@@ -107,9 +107,9 @@ public:
 
 private:
 
-    TypeMapSmartPtr<Component>  m_ComponentMap;
-    const char*                 m_Name;
-    const EntityManager*        m_Creator;
+    TypeMapSmartPtr<Component>      m_ComponentMap;
+    const char*                     m_Name;
+    const EntityManagerInterface*   m_Creator;
 };
 
 } // namespace Ontology
