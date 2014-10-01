@@ -49,6 +49,6 @@ TEST(NAME, ThousandEntities)
 
     for(auto& entity : world.getEntityManager().getEntityList())
     {
-        ASSERT_EQ(Position(200, 100), entity->getComponent<Position>());
+        ASSERT_EQ(Position(2000, 1000), entity->getComponent<Position>());
     }
 }
