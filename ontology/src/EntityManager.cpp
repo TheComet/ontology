@@ -22,19 +22,18 @@ EntityManager::EntityManager()
 // ----------------------------------------------------------------------------
 Entity& EntityManager::createEntity(const char* name)
 {
-    m_EntityList.push_back(Entity(name, this));
-    this->event.dispatch(&EntityManagerListener::onCreateEntity, &m_EntityList.back());
+    m_EntityList.emplace_back(name, this);
+    this->event.dispatch(&EntityManagerListener::onCreateEntity, m_EntityList.back());
     this->handleEntityReallocation();
     return m_EntityList.back();
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyEntity(Entity* entity)
+void EntityManager::destroyEntity(Entity& entity)
 {
-    std::size_t n = 0;
-    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it, ++n)
+    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
     {
-        if(&m_EntityList[n] == entity)
+        if(&(*it) == &entity)
         {
             this->event.dispatch(&EntityManagerListener::onDestroyEntity, entity);
             m_EntityList.erase(it);
@@ -64,13 +63,13 @@ const EntityManager::EntityList& EntityManager::getEntityList() const
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informAddComponent(Entity* entity, const Component* component) const
+void EntityManager::informAddComponent(Entity& entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onAddComponent, entity, component);
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informRemoveComponent(Entity* entity, const Component* component) const
+void EntityManager::informRemoveComponent(Entity& entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onRemoveComponent, entity, component);
 }

@@ -8,6 +8,7 @@
 #include <ontology/World.hpp>
 #include <ontology/EntityManager.hpp>
 #include <ontology/SystemManager.hpp>
+#include <ontology/Entity.hpp>
 
 namespace Ontology {
 

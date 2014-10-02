@@ -148,24 +148,31 @@ bool SystemManager::isInExecutionList(const System* const system) const
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onAddComponent(Entity* entity, const Component* component)
+void SystemManager::onAddComponent(Entity& entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onRemoveComponent(Entity* entity, const Component* component)
+void SystemManager::onRemoveComponent(Entity& entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onDestroyEntity(Entity* entity)
+void SystemManager::onDestroyEntity(Entity& entity)
 {
     for(const auto& it : m_SystemList)
         it.second->informDestroyedEntity(entity);
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::onEntitiesReallocated(std::vector<Entity>& entityList)
+{
+    for(const auto& it : m_SystemList)
+        it.second->informEntitiesReallocated(entityList);
 }
 
 } // namespace Ontology

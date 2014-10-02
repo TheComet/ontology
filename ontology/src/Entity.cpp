@@ -24,10 +24,10 @@ Entity::~Entity()
 
 // ----------------------------------------------------------------------------
 bool Entity::supportsSystem(const System& system) const
-{
+{/*
     for(const auto& it : system.getSupportedComponents())
         if(m_ComponentMap.find(it) == m_ComponentMap.end())
-            return false;
+            return false;*/
     return true;
 }
 

@@ -17,10 +17,10 @@ namespace Ontology {
 struct MockEntityManager : public EntityManagerInterface
 {
     Entity& createEntity(const char*) {}
-    MOCK_METHOD1(destroyEntity, void(Entity*));
+    MOCK_METHOD1(destroyEntity, void(Entity&));
     MOCK_METHOD1(destroyEntities, void(const char*));
-    MOCK_CONST_METHOD2(informAddComponent, void(Entity*, const Component*));
-    MOCK_CONST_METHOD2(informRemoveComponent, void(Entity*, const Component*));
+    MOCK_CONST_METHOD2(informAddComponent, void(Entity&, const Component*));
+    MOCK_CONST_METHOD2(informRemoveComponent, void(Entity&, const Component*));
 };
 
 struct TestComponent : public Component
@@ -51,15 +51,14 @@ TEST(NAME, CreateEntityWithName)
 TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)
 {
     MockEntityManager entityManager;
-    TestComponent* component = new TestComponent(2, 3);
     Entity entity("entity", &entityManager);
 
-    EXPECT_CALL(entityManager, informAddComponent(&entity, component))
+    EXPECT_CALL(entityManager, informAddComponent(testing::_, testing::_))
         .Times(1);
-    EXPECT_CALL(entityManager, informRemoveComponent(&entity, component))
+    EXPECT_CALL(entityManager, informRemoveComponent(testing::_, testing::_))
         .Times(1);
 
-    entity.addComponent(component); // entity now owns the component, no need to delete
+    entity.addComponent<TestComponent>(2, 3);
     entity.removeComponent<TestComponent>();
 }
 
@@ -67,21 +66,21 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
 {
     MockEntityManager entityManager;
     Entity entity("entity", &entityManager);
-    EXPECT_CALL(entityManager, informAddComponent(&entity, testing::_))
+    EXPECT_CALL(entityManager, informAddComponent(testing::_, testing::_))
         .Times(1);
 
-    entity.addComponent(new TestComponent(2, 3));
+    entity.addComponent<TestComponent>(2, 3);
 
-    ASSERT_DEATH(entity.addComponent(new TestComponent(4, 5)), "");
+    ASSERT_DEATH(entity.addComponent<TestComponent>(3, 4), "");
 }
 
 TEST(NAME, GettingNonExistingComponentsCausesDeath)
 {
     MockEntityManager entityManager;
     Entity entity("entity", &entityManager);
-    EXPECT_CALL(entityManager, informAddComponent(&entity, testing::_))
+    EXPECT_CALL(entityManager, informAddComponent(testing::_, testing::_))
         .Times(1);
-    entity.addComponent(new TestComponent(2, 3));
+    entity.addComponent<TestComponent>(2, 3);
 
     ASSERT_EQ(TestComponent(2, 3), entity.getComponent<TestComponent>());
     ASSERT_DEATH(entity.getComponent<NonExistingComponent>(), "");

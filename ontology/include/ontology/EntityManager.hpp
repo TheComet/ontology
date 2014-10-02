@@ -59,7 +59,7 @@ public:
      * @brief Destroys an entity by pointer.
      * @param entity The entity to destroy.
      */
-    void destroyEntity(Entity* entity) override;
+    void destroyEntity(Entity& entity) override;
 
     /*!
      * @brief Destroys all entities sharing the specified name.
@@ -72,14 +72,14 @@ public:
      * @param entity The entity adding a new component.
      * @param component The component being added.
      */
-    void informAddComponent(Entity* entity, const Component* component) const override;
+    void informAddComponent(Entity& entity, const Component* component) const override;
 
     /*!
      * @brief Called by entities when they remove a component.
      * @param entity The entity removing a component.
      * @param component The component being removed.
      */
-    void informRemoveComponent(Entity* entity, const Component* component) const override;
+    void informRemoveComponent(Entity& entity, const Component* component) const override;
 
     /*!
      * @brief Gets a list of entities of type EntityManager::EntityList.

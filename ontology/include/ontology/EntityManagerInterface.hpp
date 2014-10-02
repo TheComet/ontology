@@ -7,14 +7,17 @@
 
 namespace Ontology {
 
+class Component;
+class Entity;
+
 struct EntityManagerInterface
 {
     virtual ~EntityManagerInterface() {}
     virtual Entity& createEntity(const char* name="") = 0;
-    virtual void destroyEntity(Entity* entity) = 0;
+    virtual void destroyEntity(Entity& entity) = 0;
     virtual void destroyEntities(const char* name) = 0;
-    virtual void informAddComponent(Entity* entity, const Component* component) const = 0;
-    virtual void informRemoveComponent(Entity* entity, const Component* component) const = 0;
+    virtual void informAddComponent(Entity& entity, const Component* component) const = 0;
+    virtual void informRemoveComponent(Entity& entity, const Component* component) const = 0;
 };
 
 } // namespace Ontology

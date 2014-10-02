@@ -57,26 +57,29 @@ void System::setWorld(World* world)
 }
 
 // ----------------------------------------------------------------------------
-void System::informEntityUpdate(Entity* entity)
+void System::informEntityUpdate(Entity& entity)
 {
-    for(const auto& it : m_EntityList)
-        if(it == entity)
+    for(auto& it : m_EntityList)
+        if(&it == &entity)
+        {
+            it = entity;
             return;
+        }
 
-    if(entity->supportsSystem(*this))
+    if(entity.supportsSystem(*this))
         m_EntityList.push_back(entity);
 }
 
 // ----------------------------------------------------------------------------
-void System::informDestroyedEntity(const Entity* entity)
+void System::informDestroyedEntity(const Entity& entity)
 {
-    for(auto& it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(it == entity)
+    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+        if(&(*it) == &entity)
             m_EntityList.erase(it);
 }
 
 // ----------------------------------------------------------------------------
-void System::informEntitiesReallocated(const std::vector<Entity>& entityList)
+void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 {
     m_EntityList.clear();
     for(auto& it : entityList)
@@ -92,9 +95,9 @@ void System::update(
 {
     for(auto& it : m_EntityList)
 #ifdef ONTOLOGY_MULTITHREADING
-        ioService.post(boost::bind(&System::processEntity, this, boost::ref(*it)));
+        ioService.post(boost::bind(&System::processEntity, this, boost::ref(it)));
 #else
-        this->processEntity(*it);
+        this->processEntity(it);
 #endif
 }
 

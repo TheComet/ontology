@@ -94,7 +94,7 @@ public:
      * entity in question. If it can, it will add the entity to its internal
      * list of supported entities.
      */
-    void informEntityUpdate(Entity*);
+    void informEntityUpdate(Entity&);
 
     /*!
      * @brief Called by the SystemManager when it receives an entity destroyed event.
@@ -102,9 +102,9 @@ public:
      * This causes the system to remove the entity from its internal list of
      * supported entities, if it exists.
      */
-    void informDestroyedEntity(const Entity*);
+    void informDestroyedEntity(const Entity&);
 
-    void informEntitiesReallocated(const std::vector<Entity>&);
+    void informEntitiesReallocated(std::vector<Entity>&);
 
     /*!
      * @brief Informs the system of the world it is part of.

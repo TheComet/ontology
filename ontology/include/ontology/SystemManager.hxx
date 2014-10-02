@@ -188,9 +188,10 @@ public:
 private:
 
     // EntityManagerListener methods
-    void onDestroyEntity(Entity*) override;
-    void onAddComponent(Entity*, const Component*) override;
-    void onRemoveComponent(Entity*, const Component*) override;
+    void onDestroyEntity(Entity&) override;
+    void onAddComponent(Entity&, const Component*) override;
+    void onRemoveComponent(Entity&, const Component*) override;
+    void onEntitiesReallocated(std::vector<Entity>&) override;
 
     /*!
      * @brief Triggers dependency resolution of the system execution order.
@@ -214,7 +215,7 @@ private:
      */
     bool isInExecutionList(const System* const) const;
 
-    TypeVectorPairSmartPtr<System>  m_SystemList;
+    TypeVectorPairUniquePtr<System> m_SystemList;
     std::vector<System*>            m_ExecutionList;
     World*                          m_World;
 };
