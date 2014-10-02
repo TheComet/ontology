@@ -43,6 +43,15 @@ T& Entity::getComponent()
     return *static_cast<T*>(it->second.get());
 }
 
+//----------------------------------------------------------------------------
+template<class T>
+const T& Entity::getComponent() const
+{
+    const auto& it = m_ComponentMap.find(&typeid(T));
+    assert(it != m_ComponentMap.end());
+    return *static_cast<T*>(it->second.get());
+}
+
 } // namespace Ontology
 
 #endif // __ONTOLOGY_ENTITY_HPP__
