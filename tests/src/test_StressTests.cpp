@@ -1,6 +1,9 @@
 #include <gmock/gmock.h>
 #include <ontology/Ontology.hpp>
 
+#include <math.h>
+#include <iostream>
+
 #define NAME Stress
 
 using namespace Ontology;
@@ -24,6 +27,8 @@ struct Movement : public System
     void initialise() override {}
     void processEntity(Entity& e) override
     {
+        for(volatile int i = 0; i != 10000; ++i)
+            sqrt(953.245);
         e.getComponent<Position>().x += 2;
         e.getComponent<Position>().y += 1;
     }
