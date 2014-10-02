@@ -42,7 +42,7 @@ TEST(NAME, ThousandEntities)
         ;
     for(int i = 0; i != 1000; ++i)
         world.getEntityManager().createEntity("entity")
-            .addComponent(new Position(0, 0))
+            .addComponent<Position>(0, 0)
             ;
     for(int i = 0; i != 1000; ++i)
         world.update();

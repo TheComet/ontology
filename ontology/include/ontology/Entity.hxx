@@ -73,8 +73,8 @@ public:
      * @note You can only register one instance of every type of component.
      * @return Returns a reference to itself. This is to allow chaining.
      */
-    template<class T>
-    Entity& addComponent(T* component);
+    template<class T, class... Args>
+    Entity& addComponent(Args&&...);
 
     /*!
      * @brief Remove a component from this entity.
@@ -88,6 +88,8 @@ public:
      */
     template<class T>
     T& getComponent();
+    template<class T>
+    const T& getComponent() const;
 
     /*!
      * @brief Returns true if this entity is supported by the specified system.

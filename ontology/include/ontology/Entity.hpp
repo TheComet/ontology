@@ -15,12 +15,12 @@
 namespace Ontology {
 
 //----------------------------------------------------------------------------
-template<class T>
-Entity& Entity::addComponent(T* component)
+template<class T, class... Args>
+Entity& Entity::addComponent(Args&&... args)
 {
-    std::unique_ptr<Component> componentSmartPtr(component);
     assert(m_ComponentMap.find(&typeid(T)) == m_ComponentMap.end());
-    m_ComponentMap[&typeid(T)] = std::move(componentSmartPtr);
+    Component* component = new T(args...);
+    m_ComponentMap[&typeid(T)] = std::unique_ptr<Component>(component);
     m_Creator->informAddComponent(this, component);
     return *this;
 }

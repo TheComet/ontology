@@ -51,15 +51,14 @@ TEST(NAME, CreateEntityWithName)
 TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)
 {
     MockEntityManager entityManager;
-    TestComponent* component = new TestComponent(2, 3);
     Entity entity("entity", &entityManager);
 
-    EXPECT_CALL(entityManager, informAddComponent(&entity, component))
+    EXPECT_CALL(entityManager, informAddComponent(&entity, testing::_))
         .Times(1);
-    EXPECT_CALL(entityManager, informRemoveComponent(&entity, component))
+    EXPECT_CALL(entityManager, informRemoveComponent(&entity, testing::_))
         .Times(1);
 
-    entity.addComponent(component); // entity now owns the component, no need to delete
+    entity.addComponent<TestComponent>(2, 3);
     entity.removeComponent<TestComponent>();
 }
 
@@ -70,9 +69,9 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
     EXPECT_CALL(entityManager, informAddComponent(&entity, testing::_))
         .Times(1);
 
-    entity.addComponent(new TestComponent(2, 3));
+    entity.addComponent<TestComponent>(2, 3);
 
-    ASSERT_DEATH(entity.addComponent(new TestComponent(4, 5)), "");
+    ASSERT_DEATH(entity.addComponent<TestComponent>(4, 5), "");
 }
 
 TEST(NAME, GettingNonExistingComponentsCausesDeath)
@@ -81,7 +80,7 @@ TEST(NAME, GettingNonExistingComponentsCausesDeath)
     Entity entity("entity", &entityManager);
     EXPECT_CALL(entityManager, informAddComponent(&entity, testing::_))
         .Times(1);
-    entity.addComponent(new TestComponent(2, 3));
+    entity.addComponent<TestComponent>(2, 3);
 
     ASSERT_EQ(TestComponent(2, 3), entity.getComponent<TestComponent>());
     ASSERT_DEATH(entity.getComponent<NonExistingComponent>(), "");
