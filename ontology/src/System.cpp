@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/World.hpp>
 #include <ontology/Entity.hpp>
 #include <ontology/System.hpp>
 
@@ -60,11 +61,8 @@ void System::setWorld(World* world)
 void System::informEntityUpdate(Entity& entity)
 {
     for(auto& it : m_EntityList)
-        if(&it == &entity)
-        {
-            it = entity;
+        if(&it.get() == &entity)
             return;
-        }
 
     if(entity.supportsSystem(*this))
         m_EntityList.push_back(entity);
@@ -74,7 +72,7 @@ void System::informEntityUpdate(Entity& entity)
 void System::informDestroyedEntity(const Entity& entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(&(*it) == &entity)
+        if(&it->get() == &entity)
             m_EntityList.erase(it);
 }
 
@@ -87,15 +85,15 @@ void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 }
 
 // ----------------------------------------------------------------------------
-void System::update(
-#ifdef ONTOLOGY_MULTITHREADING
-        boost::asio::io_service& ioService
-#endif
-)
+void System::update()
 {
     for(auto& it : m_EntityList)
 #ifdef ONTOLOGY_MULTITHREADING
-        ioService.post(boost::bind(&System::processEntity, this, boost::ref(it)));
+        this->world->getIoService().post(
+                boost::bind(&System::processEntity, this, boost::ref(it))
+        );
+        // wait for all entities to be processed
+        this->world->getIoService().poll();
 #else
         this->processEntity(it);
 #endif

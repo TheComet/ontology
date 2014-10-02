@@ -114,11 +114,7 @@ public:
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update(
-#ifdef ONTOLOGY_MULTITHREADING
-            boost::asio::io_service&
-#endif
-    );
+    void update();
 
 protected:
 
@@ -128,9 +124,9 @@ protected:
     World* world;
 
 private:
-    TypeSet                         m_SupportedComponents;
-    TypeSet                         m_DependingSystems;
-    std::vector<Entity>             m_EntityList;
+    TypeSet                                         m_SupportedComponents;
+    TypeSet                                         m_DependingSystems;
+    std::vector< std::reference_wrapper<Entity> >   m_EntityList;
 };
 
 } // namespace Ontology

@@ -14,16 +14,17 @@
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-template <class T>
-SystemManager& SystemManager::addSystem(T* system,
+template <class T, class... Args>
+SystemManager& SystemManager::addSystem(Args&&... args,
                          TypeSet supportedComponents,
                          TypeSet executesBeforeSystems)
 {
     // add to system list
     assert(m_SystemList.find(&typeid(T)) == m_SystemList.end());
-    m_SystemList.push_back(std::pair<const std::type_info*, std::unique_ptr<System> >(
+    System* system = new T(args...);
+    m_SystemList.emplace_back(
         &typeid(T),
-        std::unique_ptr<System>(system))
+        std::unique_ptr<System>(system)
     );
     system->setWorld(m_World);
     system->setSupportedComponents(supportedComponents);

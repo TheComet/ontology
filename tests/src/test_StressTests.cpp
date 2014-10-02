@@ -1,6 +1,8 @@
 #include <gmock/gmock.h>
 #include <ontology/Ontology.hpp>
 
+#include <math.h>
+
 #define NAME Stress
 
 using namespace Ontology;
@@ -12,7 +14,7 @@ using namespace Ontology;
 struct Position : public Component
 {
     Position(int x, int y) : x(x), y(y) {}
-    int x, y;
+    unsigned int x, y;
 };
 inline bool operator==(const Position& lhs, const Position rhs)
 {
@@ -26,6 +28,8 @@ struct Movement : public System
     {
         e.getComponent<Position>().x += 2;
         e.getComponent<Position>().y += 1;
+        for(volatile int i = 0; i != 10000; ++i)
+            sqrt(938.523);
     }
 };
 
@@ -37,7 +41,7 @@ TEST(NAME, ThousandEntities)
 {
     World world;
     world.getSystemManager()
-        .addSystem(new Movement)
+        .addSystem<Movement>()
         .initialise()
         ;
     for(int i = 0; i != 1000; ++i)

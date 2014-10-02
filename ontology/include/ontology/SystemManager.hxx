@@ -142,8 +142,8 @@ public:
      *
      * @return Returns itself, allowing the programmer to chain.
      */
-    template <class T>
-    SystemManager& addSystem(T* system,
+    template <class T, class... Args>
+    SystemManager& addSystem(Args&&... args,
                              TypeSet supportedComponents = TypeSetGenerator(),
                              TypeSet executesBeforeSystems = TypeSetGenerator());
 

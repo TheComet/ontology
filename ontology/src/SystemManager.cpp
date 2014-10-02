@@ -41,15 +41,7 @@ void SystemManager::initialise()
 void SystemManager::update()
 {
     for(const auto& system : m_ExecutionList)
-    {
-#ifdef ONTOLOGY_MULTITHREADING
-        system->update(m_World->getIoService());
-        m_World->getIoService().poll(); // wait for current system to finish
-                                        // processing all of its entities
-#else
         system->update();
-#endif
-    }
 }
 
 // ----------------------------------------------------------------------------

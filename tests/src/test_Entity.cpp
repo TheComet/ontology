@@ -5,22 +5,20 @@
 
 using namespace Ontology;
 
-namespace Ontology {
-    class Entity;
-    class Component;
-}
-
 // ----------------------------------------------------------------------------
 // test fixture
 // ----------------------------------------------------------------------------
 
 struct MockEntityManager : public EntityManagerInterface
 {
-    Entity& createEntity(const char*) {}
+    Entity& createEntity(const char*) { return entity; }
     MOCK_METHOD1(destroyEntity, void(Entity&));
     MOCK_METHOD1(destroyEntities, void(const char*));
     MOCK_CONST_METHOD2(informAddComponent, void(Entity&, const Component*));
     MOCK_CONST_METHOD2(informRemoveComponent, void(Entity&, const Component*));
+
+    MockEntityManager() : entity("invalid_entity", this) {}
+    Entity entity;
 };
 
 struct TestComponent : public Component
