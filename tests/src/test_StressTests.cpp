@@ -28,7 +28,7 @@ struct Movement : public System
     {
         e.getComponent<Position>().x += 2;
         e.getComponent<Position>().y += 1;
-        for(volatile int i = 0; i != 10000; ++i)
+        for(volatile int i = 0; i != 100; ++i)
             sqrt(938.523);
     }
 };

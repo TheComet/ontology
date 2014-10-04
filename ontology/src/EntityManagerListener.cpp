@@ -29,4 +29,9 @@ void EntityManagerListener::onRemoveComponent(Entity&, const Component*)
 {
 }
 
+// ----------------------------------------------------------------------------
+void EntityManagerListener::onEntitiesReallocated(std::vector<Entity>&)
+{
+}
+
 } // namespace Ontology

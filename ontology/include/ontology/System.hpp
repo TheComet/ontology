@@ -11,6 +11,10 @@
 #include <ontology/Export.hpp>
 #include <ontology/TypeContainers.hpp>
 
+#ifdef ONTOLOGY_MULTITHREADING
+#   include <boost/thread/thread.hpp>
+#endif
+
 // ----------------------------------------------------------------------------
 // forward declarations
 
@@ -18,12 +22,6 @@ namespace Ontology {
     class Entity;
     class World;
 }
-
-#ifdef ONTOLOGY_MULTITHREADING
-namespace boost { namespace asio {
-    class io_service;
-}}
-#endif // ONTOLOGY_MULTITHREADING
 
 namespace Ontology {
 
@@ -45,6 +43,7 @@ namespace Ontology {
  */
 class ONTOLOGY_API System
 {
+    typedef std::vector< std::reference_wrapper<Entity> > EntityList;
 public:
 
     /*!
@@ -124,9 +123,21 @@ protected:
     World* world;
 
 private:
-    TypeSet                                         m_SupportedComponents;
-    TypeSet                                         m_DependingSystems;
-    std::vector< std::reference_wrapper<Entity> >   m_EntityList;
+
+#ifdef ONTOLOGY_MULTITHREADING
+    void joinableThreadEntryPoint();
+    void waitForNotify();
+#endif
+
+    TypeSet         m_SupportedComponents;
+    TypeSet         m_DependingSystems;
+    EntityList      m_EntityList;
+
+#ifdef ONTOLOGY_MULTITHREADING
+    boost::condition_variable m_ConditionVariable;
+    boost::mutex m_Mutex;
+    EntityList::iterator m_ThreadedEntityIterator;
+#endif
 };
 
 } // namespace Ontology

@@ -58,7 +58,7 @@ public:
     /*!
      * @brief Called when EntityManager has re-allocated the memory for its entities
      */
-    virtual void onEntitiesReallocated(std::vector<Entity>& entityList) = 0;
+    virtual void onEntitiesReallocated(std::vector<Entity>& entityList);
 };
 
 } // namespace Ontology

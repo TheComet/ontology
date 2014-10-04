@@ -10,11 +10,52 @@
 #include <ontology/System.hpp>
 
 #ifdef ONTOLOGY_MULTITHREADING
-#   include <boost/asio/io_service.hpp>
 #   include <boost/bind.hpp>
+#   include <boost/asio/io_service.hpp>
+#   include <boost/thread.hpp>
 #endif // ONTOLOGY_MULTITHREADING
 
 namespace Ontology {
+
+// ----------------------------------------------------------------------------
+/*!
+ * @brief Gets the number of cores on this machine.
+ * @note see http://www.cprogramming.com/snippets/source-code/find-the-number-of-cpu-cores-for-windows-mac-or-linux
+ */
+#ifdef ONTOLOGY_MULTITHREADING
+#   if defined(ONTOLOGY_PLATFORM_WINDOWS)
+#       include <windows.h>
+#   elif defined(ONTOLOGY_PLATFORM_MAC)
+#       include <sys/param.h>
+#       include <sys/sysctl.h>
+#   else
+#       include <unistd.h>
+#   endif
+
+int getNumberOfCores() {
+#   ifdef ONTOLOGY_PLATFORM_WINDOWS
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+    return sysinfo.dwNumberOfProcessors;
+#   elif defined(ONTOLOGY_PLATFORM_MAC)
+    int nm[2];
+    size_t len = 4;
+    uint32_t count;
+
+    nm[0] = CTL_HW; nm[1] = HW_AVAILCPU;
+    sysctl(nm, 2, &count, &len, NULL, 0);
+
+    if(count < 1) {
+        nm[1] = HW_NCPU;
+        sysctl(nm, 2, &count, &len, NULL, 0);
+        if(count < 1) { count = 1; }
+    }
+    return count;
+#   else
+    return sysconf(_SC_NPROCESSORS_ONLN);
+#   endif
+}
+#endif
 
 // ----------------------------------------------------------------------------
 System::System() :
@@ -85,18 +126,45 @@ void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 }
 
 // ----------------------------------------------------------------------------
+void System::joinableThreadEntryPoint()
+{
+    boost::unique_lock<boost::mutex> guard(m_Mutex);
+    while(m_ThreadedEntityIterator != m_EntityList.end())
+    {
+        auto& entity = *m_ThreadedEntityIterator;  // while locked, get reference to current entity
+        ++m_ThreadedEntityIterator;                // increment so other threads don't process this entity.
+        guard.unlock();
+        this->processEntity(entity);
+        guard.lock();
+    }
+    // wakes up main thread, which joins all other threads
+    m_ConditionVariable.notify_all();
+}
+
+// ----------------------------------------------------------------------------
+void System::waitForNotify()
+{
+    boost::unique_lock<boost::mutex> guard(m_Mutex);
+    m_ConditionVariable.wait(guard);
+}
+
+// ----------------------------------------------------------------------------
 void System::update()
 {
-    for(auto& it : m_EntityList)
-#ifdef ONTOLOGY_MULTITHREADING
-        this->world->getIoService().post(
-                boost::bind(&System::processEntity, this, boost::ref(it))
-        );
-        // wait for all entities to be processed
-        this->world->getIoService().poll();
-#else
-        this->processEntity(it);
-#endif
+    // restart iterator, threads will increment this whenever they pick up
+    // a new entity to process until the end is reached.
+    m_ThreadedEntityIterator = m_EntityList.begin();
+
+    // create as many threads as there are cores. Threads will automatically
+    // begin processing entities.
+    boost::thread_group threads;
+    for(int i = 0; i != getNumberOfCores(); ++i)
+        threads.create_thread(boost::bind(&System::joinableThreadEntryPoint, this));
+
+    // main thread goes idle until all entities are processed. Join all threads
+    // when done.
+    this->waitForNotify();
+    threads.join_all();
 }
 
 } // namespace Ontology
