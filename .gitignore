@@ -33,3 +33,6 @@
 
 # temporary files
 *.swp
+
+# OS X Finder Cache files
+.DS_Store
