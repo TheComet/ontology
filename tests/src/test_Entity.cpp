@@ -124,7 +124,7 @@ TEST(NAME, EntityDestructionInformsEntityManagerAboutComponentRemoval)
     // uninteresting calls
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
-    // interesint calls
+    // interesting calls
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::Pointee(TestComponent(2, 4))))
         .Times(1);
 
