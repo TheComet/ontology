@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 #include <ontology/TypeContainers.hpp>
 
 #ifdef ONTOLOGY_MULTITHREADING
@@ -24,6 +24,19 @@ namespace Ontology {
 }
 
 namespace Ontology {
+
+template <class... T>
+inline TypeSet TypeSetGenerator()
+{
+    return TypeSet({&typeid(T)...});
+}
+
+/*!
+ * @brief Used to declare that a system should not receive any entities.
+ *
+ * See SystemManager or SystemManager::addSystem() for more information.
+ */
+struct None {};
 
 /*!
  * @brief A system acts upon entities and their components.
@@ -41,7 +54,7 @@ namespace Ontology {
  * @see World
  * @see SystemManager
  */
-class ONTOLOGY_API System
+class ONTOLOGY_PUBLIC_API System
 {
     typedef std::vector< std::reference_wrapper<Entity> > EntityList;
 public:
@@ -69,22 +82,30 @@ public:
     /*!
      * @brief Informs the system of the components it should support.
      */
-    void setSupportedComponents(const TypeSet&);
+    template <class... T>
+    inline void supportsComponents()
+    {
+        m_SupportedComponents = TypeSetGenerator<T...>();
+    }
 
     /*!
      * @brief Gets the typeset of supported components.
      */
-    const TypeSet& getSupportedComponents() const;
+    ONTOLOGY_LOCAL_API const TypeSet& getSupportedComponents() const;
 
     /*!
      * @brief Informs the system about which systems need to execute before it.
      */
-    void setDependingSystems(const TypeSet&);
+    template <class... T>
+    inline void executesAfter()
+    {
+        m_DependingSystems = TypeSetGenerator<T...>();
+    }
 
     /*!
      * @brief Gets the typeset of depending systems.
      */
-    const TypeSet& getDependingSystems() const;
+    ONTOLOGY_LOCAL_API const TypeSet& getDependingSystems() const;
 
     /*!
      * @brief Called by the SystemManager when it receives an update event from an entity.
@@ -93,7 +114,7 @@ public:
      * entity in question. If it can, it will add the entity to its internal
      * list of supported entities.
      */
-    void informEntityUpdate(Entity&);
+    ONTOLOGY_LOCAL_API void informEntityUpdate(Entity&);
 
     /*!
      * @brief Called by the SystemManager when it receives an entity destroyed event.
@@ -101,19 +122,19 @@ public:
      * This causes the system to remove the entity from its internal list of
      * supported entities, if it exists.
      */
-    void informDestroyedEntity(const Entity&);
+    ONTOLOGY_LOCAL_API void informDestroyedEntity(const Entity&);
 
-    void informEntitiesReallocated(std::vector<Entity>&);
+    ONTOLOGY_LOCAL_API void informEntitiesReallocated(std::vector<Entity>&);
 
     /*!
      * @brief Informs the system of the world it is part of.
      */
-    void setWorld(World*);
+    ONTOLOGY_LOCAL_API void setWorld(World*);
 
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    void update();
+    ONTOLOGY_LOCAL_API void update();
 
 protected:
 
@@ -124,16 +145,13 @@ protected:
 
 private:
 
-#ifdef ONTOLOGY_MULTITHREADING
-    void joinableThreadEntryPoint();
-    void waitForNotify();
-#endif
-
     TypeSet         m_SupportedComponents;
     TypeSet         m_DependingSystems;
     EntityList      m_EntityList;
 
 #ifdef ONTOLOGY_MULTITHREADING
+    void joinableThreadEntryPoint();
+    void waitForNotify();
     boost::condition_variable m_ConditionVariable;
     boost::mutex m_Mutex;
     EntityList::iterator m_ThreadedEntityIterator;

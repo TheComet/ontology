@@ -69,21 +69,9 @@ System::~System()
 }
 
 // ----------------------------------------------------------------------------
-void System::setSupportedComponents(const TypeSet& components)
-{
-    m_SupportedComponents = components;
-}
-
-// ----------------------------------------------------------------------------
 const TypeSet& System::getSupportedComponents() const
 {
     return m_SupportedComponents;
-}
-
-// ----------------------------------------------------------------------------
-void System::setDependingSystems(const TypeSet& systems)
-{
-    m_DependingSystems = systems;
 }
 
 // ----------------------------------------------------------------------------
@@ -101,7 +89,7 @@ void System::setWorld(World* world)
 // ----------------------------------------------------------------------------
 void System::informEntityUpdate(Entity& entity)
 {
-    for(auto& it : m_EntityList)
+    for(const auto& it : m_EntityList)
         if(&it.get() == &entity)
             return;
 
@@ -158,8 +146,8 @@ void System::update()
 
     // restart iterator, threads will increment this whenever they pick up
     // a new entity to process until the end is reached.
-
     m_ThreadedEntityIterator = m_EntityList.begin();
+
     // create as many threads as there are cores. Threads will automatically
     // begin processing entities.
     boost::thread_group threads;

@@ -18,6 +18,12 @@ configure_file (
 )
 
 ###############################################################################
+# defines
+###############################################################################
+
+add_definitions (-DONTOLOGY_BUILDING_LIBRARY)
+
+###############################################################################
 # source and header files
 ###############################################################################
 
@@ -29,7 +35,6 @@ set (ontology_HEADERS
 	"include/ontology/EntityManager.hpp"
 	"include/ontology/EntityManagerInterface.hpp"
 	"include/ontology/EntityManagerListener.hpp"
-	"include/ontology/Export.hpp"
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"

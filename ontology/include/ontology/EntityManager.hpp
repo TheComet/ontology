@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 #include <ontology/EntityManagerInterface.hpp>
 #include <ontology/ListenerDispatcher.hpp>
 
@@ -35,7 +35,7 @@ namespace Ontology {
  * @see Entity
  * @see World
  */
-class ONTOLOGY_API EntityManager : public EntityManagerInterface
+class ONTOLOGY_PUBLIC_API EntityManager : public EntityManagerInterface
 {
 public:
 
@@ -45,6 +45,11 @@ public:
      * @brief Default constructor
      */
     EntityManager();
+
+    /*!
+     * @brief Default destructor
+     */
+    ~EntityManager();
 
     /*!
      * @brief Creates a new entity and adds it to the world.
@@ -68,18 +73,9 @@ public:
     void destroyEntities(const char* name) override;
 
     /*!
-     * @brief Called by entities when they add a new component.
-     * @param entity The entity adding a new component.
-     * @param component The component being added.
+     * @brief Destroys all entities. Everything.
      */
-    void informAddComponent(Entity& entity, const Component* component) const override;
-
-    /*!
-     * @brief Called by entities when they remove a component.
-     * @param entity The entity removing a component.
-     * @param component The component being removed.
-     */
-    void informRemoveComponent(Entity& entity, const Component* component) const override;
+    void destroyAllEntities() override;
 
     /*!
      * @brief Gets a list of entities of type EntityManager::EntityList.
@@ -92,6 +88,20 @@ public:
     ListenerDispatcher<EntityManagerListener> event;
 
 private:
+
+    /*!
+     * @brief Called by entities when they add a new component.
+     * @param entity The entity adding a new component.
+     * @param component The component being added.
+     */
+    void informAddComponent(Entity& entity, const Component* component) const override;
+
+    /*!
+     * @brief Called by entities when they remove a component.
+     * @param entity The entity removing a component.
+     * @param component The component being removed.
+     */
+    void informRemoveComponent(Entity& entity, const Component* component) const override;
 
     /*!
      * @brief Dispatches a reallocation event if the capacity has changed.

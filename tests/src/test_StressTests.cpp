@@ -23,7 +23,6 @@ inline bool operator==(const Position& lhs, const Position rhs)
 
 struct Movement : public System
 {
-    Movement(int x) {}
     void initialise() override {}
     void processEntity(Entity& e) override
     {
@@ -40,10 +39,10 @@ TEST(NAME, ThousandEntities)
 {
     World world;
     world.getSystemManager()
-        .addSystem<Movement>(6)
-        .initialise()
-        ;
-    for(int i = 0; i != 10000; ++i)
+        .addSystem<Movement>();
+    world.getSystemManager().initialise();
+
+    for(int i = 0; i != 1000; ++i)
         world.getEntityManager().createEntity("entity")
             .addComponent<Position>(0, 0)
             ;

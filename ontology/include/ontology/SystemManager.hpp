@@ -15,32 +15,26 @@ namespace Ontology {
 
 // ----------------------------------------------------------------------------
 template <class T, class... Args>
-SystemManager& SystemManager::addSystem(Args&&... args,
-                         TypeSet supportedComponents,
-                         TypeSet executesBeforeSystems)
+System& SystemManager::addSystem(Args&&... args)
 {
-    // add to system list
     assert(m_SystemList.find(&typeid(T)) == m_SystemList.end());
+
     System* system = new T(args...);
     m_SystemList.emplace_back(
         &typeid(T),
         std::unique_ptr<System>(system)
     );
-    system->setWorld(m_World);
-    system->setSupportedComponents(supportedComponents);
-    // default behaviour is to depend on previously registered system
-    /*if(!executesBeforeSystems.size() && m_SystemList.size() > 1)
-        executesBeforeSystems = TypeSet({(m_SystemList.end()-2)->first});*/
-    system->setDependingSystems(executesBeforeSystems);
-    return *this;
+    this->initSystem(system);
+    return *system;
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-void SystemManager::removeSystem()
+SystemManager& SystemManager::removeSystem()
 {
     m_SystemList.erase(m_SystemList.find(&typeid(T)));
     this->computeExecutionOrder();
+    return *this;
 }
 
 // ----------------------------------------------------------------------------

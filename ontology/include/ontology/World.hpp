@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 
 #include <vector>
 #include <memory>
@@ -35,7 +35,7 @@ namespace Ontology {
  * The world also stores a delta time, which can be accessed from within any
  * registered system.
  */
-class ONTOLOGY_API World
+class ONTOLOGY_PUBLIC_API World
 {
 public:
 
