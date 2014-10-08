@@ -42,12 +42,14 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 	add_definitions (-D_DEBUG -DDEBUG)
 endif ()
 
-if (UNIX)
-	add_definitions (-std=c++11 -pedantic)
-	if (WITH_MULTITHREADING)
-		add_definitions (-pthread)
-	endif (WITH_MULTITHREADING)
-endif (UNIX)
+if (WITH_MULTITHREADING)
+	if (UNIX)
+		add_definitions (-std=c++11 -pedantic)
+		if (WITH_MULTITHREADING)
+			add_definitions (-fopenmp -pthread)
+		endif (WITH_MULTITHREADING)
+	endif (UNIX)
+endif ()
 
 ###############################################################################
 # set up project

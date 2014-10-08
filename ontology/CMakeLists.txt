@@ -76,9 +76,9 @@ if (WITH_MULTITHREADING)
 	)
 
 	# work around gcc bug on unix where -pthread doesn't link against
-	# pthread
+	# pthread and -fopenmp doesn't link against libgomp
 	if (UNIX)
-		target_link_libraries (ontology pthread)
+		target_link_libraries (ontology pthread gomp)
 	endif ()
 endif (WITH_MULTITHREADING)
 

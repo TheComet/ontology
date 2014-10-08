@@ -151,10 +151,15 @@ void System::waitForNotify()
 // ----------------------------------------------------------------------------
 void System::update()
 {
+    #pragma omp parallel for
+    for(auto it = m_EntityList.begin(); it < m_EntityList.end(); ++it)
+        this->processEntity(*it);
+    return;
+
     // restart iterator, threads will increment this whenever they pick up
     // a new entity to process until the end is reached.
-    m_ThreadedEntityIterator = m_EntityList.begin();
 
+    m_ThreadedEntityIterator = m_EntityList.begin();
     // create as many threads as there are cores. Threads will automatically
     // begin processing entities.
     boost::thread_group threads;
