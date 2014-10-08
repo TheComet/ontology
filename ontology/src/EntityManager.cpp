@@ -20,6 +20,12 @@ EntityManager::EntityManager()
 }
 
 // ----------------------------------------------------------------------------
+EntityManager::~EntityManager()
+{
+    this->destroyAllEntities();
+}
+
+// ----------------------------------------------------------------------------
 Entity& EntityManager::createEntity(const char* name)
 {
     m_EntityList.emplace_back(name, this);
@@ -50,10 +56,28 @@ void EntityManager::destroyEntities(const char* name)
     while(it != m_EntityList.end())
     {
         if(!strcmp(it->getName(), name))
+        {
+            this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
             it = m_EntityList.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
+    this->handleEntityReallocation(true);
+}
+
+// ----------------------------------------------------------------------------
+void EntityManager::destroyAllEntities()
+{
+    auto it = m_EntityList.begin();
+    while(it != m_EntityList.end())
+    {
+        this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
+        it = m_EntityList.erase(it);
+    }
+    this->handleEntityReallocation(true);
 }
 
 // ----------------------------------------------------------------------------

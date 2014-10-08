@@ -69,7 +69,7 @@ System::~System()
 }
 
 // ----------------------------------------------------------------------------
-void System::setSupportedComponents(const TypeSet& components)
+void System::supportsComponents(const TypeSet& components)
 {
     m_SupportedComponents = components;
 }
@@ -81,7 +81,7 @@ const TypeSet& System::getSupportedComponents() const
 }
 
 // ----------------------------------------------------------------------------
-void System::setDependingSystems(const TypeSet& systems)
+void System::executesAfter(const TypeSet& systems)
 {
     m_DependingSystems = systems;
 }
@@ -101,7 +101,7 @@ void System::setWorld(World* world)
 // ----------------------------------------------------------------------------
 void System::informEntityUpdate(Entity& entity)
 {
-    for(auto& it : m_EntityList)
+    for(const auto& it : m_EntityList)
         if(&it.get() == &entity)
             return;
 
@@ -151,6 +151,9 @@ void System::waitForNotify()
 // ----------------------------------------------------------------------------
 void System::update()
 {
+    for(auto& it : m_EntityList)
+        this->processEntity(it);
+    return;
     // restart iterator, threads will increment this whenever they pick up
     // a new entity to process until the end is reached.
     m_ThreadedEntityIterator = m_EntityList.begin();

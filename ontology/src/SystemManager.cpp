@@ -30,6 +30,12 @@ SystemManager::~SystemManager()
 }
 
 // ----------------------------------------------------------------------------
+void SystemManager::initSystem(System* system)
+{
+    system->setWorld(m_World);
+}
+
+// ----------------------------------------------------------------------------
 void SystemManager::initialise()
 {
     this->computeExecutionOrder();

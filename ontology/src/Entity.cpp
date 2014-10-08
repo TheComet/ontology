@@ -20,14 +20,17 @@ Entity::Entity(const char* name, const EntityManagerInterface* creator) :
 // ----------------------------------------------------------------------------
 Entity::~Entity()
 {
+    // dispatch remove component events
+    for(const auto& it : m_ComponentMap)
+        m_Creator->informRemoveComponent(*this, it.second.get());
 }
 
 // ----------------------------------------------------------------------------
 bool Entity::supportsSystem(const System& system) const
-{/*
+{
     for(const auto& it : system.getSupportedComponents())
         if(m_ComponentMap.find(it) == m_ComponentMap.end())
-            return false;*/
+            return false;
     return true;
 }
 

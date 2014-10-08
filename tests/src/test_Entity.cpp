@@ -14,6 +14,7 @@ struct MockEntityManager : public EntityManagerInterface
     Entity& createEntity(const char*) { return entity; }
     MOCK_METHOD1(destroyEntity, void(Entity&));
     MOCK_METHOD1(destroyEntities, void(const char*));
+    MOCK_METHOD0(destroyAllEntities, void());
     MOCK_CONST_METHOD2(informAddComponent, void(Entity&, const Component*));
     MOCK_CONST_METHOD2(informRemoveComponent, void(Entity&, const Component*));
 
@@ -64,6 +65,11 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
 {
     MockEntityManager entityManager;
     Entity entity("entity", &entityManager);
+
+    // uninteresting calls
+    EXPECT_CALL(entityManager, informRemoveComponent(testing::_, testing::_));
+
+    // interesting calls
     EXPECT_CALL(entityManager, informAddComponent(testing::_, testing::_))
         .Times(1);
 
@@ -76,10 +82,15 @@ TEST(NAME, GettingNonExistingComponentsCausesDeath)
 {
     MockEntityManager entityManager;
     Entity entity("entity", &entityManager);
+
+    // uninteresting calls
+    EXPECT_CALL(entityManager, informRemoveComponent(testing::_, testing::_));
+
+    // interesint calls
     EXPECT_CALL(entityManager, informAddComponent(testing::_, testing::_))
         .Times(1);
-    entity.addComponent<TestComponent>(2, 3);
 
+    entity.addComponent<TestComponent>(2, 3);
     ASSERT_EQ(TestComponent(2, 3), entity.getComponent<TestComponent>());
     ASSERT_DEATH(entity.getComponent<NonExistingComponent>(), "");
 }

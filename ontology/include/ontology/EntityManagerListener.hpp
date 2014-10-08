@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 
 #include <vector>
 
@@ -25,7 +25,7 @@ namespace Ontology {
 /*!
  * @brief Listener interface for classes that want to listen to EntityManager events.
  */
-class ONTOLOGY_API EntityManagerListener
+class ONTOLOGY_PUBLIC_API EntityManagerListener
 {
 public:
 

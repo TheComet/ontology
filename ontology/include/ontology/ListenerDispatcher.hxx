@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 
 #include <map>
 #include <string>
@@ -58,7 +58,7 @@ namespace Ontology {
  * @endcode
  */
 template <class LISTENER_CLASS>
-class ONTOLOGY_API ListenerDispatcher
+class ONTOLOGY_PUBLIC_API ListenerDispatcher
 {
 public:
 

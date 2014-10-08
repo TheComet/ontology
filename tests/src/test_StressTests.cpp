@@ -41,9 +41,9 @@ TEST(NAME, ThousandEntities)
 {
     World world;
     world.getSystemManager()
-        .addSystem<Movement>()
-        .initialise()
-        ;
+        .addSystem<Movement>();
+    world.getSystemManager().initialise();
+
     for(int i = 0; i != 1000; ++i)
         world.getEntityManager().createEntity("entity")
             .addComponent<Position>(0, 0)
@@ -56,3 +56,4 @@ TEST(NAME, ThousandEntities)
         ASSERT_EQ(Position(2000, 1000), entity.getComponent<Position>());
     }
 }
+
