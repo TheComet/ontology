@@ -35,7 +35,6 @@ set (ontology_HEADERS
 	"include/ontology/EntityManager.hpp"
 	"include/ontology/EntityManagerInterface.hpp"
 	"include/ontology/EntityManagerListener.hpp"
-	"include/ontology/Export.hpp"
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"
