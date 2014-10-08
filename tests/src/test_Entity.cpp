@@ -50,7 +50,18 @@ struct MockEntityManager : public MockEntityManagerHelper
     MOCK_METHOD0(destroyAllEntities, void());
     MOCK_CONST_METHOD2(informAddComponentHelper, void(Entity&, const TestComponent*));
     MOCK_CONST_METHOD2(informRemoveComponentHelper, void(Entity&, const TestComponent*));
+};
 
+struct SupportedSystem : public System
+{
+    void initialise() override {}
+    void processEntity(Entity&) override {}
+};
+
+struct UnsupportedSystem : public System
+{
+    void initialise() override {}
+    void processEntity(Entity&) override {}
 };
 
 // ----------------------------------------------------------------------------
@@ -69,6 +80,7 @@ TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)
     MockEntityManager em;
     Entity entity("entity", &em);
 
+    // interesting calls
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::Pointee(TestComponent(2, 3))))
         .Times(1);
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::Pointee(TestComponent(12, 3))))
@@ -85,7 +97,7 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
     Entity entity("entity", &em);
 
     // uninteresting calls
-    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_));
+    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
     // interesting calls
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::Pointee(TestComponent(2, 3))))
@@ -102,8 +114,8 @@ TEST(NAME, GettingNonExistingComponentsCausesDeath)
     Entity entity("entity", &em);
 
     // uninteresting calls
-    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_));
-    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_));
+    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
+    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
     entity.addComponent<TestComponent>(2, 3);
     ASSERT_EQ(TestComponent(2, 3), entity.getComponent<TestComponent>());
@@ -116,11 +128,28 @@ TEST(NAME, EntityDestructionInformsEntityManagerAboutComponentRemoval)
     Entity entity("entity", &em);
 
     // uninteresting calls
-    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_));
+    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
     // interesint calls
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::Pointee(TestComponent(2, 4))))
         .Times(1);
 
     entity.addComponent<TestComponent>(2, 4);
+}
+
+TEST(NAME, CheckForSupportedSystems)
+{
+    MockEntityManager em;
+    SupportedSystem supported; supported.supportsComponents<TestComponent>();
+    UnsupportedSystem unsupported; unsupported.supportsComponents<None>();
+    Entity entity("entity", &em);
+
+    // uninteresting calls
+    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
+    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
+
+    entity.addComponent<TestComponent>(5, 5);
+
+    ASSERT_EQ(true, entity.supportsSystem(supported));
+    ASSERT_EQ(true, !entity.supportsSystem(unsupported));
 }

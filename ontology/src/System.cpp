@@ -69,21 +69,9 @@ System::~System()
 }
 
 // ----------------------------------------------------------------------------
-void System::supportsComponents(const TypeSet& components)
-{
-    m_SupportedComponents = components;
-}
-
-// ----------------------------------------------------------------------------
 const TypeSet& System::getSupportedComponents() const
 {
     return m_SupportedComponents;
-}
-
-// ----------------------------------------------------------------------------
-void System::executesAfter(const TypeSet& systems)
-{
-    m_DependingSystems = systems;
 }
 
 // ----------------------------------------------------------------------------

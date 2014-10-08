@@ -82,7 +82,11 @@ public:
     /*!
      * @brief Informs the system of the components it should support.
      */
-    void supportsComponents(const TypeSet&);
+    template <class... T>
+    inline void supportsComponents()
+    {
+        m_SupportedComponents = TypeSetGenerator<T...>();
+    }
 
     /*!
      * @brief Gets the typeset of supported components.
@@ -92,7 +96,11 @@ public:
     /*!
      * @brief Informs the system about which systems need to execute before it.
      */
-    void executesAfter(const TypeSet&);
+    template <class... T>
+    inline void executesAfter()
+    {
+        m_DependingSystems = TypeSetGenerator<T...>();
+    }
 
     /*!
      * @brief Gets the typeset of depending systems.
