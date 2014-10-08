@@ -52,13 +52,7 @@ struct MockEntityManager : public MockEntityManagerHelper
     MOCK_CONST_METHOD2(informRemoveComponentHelper, void(Entity&, const TestComponent*));
 };
 
-struct SupportedSystem : public System
-{
-    void initialise() override {}
-    void processEntity(Entity&) override {}
-};
-
-struct UnsupportedSystem : public System
+struct TestSystem : public System
 {
     void initialise() override {}
     void processEntity(Entity&) override {}
@@ -137,19 +131,27 @@ TEST(NAME, EntityDestructionInformsEntityManagerAboutComponentRemoval)
     entity.addComponent<TestComponent>(2, 4);
 }
 
-TEST(NAME, CheckForSupportedSystems)
+TEST(NAME, CheckForSupportedSystemsUpdatesWhenComponentsAreAddedOrRemoved)
 {
     MockEntityManager em;
-    SupportedSystem supported; supported.supportsComponents<TestComponent>();
-    UnsupportedSystem unsupported; unsupported.supportsComponents<None>();
+    TestSystem supported; supported.supportsComponents<TestComponent>();
+    TestSystem unsupported; unsupported.supportsComponents<None>();
     Entity entity("entity", &em);
 
     // uninteresting calls
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
+    ASSERT_EQ(true, !entity.supportsSystem(supported));
+    ASSERT_EQ(true, !entity.supportsSystem(unsupported));
+
     entity.addComponent<TestComponent>(5, 5);
 
     ASSERT_EQ(true, entity.supportsSystem(supported));
+    ASSERT_EQ(true, !entity.supportsSystem(unsupported));
+
+    entity.removeComponent<TestComponent>();
+
+    ASSERT_EQ(true, !entity.supportsSystem(supported));
     ASSERT_EQ(true, !entity.supportsSystem(unsupported));
 }
