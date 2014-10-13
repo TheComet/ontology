@@ -102,6 +102,18 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
     ASSERT_DEATH(entity.addComponent<TestComponent>(3, 4), "");
 }
 
+TEST(NAME, RemovingNonExistingComponentCausesDeath)
+{
+    MockEntityManager em;
+    Entity entity("entity", &em);
+
+    // uninteresting calls
+    EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
+    EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
+
+    ASSERT_DEATH(entity.removeComponent<NonExistingComponent>(), "");
+}
+
 TEST(NAME, GettingNonExistingComponentsCausesDeath)
 {
     MockEntityManager em;

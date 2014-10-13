@@ -30,6 +30,7 @@ template<class T>
 void Entity::removeComponent()
 {
     const auto it = m_ComponentMap.find(&typeid(T));
+    assert(it != m_ComponentMap.end());
     m_Creator->informRemoveComponent(*this, it->second.get());
     m_ComponentMap.erase(it);
 }
