@@ -38,6 +38,7 @@ set (ontology_HEADERS
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"
+	"include/ontology/System.hxx"
 	"include/ontology/SystemManager.hpp"
 	"include/ontology/SystemManager.hxx"
 	"include/ontology/TypeContainers.hpp"
