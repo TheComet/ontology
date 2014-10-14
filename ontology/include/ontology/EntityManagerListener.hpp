@@ -27,7 +27,7 @@ namespace Ontology {
  */
 class ONTOLOGY_PUBLIC_API EntityManagerListener
 {
-public:
+PUBLIC:
 
     /*!
      * @brief Called when a new entity was created.

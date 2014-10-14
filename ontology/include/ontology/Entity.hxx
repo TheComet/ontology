@@ -8,6 +8,7 @@
 //----------------------------------------------------------------------------
 //include files
 
+#include <ontology/Config.hpp>
 #include <ontology/TypeContainers.hpp>
 
 #include <map>
@@ -51,7 +52,7 @@ namespace Ontology{
  */
 class Entity
 {
-public:
+PUBLIC:
 
     /*!
      * @brief Construct an entity with a name.
@@ -107,7 +108,7 @@ public:
      */
     const char* getName() const;
 
-private:
+PRIVATE:
 
     TypeMapSharedPtr<Component>     m_ComponentMap;
     const char*                     m_Name;

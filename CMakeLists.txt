@@ -51,6 +51,10 @@ if (WITH_MULTITHREADING)
 	endif (UNIX)
 endif ()
 
+if (BUILD_TESTS)
+    add_definitions (-DTESTING)
+endif ()
+
 ###############################################################################
 # set up project
 ###############################################################################
