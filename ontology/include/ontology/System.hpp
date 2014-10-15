@@ -27,7 +27,7 @@ inline void System::supportsComponents()
 template <class... T>
 inline void System::executesAfter()
 {
-        m_DependingSystems = TypeSetGenerator<T...>();
+    m_DependingSystems = TypeSetGenerator<T...>();
 }
 
 } // namespace Ontology
