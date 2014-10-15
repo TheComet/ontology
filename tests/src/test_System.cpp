@@ -15,6 +15,21 @@ struct MockSystem : public System
     MOCK_METHOD0(initialise, void());
 };
 
+class TestEntityManager : public EntityManagerInterface
+{
+    // WARNING: DO NOT CALL THIS FUNCTION - It is required to be implemented
+    // by the base class (abstract function) but doesn't do what it is intended
+    // to. This is only here to make the compiler happy.
+    Entity& createEntity(const char* name) override { Entity("invalid_entity", this); }
+    
+    // uninteresting, implement abstracts
+    void destroyEntity(Entity&) override {}
+    void destroyEntities(const char*) override {}
+    void destroyAllEntities() override {}
+    void informAddComponent(Entity&, const Component*) const override {}
+    void informRemoveComponent(Entity&, const Component*) const override {}
+};
+
 #define OVERRIDE_NECESSARY void processEntity(Entity&) override {} void initialise() override {} 
 struct DependencySystem1 : public System { OVERRIDE_NECESSARY };
 struct DependencySystem2 : public System { OVERRIDE_NECESSARY };
@@ -61,4 +76,104 @@ TEST(NAME, ReceivesDependingSystems)
     ASSERT_EQ(system.getDependingSystems().end(), system.getDependingSystems().find(&typeid(NonDependingSystem)));
 }
 
-TEST(NAME, 
+TEST(NAME, AcceptsSupportedEntities)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    Entity entity("entity", &em);
+    
+    ASSERT_EQ(0, system.m_EntityList.size());
+    
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(0, system.m_EntityList.size());
+    
+    entity.addComponent<SupportedComponent2>();
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(0, system.m_EntityList.size());
+    
+    entity.addComponent<SupportedComponent1>();
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(1, system.m_EntityList.size());
+}
+
+TEST(NAME, DoesntAddEntitiesTwiceOnEntityUpdate)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    Entity entity("entity1", &em);
+    entity.addComponent<SupportedComponent1>();
+    system.informEntityUpdate(entity);
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(1, system.m_EntityList.size());
+}
+
+TEST(NAME, RemovesEntitiesNoLongerSupportedBySystem)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    Entity entity("entity", &em);
+    entity.addComponent<SupportedComponent1>();
+    
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(1, system.m_EntityList.size());
+    
+    entity.removeComponent<SupportedComponent1>();
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(0, system.m_EntityList.size());
+}
+
+TEST(NAME, RemovesEntitiesAboutToBeDestroyed)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    Entity entity("entity", &em);
+    entity.addComponent<SupportedComponent1>();
+    
+    system.informEntityUpdate(entity);
+    ASSERT_EQ(1, system.m_EntityList.size());
+    
+    system.informDestroyedEntity(entity);
+    ASSERT_EQ(0, system.m_EntityList.size());
+}
+
+TEST(NAME, ReallocatedEntitiesAreReprocessed)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    std::vector<Entity> entityList;
+    entityList.push_back(Entity("entity", &em));
+    entityList.push_back(Entity("entity", &em));
+    entityList[0].addComponent<SupportedComponent1>();
+    entityList[1].addComponent<SupportedComponent1>();
+    
+    system.informEntityUpdate(entityList[0]);
+    system.informEntityUpdate(entityList[1]);
+    
+    ASSERT_EQ(2, system.m_EntityList.size());
+    
+    system.informEntitiesReallocated(entityList);
+    ASSERT_EQ(2, system.m_EntityList.size());
+    
+    // try removing a component and sending a re-allocation event
+    entityList[0].removeComponent<SupportedComponent1>();
+    system.informEntitiesReallocated(entityList);
+    ASSERT_EQ(1, system.m_EntityList.size());
+}
+
+TEST(NAME, UpdatingSystemCallsInheritingClass)
+{
+    MockSystem system;
+    system.supportsComponents<SupportedComponent1>();
+    TestEntityManager em;
+    Entity entity("entity", &em);
+    entity.addComponent<SupportedComponent1>();
+    system.informEntityUpdate(entity);
+    
+    EXPECT_CALL(system, processEntity(testing::_));
+    system.update();
+}

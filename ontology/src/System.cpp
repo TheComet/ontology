@@ -89,9 +89,15 @@ void System::setWorld(World* world)
 // ----------------------------------------------------------------------------
 void System::informEntityUpdate(Entity& entity)
 {
-    for(const auto& it : m_EntityList)
-        if(&it.get() == &entity)
+    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+        if(&it->get() == &entity)
+        {
+            if(entity.supportsSystem(*this))
+                return;
+            // entity is no longer supported by this system
+            m_EntityList.erase(it);
             return;
+        }
 
     if(entity.supportsSystem(*this))
         m_EntityList.push_back(entity);
@@ -102,7 +108,10 @@ void System::informDestroyedEntity(const Entity& entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
         if(&it->get() == &entity)
+        {
             m_EntityList.erase(it);
+            return;
+        }
 }
 
 // ----------------------------------------------------------------------------
