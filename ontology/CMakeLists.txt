@@ -28,6 +28,7 @@ add_definitions (-DONTOLOGY_BUILDING_LIBRARY)
 ###############################################################################
 
 set (ontology_HEADERS
+    "include/ontology/Config.hpp.in"
 	"include/ontology/Config.hpp"
 	"include/ontology/Component.hpp"
 	"include/ontology/Entity.hpp"

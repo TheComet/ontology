@@ -31,6 +31,7 @@
     // define visibility macros
     // --------------------------------------------------------------
 
+    // define platform dependent and build dependent visibility macro helpers
 #   if defined(ONTOLOGY_SHARED)
 #       if defined(ONTOLOGY_PLATFORM_WINDOWS)
 #           if defined(__GNUC__)
@@ -65,12 +66,33 @@
 #       error Please define ONTOLOGY_SHARED or ONTOLOGY_STATIC
 #   endif
 
+    // define public API macro, depending on whether the library is being
+    // built or being linked against.
 #   if defined(ONTOLOGY_BUILDING_LIBRARY) // defined by CMake when library is being compiled
 #       define ONTOLOGY_PUBLIC_API ONTOLOGY_HELPER_API_EXPORT
 #   else
 #       define ONTOLOGY_PUBLIC_API ONTOLOGY_HELPER_API_IMPORT
 #   endif
-#   define ONTOLOGY_LOCAL_API ONTOLOGY_HELPER_API_LOCAL
+
+    // define local visibility macro. If we're testing, everything
+    // is visible
+#   if defined(TESTING)
+#       define ONTOLOGY_LOCAL_API ONTOLOGY_PUBLIC_API
+#   else
+#       define ONTOLOGY_LOCAL_API ONTOLOGY_HELPER_API_LOCAL
+#   endif
+
+    // define class member visibility macros. If we're testing, everything
+    // is public
+#   if defined(TESTING)
+#       define PUBLIC public
+#       define PROTECTED public
+#       define PRIVATE public
+#   else
+#       define PUBLIC public
+#       define PROTECTED protected
+#       define PRIVATE private
+#   endif
 
 namespace Ontology {
 
