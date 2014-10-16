@@ -43,10 +43,10 @@ namespace Ontology{
  * demonstrating this:
  * @code
  * world.getEntityManager().createEntity("My Entity")
- *         .addComponent(new Position(0, 0))
- *         .addComponent(new Velocity(1, 2))
- *         .addComponent(new Sprite("player.png"))
- *         ;
+ *     .addComponent<Position>(0, 0)
+ *     .addComponent<Velocity>(1, 2)
+ *     .addComponent<Sprite>("player.png")
+ *     ;
  * @endcode
  * @see Component
  */
@@ -67,25 +67,34 @@ PUBLIC:
     /*!
      * @brief Add a component to this entity.
      *
-     * @param component The component to add. Entity owns the passed object
-     * after calling this and is responsible for deleting it. Make sure to use
-     * **new** when instantiating your component.
+     * @param component The component to add to this Entity. The Component
+     * type is passed as a template argument. If the Component has a
+     * constructor that takes arguments, you may supply those directly as
+     * arguments to this function call. E.g.
+     * @code
+     * myEntity.addComponent<Position2D>(4.2, 6.0);
+     * @endcode
      *
      * @note You can only register one instance of every type of component.
-     * @return Returns a reference to itself. This is to allow chaining.
+     * @return Returns a reference to this Entity. This is to allow chaining.
      */
     template<class T, class... Args>
     Entity& addComponent(Args&&...);
 
     /*!
      * @brief Remove a component from this entity.
+     * 
+     * The component to be removed is passed as a template argument. E.g.
+     * @code
+     * myEntity.removeComponent<Position2D>();
+     * @endcode
      */
     template<class T>
     void removeComponent();
 
     /*!
      * @brief Get a component from the entity.
-     * @return A pointer to the requested component.
+     * @return A reference to the requested component.
      */
     template<class T>
     T& getComponent();

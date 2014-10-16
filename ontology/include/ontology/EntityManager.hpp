@@ -54,14 +54,17 @@ PUBLIC:
     /*!
      * @brief Creates a new entity and adds it to the world.
      *
-     * @param name The name to give the new entity.
-     * @note Note that you can have multiple entities with the same name.
+     * @param name The name to give the new entity. Doesn't have to be globally
+     * unique.
+     * @warning The returned reference may become invalidated if you add
+     * another entity. Behind the scenes, entities are stored in contiguous
+     * memory for optimisation, and adding an entity could cause a re-allocation.
      * @return Returns a reference to the newly created entity.
      */
     Entity& createEntity(const char* name="") override;
 
     /*!
-     * @brief Destroys an entity by pointer.
+     * @brief Destroys the specified entity.
      * @param entity The entity to destroy.
      */
     void destroyEntity(Entity& entity) override;
@@ -79,6 +82,8 @@ PUBLIC:
 
     /*!
      * @brief Gets a list of entities of type EntityManager::EntityList.
+     *
+     * You can iterate over the list using standard iterators.
      */
     const EntityList& getEntityList() const;
 

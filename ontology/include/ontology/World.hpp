@@ -26,11 +26,14 @@ namespace Ontology {
  * multiple worlds. Instances of Entity, Component and System cannot be
  * transferred between worlds. What can be done is to dispatch listener events
  * from one system in one world to another system in another world. They will
- * have to register to themselves in order for this to work.
+ * have to register to each other in order for this to work.
  *
  * World has two main parts. It has an EntityManager and a SystemManager. These
  * are responsible for adding and removing entities, components and systems to
  * your world.
+ * 
+ * World has a method, World::update(), which will udpate all registered
+ * systems.
  *
  * The world also stores a delta time, which can be accessed from within any
  * registered system.

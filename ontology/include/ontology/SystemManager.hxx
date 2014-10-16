@@ -39,33 +39,34 @@ namespace Ontology {
  * more information.
  *
  * @note SystemManager supports chaining and the programmer is encouraged to
- * use this feature. The following demonstrates the syntax that should be used:
+ * use this feature. The following demonstrates the recommended syntax:
  * @code
- * world.getSystemManager()
- *     .addSystem(new MainLoop,
- *         Ontology::SupportsComponents<
- *             Ontology::None>())
- *     .addSystem(new MovementSystem,
- *         Ontology::SupportsComponents<
+ * // creates and registers some systems with our world
+ * world.getSystemManager().addSystem<MainLoop>()
+ *     .suppportsComponents<
+ *         Ontology::None>());
+ * world.getSystemManager().addSystem<MovementSystem>()
+ *     .supportsComponents<
  *             Position,
- *             Velocity>(),
- *         Ontology::ExecuteAfter<
- *             CollisionSystem>())
- *     .addSystem(new CollisionSystem
- *         Ontology::SupportsComponents<
- *             Position>())
- *     .initialise()
- *     ;
+ *             Velocity>()
+ *     .executeAfter<
+ *             CollisionSystem>());
+ * world.getSystemManager().addSystem<CollisionSystem>()
+ *     .supportsComponents<
+ *             Position>());
+ * 
+ * // initialises all systems
+ * world.getSystemManager().initialise();
  * @endcode
  * Here, **MainLoop** will not receive any entities at all because
- * Ontology::None was declared. **MovementSystem** will receive entities that
- * have a Position and Velocity. **CollisionSystem* will receive entities that
+ * Ontology::None was declared. **MovementSystem** will only receive entities that
+ * have a Position and Velocity. **CollisionSystem* will only receive entities that
  * have a Position.
  *
- * Also note the use of **Ontology::ExecutesAfter**, which guarantees
+ * Also note the use of **executesAfter()**, which guarantees
  * CollisionSystem to be executed **before** MovementSystem.
  *
- * Make sure to call SystemManager::initialise() after adding all of your
+ * @note Make sure to call SystemManager::initialise() after adding all of your
  * systems.
  */
 class ONTOLOGY_PUBLIC_API SystemManager :
@@ -88,43 +89,18 @@ PUBLIC:
     /*!
      * @brief Adds a new system to the world.
      *
-     * @param system The system to add. SystemManager owns the passed object
-     * after calling this and is responsible for deleting it. Make sure to use
-     * **new** when instantiating your system.
-     * @param supportedComponents Declare which components your system will
-     * support. This causes only those entities that actually have all of the
-     * components a system requires to be passed to the system's process loop.
-     * If you don't specify anything, the system will receive all entities
-     * registered to the world.
-     * @param executesBeforeSystems Declare which systems are required to be
-     * executed before this one. This is especially critical when
-     * multithreading is enabled. If nothing is specified, the default setting
-     * is to execute after the last system that was added. This means that if
-     * no system declares execution dependencies, all systems will be executed
-     * linearly, one after another.
-     *
-     * Example:
+     * @param system The system to add. The type of system is passed as a
+     * template argument. If your system has a constructor that requires
+     * arguments, those can be directly supplied as arguments to this function.
      * @code
-     * world.getSystemManager()
-     *    .addSystem(new MovementSystem,
-     *        SupportedComponents<
-     *            Position,
-     *            Velocity
-     *            >())
-     *    .addSystem(new AnotherSystem)
-     *    .initialise()
-     *    ;
+     * world.getSystemManager().addSystem<MySystem>(ConstructorArg1, ConstructorArg2);
      * @endcode
-     * In this example, MovementSystem will only process entities that have a
-     * Position and Velocity component. AnotherSystem will receive all entities
-     * registered to the world (since no supported components were declared).
-     *
      * @note Systems are stored such that the order in which they are added
-     * to the system manager is the order in which they are initialised and
-     * processed. Their destructors are called in reverse order when destroying
+     * to the system manager is the order in which they are initialised.
+     * Their destructors are called in reverse order when destroying
      * the world.
      *
-     * @return Returns itself, allowing the programmer to chain.
+     * @return Returns a reference to the newly added system.
      */
     template <class T, class... Args>
     System& addSystem(Args&&... args);
@@ -136,6 +112,8 @@ PUBLIC:
      * @code
      * world.getSystemManager().removeSystem<MovementSystem>();
      * @endcode
+     * @return Returns a reference to this SystemManager, allowing the user
+     * to chain.
      */
     template <class T>
     SystemManager& removeSystem();
@@ -157,6 +135,7 @@ PUBLIC:
 
     /*!
      * @brief Passes required information to the specified system so it is functional.
+     * @note Should not be called by the user. This is an internal function.
      */
     void initSystem(System*);
 
@@ -172,8 +151,6 @@ PUBLIC:
      * @brief Updates all currently registered systems. Don't call this.
      *
      * @note Don't call this manually, use World::update() instead.
-     * The order in which the systems are added to the system manager is the
-     * order in which they are updated.
      */
     void update();
 

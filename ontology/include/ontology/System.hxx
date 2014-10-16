@@ -78,7 +78,22 @@ PUBLIC:
     virtual void initialise() = 0;
 
     /*!
-     * @brief Informs the system of the components it should support.
+     * @brief Declare which components your system will support.
+     * 
+     * This causes only those entities that actually have all of the
+     * components a system requires to be passed to the system's process loop.
+     * If you don't specify anything, the system will receive all entities
+     * registered to the world.
+     * 
+     * Supported components are supplied via a list of template
+     * arguments. E.g.
+     * @code
+     * mySystem.supportsComponents<
+     *     Position2D,
+     *     Velocity2D>();
+     * @endcode
+     * This would cause the system to only receive entities that have at
+     * least a Position2D and a Velocity2D component.
      */
     template <class... T>
     inline void supportsComponents();
@@ -89,7 +104,22 @@ PUBLIC:
     ONTOLOGY_LOCAL_API const TypeSet& getSupportedComponents() const;
 
     /*!
-     * @brief Informs the system about which systems need to execute before it.
+     * @brief Declare which systems are required to be executed before this one.
+     * 
+     * This allows you to constrain the execution order of systems.
+     * 
+     * If nothing is specified, the default setting is to execute after the
+     * last system that was added. This means that if no system declares
+     * execution dependencies, all systems will be executed linearly, one after
+     * another.
+     * 
+     * The Systems are passed as a list of template arguments. Sometimes, you'll
+     * want MovementSystem to execute before CollisionSystem, in which case you
+     * would write:
+     * @code
+     * collisionSystem.executesAfter<
+     *     MovementSystem>();
+     * @endcode
      */
     template <class... T>
     inline void executesAfter();
