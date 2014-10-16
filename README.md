@@ -15,10 +15,10 @@ It is very simple to compile Ontology using CMake. Just follow these steps:
 1. Install CMake in your system.
 2. Make sure you have cmake in your $PATH variable.
 3. Open a new terminal and go to ontology's folder.
-4. Run this code:
+4. Execute the following commands:
    ```
-   mkdir build.
-   cd build.
+   mkdir build
+   cd build
    cmake ..
    make
    sudo make install.
@@ -39,29 +39,26 @@ int main()
 	Ontology::World world;
 
 	// register various systems with the world
-	world.getSystemManager()
-		.addSystem(new MovementSystem,
-			Ontology::SupportsComponents<
-				Position,
-				Velocity
-				>())
-		.addSystem(new RenderSystem,
-			Ontology::SupportsComponents<
-				Position,
-				Sprite
-				>())
-		.addSystem(new InputSystem)
-		.addSystem(new MainLoop,
-			Ontology::SupportsComponents<
-				Ontology::None>())
-		.initialise()
-		;
+	world.getSystemManager().addSystem<MovementSystem>()
+		.supportsComponents<
+			Position,
+			Velocity>();
+	world.getSystemManager().addSystem<RenderSystem>()
+		.supportsComponents<
+			Position,
+			Sprite>();
+	world.getSystemManager().addSystem<InputSystem>();
+	world.getSystemManager().addSystem<MainLoop>()
+		.supportsComponents<
+			Ontology::None>();
+
+	world.getSystemManager().initialise()
 
 	// create an entity in the world
 	world.getEntityManager().createEntity("Player")
-		.addComponent(new Position(0, 0))
-		.addComponent(new Velocity(0, 0))
-		.addComponent(new Sprite("res/player.png"))
+		.addComponent<Position>(0, 0)
+		.addComponent<Velocity>(0, 0)
+		.addComponent<Sprite>("res/player.png")
 		;
 
 	// run game
