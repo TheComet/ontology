@@ -103,7 +103,7 @@ PUBLIC:
      * @return Returns a reference to the newly added system.
      */
     template <class T, class... Args>
-    System& addSystem(Args&&... args);
+    T& addSystem(Args&&... args);
 
     /*!
      * @brief Removes the specified system from the world.

@@ -29,13 +29,13 @@ struct TypeComparator
 };
 
 /// A set of std::type_info pointers (&typeid(T)).
-typedef typename std::set<const std::type_info*, TypeComparator> TypeSet;
+typedef std::set<const std::type_info*, TypeComparator> TypeSet;
 
 /// A map of std::type_info pointers (&typeid(T)) and a templated type.
 template <class T>
 struct GenericTypeMap
 {
-    typedef typename std::map<const std::type_info*, T, TypeComparator> TypeMap;
+    typedef std::map<const std::type_info*, T, TypeComparator> TypeMap;
 };
 template <class T>
 using TypeMap = typename GenericTypeMap<T>::TypeMap;
@@ -49,7 +49,7 @@ template <class T>
 using TypeMapSharedPtr = typename GenericTypeMap< std::shared_ptr<T> >::TypeMap;
 
 /// A vector of std::type_info pointers (&typeid(T))
-typedef typename std::vector<const std::type_info*> TypeVector;
+typedef std::vector<const std::type_info*> TypeVector;
 
 /// A pair of std::type_info pointers (&typeid(T)) and a templated type.
 template <class T>

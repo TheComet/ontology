@@ -15,11 +15,11 @@ namespace Ontology {
 
 // ----------------------------------------------------------------------------
 template <class T, class... Args>
-System& SystemManager::addSystem(Args&&... args)
+T& SystemManager::addSystem(Args&&... args)
 {
     assert(m_SystemList.find(&typeid(T)) == m_SystemList.end());
 
-    System* system = new T(args...);
+    T* system = new T(args...);
     m_SystemList.emplace_back(
         &typeid(T),
         std::unique_ptr<System>(system)

@@ -22,7 +22,7 @@
 
 namespace Ontology{
     class Component;
-    class EntityManagerInterface;
+    struct EntityManagerInterface;
     class System;
 }
 
