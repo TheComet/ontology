@@ -9,6 +9,8 @@
 #include <ontology/EntityManager.hpp>
 #include <ontology/EntityManagerListener.hpp>
 
+#include <sstream>
+#include <stdexcept>
 #include <string.h>
 
 namespace Ontology {
@@ -78,6 +80,19 @@ void EntityManager::destroyAllEntities()
         it = m_EntityList.erase(it);
     }
     this->handleEntityReallocation(true);
+}
+
+// ----------------------------------------------------------------------------
+Entity& EntityManager::getEntity(Entity::ID entityID)
+{
+    for(auto& it : m_EntityList)
+        if(it.getID() == entityID)
+            return it;
+    
+    std::stringstream ss;
+    ss << "[EntityManager::getEntity] Error: Entity ID " << entityID
+            << "is not registered with this manager";
+    throw std::runtime_error(ss.str());
 }
 
 // ----------------------------------------------------------------------------

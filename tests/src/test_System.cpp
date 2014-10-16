@@ -20,7 +20,9 @@ class TestEntityManager : public EntityManagerInterface
     // WARNING: DO NOT CALL THIS FUNCTION - It is required to be implemented
     // by the base class (abstract function) but doesn't do what it is intended
     // to. This is only here to make the compiler happy.
-    Entity& createEntity(const char* name) override { Entity("invalid_entity", this); }
+    Entity& createEntity(const char* name) override { return e; }
+    Entity& getEntity(Entity::ID) override { return e; }
+    Entity e;
     
     // uninteresting, implement abstracts
     void destroyEntity(Entity&) override {}
@@ -28,6 +30,8 @@ class TestEntityManager : public EntityManagerInterface
     void destroyAllEntities() override {}
     void informAddComponent(Entity&, const Component*) const override {}
     void informRemoveComponent(Entity&, const Component*) const override {}
+public:
+    TestEntityManager() : e("dont_call_this", this) {}
 };
 
 #define OVERRIDE_NECESSARY void processEntity(Entity&) override {} void initialise() override {} 

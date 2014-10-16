@@ -9,6 +9,7 @@
 // include files
 
 #include <ontology/Config.hpp>
+#include <ontology/Entity.hxx>
 
 namespace Ontology {
 
@@ -22,6 +23,7 @@ struct EntityManagerInterface
     virtual void destroyEntity(Entity& entity) = 0;
     virtual void destroyEntities(const char* name) = 0;
     virtual void destroyAllEntities() = 0;
+    virtual Entity& getEntity(Entity::ID) = 0;
     ONTOLOGY_LOCAL_API virtual void informAddComponent(Entity& entity, const Component* component) const = 0;
     ONTOLOGY_LOCAL_API virtual void informRemoveComponent(Entity& entity, const Component* component) const = 0;
 };

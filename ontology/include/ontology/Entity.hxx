@@ -54,6 +54,8 @@ class Entity
 {
 PUBLIC:
 
+    typedef std::size_t ID;
+
     /*!
      * @brief Construct an entity with a name.
      */
@@ -116,9 +118,16 @@ PUBLIC:
      * @return A const char pointer to the entity's name string.
      */
     const char* getName() const;
+    
+    /*!
+     * @brief Gets this entity's globally unique Identifier.
+     */
+    ID getID() const;
 
 PRIVATE:
 
+    static ID                       GUIDCounter;
+    ID                              m_ID;
     TypeMapSharedPtr<Component>     m_ComponentMap;
     const char*                     m_Name;
     const EntityManagerInterface*   m_Creator;

@@ -10,10 +10,13 @@
 
 namespace Ontology {
 
+Entity::ID Entity::GUIDCounter = 0;
+
 // ----------------------------------------------------------------------------
 Entity::Entity(const char* name, const EntityManagerInterface* creator) :
     m_Name(name),
-    m_Creator(creator)
+    m_Creator(creator),
+    m_ID(GUIDCounter++)
 {
 }
 
@@ -38,6 +41,12 @@ bool Entity::supportsSystem(const System& system) const
 const char* Entity::getName() const
 {
     return m_Name;
+}
+
+// ----------------------------------------------------------------------------
+Entity::ID Entity::getID() const
+{
+    return m_ID;
 }
 
 } // namespace Ontology

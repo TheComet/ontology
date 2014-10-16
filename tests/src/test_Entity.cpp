@@ -35,9 +35,14 @@ class MockEntityManagerHelper : public EntityManagerInterface
     // WARNING: DO NOT CALL THIS FUNCTION - It is required to be implemented
     // by the base class (abstract function) but doesn't do what it is intended
     // to. This is only here to make the compiler happy.
-    Entity& createEntity(const char* name) override { Entity("invalid_entity", this); }
+    Entity& createEntity(const char* name) override { return e; }
+    Entity& getEntity(Entity::ID) override { return e; }
+    
+    Entity e;
 
 public:
+    MockEntityManagerHelper() : e("dont_call_this", this) {}
+    
     virtual ~MockEntityManagerHelper() {}
     virtual void informAddComponentHelper(Entity&, const TestComponent*) const = 0;
     virtual void informRemoveComponentHelper(Entity&, const TestComponent*) const = 0;
@@ -67,6 +72,21 @@ TEST(NAME, CreateEntityWithName)
     MockEntityManager em;
     Entity entity("entity1", &em);
     ASSERT_EQ(std::string("entity1"), std::string(entity.getName()));
+}
+
+TEST(NAME, GUIDIncrementsCorrectly)
+{
+    MockEntityManager em;
+    // Entity GUIDs rely on a global static variable. Reset it so we know what
+    // to expect
+    Entity::GUIDCounter = 0;
+    Entity entity1("entity1", &em);
+    Entity entity2("entity2", &em);
+    Entity entity3("entity3", &em);
+    
+    EXPECT_EQ(0, entity1.getID());
+    EXPECT_EQ(1, entity2.getID());
+    EXPECT_EQ(2, entity3.getID());
 }
 
 TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)

@@ -56,10 +56,15 @@ PUBLIC:
      *
      * @param name The name to give the new entity. Doesn't have to be globally
      * unique.
+     * @return Returns a reference to the created entity for chaining purposes.
      * @warning The returned reference may become invalidated if you add
      * another entity. Behind the scenes, entities are stored in contiguous
      * memory for optimisation, and adding an entity could cause a re-allocation.
-     * @return Returns a reference to the newly created entity.
+     * 
+     * If you want to hold on to the created entity for future use, then call
+     * Entity::getID() and store its globally unique identifier. When you need
+     * to access the entity again, use EntityManager::getEntity() to get the
+     * Entity assigned to that ID.
      */
     Entity& createEntity(const char* name="") override;
 
@@ -79,6 +84,17 @@ PUBLIC:
      * @brief Destroys all entities. Everything.
      */
     void destroyAllEntities() override;
+    
+    /*!
+     * @brief Gets a reference to the entity object.
+     * @warning The returned reference may become invalidated if you add
+     * another entity. Behind the scenes, entities are stored in contiguous
+     * memory for optimisation, and adding an entity could cause a re-allocation.
+     * @param entityID The identifier of the entity you wish to get the
+     * reference of.
+     * @return The reference to the entity.
+     */
+    Entity& getEntity(Entity::ID entityID) override;
 
     /*!
      * @brief Gets a list of entities of type EntityManager::EntityList.

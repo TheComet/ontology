@@ -202,3 +202,15 @@ TEST(NAME, DestroyingEntitiesDispatchesReallocationEvent)
     em->createEntity("entity4"); // destroyed by destructor
     delete em;
 }
+
+TEST(NAME, GetEntityByID)
+{
+    EntityManager em;
+    Entity::ID a = em.createEntity("entity1").getID();
+    Entity::ID b = em.createEntity("entity2").getID();
+    Entity::ID c = em.createEntity("entity3").getID();
+    
+    ASSERT_EQ(std::string("entity1"), em.getEntity(a).getName());
+    ASSERT_EQ(std::string("entity2"), em.getEntity(b).getName());
+    ASSERT_EQ(std::string("entity3"), em.getEntity(c).getName());
+}
