@@ -152,7 +152,7 @@ void System::update()
     for(auto it = m_EntityList.begin(); it < m_EntityList.end(); ++it)
         this->processEntity(*it);
     return;
-
+/* TODO get this reviewed
     // restart iterator, threads will increment this whenever they pick up
     // a new entity to process until the end is reached.
     m_ThreadedEntityIterator = m_EntityList.begin();
@@ -166,7 +166,7 @@ void System::update()
     // main thread goes idle until all entities are processed. Join all threads
     // when done.
     this->waitForNotify();
-    threads.join_all();
+    threads.join_all();*/
 }
 
 } // namespace Ontology
