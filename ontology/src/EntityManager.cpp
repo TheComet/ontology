@@ -14,23 +14,39 @@
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-Entity& EntityManager::createEntity(const char* name)
+EntityManager::EntityManager()
 {
-    m_EntityList.push_back(std::unique_ptr<Entity>(new Entity(name, this)));
-    this->event.dispatch(&EntityManagerListener::onCreateEntity, m_EntityList.back().get());
-    return *m_EntityList.back().get();
+    m_EntityListCapacity = m_EntityList.capacity();
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyEntity(Entity* entity)
+EntityManager::~EntityManager()
+{
+    this->destroyAllEntities();
+}
+
+// ----------------------------------------------------------------------------
+Entity& EntityManager::createEntity(const char* name)
+{
+    m_EntityList.emplace_back(name, this);
+    this->event.dispatch(&EntityManagerListener::onCreateEntity, m_EntityList.back());
+    this->handleEntityReallocation();
+    return m_EntityList.back();
+}
+
+// ----------------------------------------------------------------------------
+void EntityManager::destroyEntity(Entity& entity)
 {
     for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(it->get() == entity)
+    {
+        if(&(*it) == &entity)
         {
             this->event.dispatch(&EntityManagerListener::onDestroyEntity, entity);
             m_EntityList.erase(it);
+            this->handleEntityReallocation(true);
             return;
         }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -39,11 +55,29 @@ void EntityManager::destroyEntities(const char* name)
     auto it = m_EntityList.begin();
     while(it != m_EntityList.end())
     {
-        if(!strcmp(it->get()->getName(), name))
+        if(!strcmp(it->getName(), name))
+        {
+            this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
             it = m_EntityList.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
+    this->handleEntityReallocation(true);
+}
+
+// ----------------------------------------------------------------------------
+void EntityManager::destroyAllEntities()
+{
+    auto it = m_EntityList.begin();
+    while(it != m_EntityList.end())
+    {
+        this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
+        it = m_EntityList.erase(it);
+    }
+    this->handleEntityReallocation(true);
 }
 
 // ----------------------------------------------------------------------------
@@ -53,15 +87,24 @@ const EntityManager::EntityList& EntityManager::getEntityList() const
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informAddComponent(Entity* entity, const Component* component) const
+void EntityManager::informAddComponent(Entity& entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onAddComponent, entity, component);
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informRemoveComponent(Entity* entity, const Component* component) const
+void EntityManager::informRemoveComponent(Entity& entity, const Component* component) const
 {
     this->event.dispatch(&EntityManagerListener::onRemoveComponent, entity, component);
+}
+
+// ----------------------------------------------------------------------------
+void EntityManager::handleEntityReallocation(bool force)
+{
+    if(m_EntityListCapacity == m_EntityList.capacity() && !force)
+        return;
+    this->event.dispatch(&EntityManagerListener::onEntitiesReallocated, m_EntityList);
+    m_EntityListCapacity = m_EntityList.capacity();
 }
 
 } // namespace Ontology

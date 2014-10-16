@@ -18,10 +18,17 @@ configure_file (
 )
 
 ###############################################################################
+# defines
+###############################################################################
+
+add_definitions (-DONTOLOGY_BUILDING_LIBRARY)
+
+###############################################################################
 # source and header files
 ###############################################################################
 
 set (ontology_HEADERS
+    "include/ontology/Config.hpp.in"
 	"include/ontology/Config.hpp"
 	"include/ontology/Component.hpp"
 	"include/ontology/Entity.hpp"
@@ -29,10 +36,10 @@ set (ontology_HEADERS
 	"include/ontology/EntityManager.hpp"
 	"include/ontology/EntityManagerInterface.hpp"
 	"include/ontology/EntityManagerListener.hpp"
-	"include/ontology/Export.hpp"
 	"include/ontology/ListenerDispatcher.hpp"
 	"include/ontology/ListenerDispatcher.hxx"
 	"include/ontology/System.hpp"
+	"include/ontology/System.hxx"
 	"include/ontology/SystemManager.hpp"
 	"include/ontology/SystemManager.hxx"
 	"include/ontology/TypeContainers.hpp"
@@ -76,9 +83,9 @@ if (WITH_MULTITHREADING)
 	)
 
 	# work around gcc bug on unix where -pthread doesn't link against
-	# pthread
+	# pthread and -fopenmp doesn't link against libgomp
 	if (UNIX)
-		target_link_libraries (ontology pthread)
+		target_link_libraries (ontology pthread gomp)
 	endif ()
 endif (WITH_MULTITHREADING)
 

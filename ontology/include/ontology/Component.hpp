@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 
 namespace Ontology {
 
@@ -30,16 +30,16 @@ namespace Ontology {
  * @endcode
  */
 
-class ONTOLOGY_API Component
+class ONTOLOGY_PUBLIC_API Component
 {
-public:
+PUBLIC:
 
     /*!
      * @brief Allow destruction through base class pointer.
      */
     virtual ~Component();
 
-protected:
+PROTECTED:
 
     /*!
      * @brief Disallow construction without inheritance.

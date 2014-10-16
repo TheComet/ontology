@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 #include <ontology/EntityManagerListener.hpp>
 #include <ontology/TypeContainers.hpp>
 
@@ -25,22 +25,6 @@ namespace Ontology {
 }
 
 namespace Ontology {
-
-template <class... T>
-inline TypeSet TypeSetGenerator()
-{
-    return TypeSet({&typeid(T)...});
-}
-
-#define SupportsComponents     TypeSetGenerator
-#define ExecuteAfter           TypeSetGenerator
-
-/*!
- * @brief Used to declare that a system should not receive any entities.
- *
- * See SystemManager or SystemManager::addSystem() for more information.
- */
-struct None {};
 
 /*!
  * @brief Manages the creation and deletion of systems.
@@ -84,10 +68,10 @@ struct None {};
  * Make sure to call SystemManager::initialise() after adding all of your
  * systems.
  */
-class ONTOLOGY_API SystemManager :
+class ONTOLOGY_PUBLIC_API SystemManager :
     public EntityManagerListener
 {
-public:
+PUBLIC:
 
     /*!
      * @brief Default constructor.
@@ -142,10 +126,8 @@ public:
      *
      * @return Returns itself, allowing the programmer to chain.
      */
-    template <class T>
-    SystemManager& addSystem(T* system,
-                             TypeSet supportedComponents = TypeSetGenerator(),
-                             TypeSet executesBeforeSystems = TypeSetGenerator());
+    template <class T, class... Args>
+    System& addSystem(Args&&... args);
 
     /*!
      * @brief Removes the specified system from the world.
@@ -156,7 +138,7 @@ public:
      * @endcode
      */
     template <class T>
-    void removeSystem();
+    SystemManager& removeSystem();
 
     /*!
      * @brief Gets the specified system.
@@ -167,6 +149,16 @@ public:
      */
     template <class T>
     T& getSystem();
+
+    /*!
+     * @brief Passes important data to a new System object so it functions correctly.
+     */
+    ONTOLOGY_LOCAL_API void configureSystem();
+
+    /*!
+     * @brief Passes required information to the specified system so it is functional.
+     */
+    void initSystem(System*);
 
     /*!
      * @brief Initialises all currently registered systems.
@@ -185,12 +177,13 @@ public:
      */
     void update();
 
-private:
+PRIVATE:
 
     // EntityManagerListener methods
-    void onDestroyEntity(Entity*) override;
-    void onAddComponent(Entity*, const Component*) override;
-    void onRemoveComponent(Entity*, const Component*) override;
+    void onDestroyEntity(Entity&) override;
+    void onAddComponent(Entity&, const Component*) override;
+    void onRemoveComponent(Entity&, const Component*) override;
+    void onEntitiesReallocated(std::vector<Entity>&) override;
 
     /*!
      * @brief Triggers dependency resolution of the system execution order.
@@ -214,7 +207,7 @@ private:
      */
     bool isInExecutionList(const System* const) const;
 
-    TypeVectorPairSmartPtr<System>  m_SystemList;
+    TypeVectorPairUniquePtr<System> m_SystemList;
     std::vector<System*>            m_ExecutionList;
     World*                          m_World;
 };

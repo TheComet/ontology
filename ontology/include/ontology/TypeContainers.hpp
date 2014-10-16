@@ -42,7 +42,11 @@ using TypeMap = typename GenericTypeMap<T>::TypeMap;
 
 /// A TypeMap the second pair type being a unique_ptr of a templated type.
 template <class T>
-using TypeMapSmartPtr = typename GenericTypeMap< std::unique_ptr<T> >::TypeMap;
+using TypeMapUniquePtr = typename GenericTypeMap< std::unique_ptr<T> >::TypeMap;
+
+/// A TypeMap the second pair type being a shared_ptr of a templated type.
+template <class T>
+using TypeMapSharedPtr = typename GenericTypeMap< std::shared_ptr<T> >::TypeMap;
 
 /// A vector of std::type_info pointers (&typeid(T))
 typedef typename std::vector<const std::type_info*> TypeVector;
@@ -57,10 +61,28 @@ using TypeVectorPair = typename std::vector< TypePair<T> >;
 
 /// A TypeVectorPair with the second pair type being a unique_ptr of a templated type.
 template <class T>
-class TypeVectorPairSmartPtr : public TypeVectorPair< std::unique_ptr<T> >
+class TypeVectorPairUniquePtr : public TypeVectorPair< std::unique_ptr<T> >
 {
 public:
     typedef typename TypeVectorPair< std::unique_ptr<T> >::iterator iterator;
+
+    /// Searches the vector for the specified type. (linear search)
+    iterator find(const std::type_info* key)
+    {
+        iterator it = this->begin();
+        for(; it != this->end(); ++it)
+            if(it->first == key)
+                return it;
+        return it;
+    }
+};
+
+/// A TypeVectorPair with the second pair type being a shared_ptr of a templated type.
+template <class T>
+class TypeVectorPairSharedPtr : public TypeVectorPair< std::shared_ptr<T> >
+{
+public:
+    typedef typename TypeVectorPair< std::shared_ptr<T> >::iterator iterator;
 
     /// Searches the vector for the specified type. (linear search)
     iterator find(const std::type_info* key)

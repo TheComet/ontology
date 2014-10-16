@@ -5,16 +5,10 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Export.hpp>
+#include <ontology/Config.hpp>
 
 #include <vector>
 #include <memory>
-
-#ifdef ONTOLOGY_MULTITHREADING
-#   include <boost/asio/io_service.hpp>
-#   include <boost/bind.hpp>
-#   include <boost/thread/thread.hpp>
-#endif // ONTOLOGY_MULTITHREADING
 
 // ----------------------------------------------------------------------------
 // forward declarations
@@ -41,9 +35,9 @@ namespace Ontology {
  * The world also stores a delta time, which can be accessed from within any
  * registered system.
  */
-class ONTOLOGY_API World
+class ONTOLOGY_PUBLIC_API World
 {
-public:
+PUBLIC:
 
     /*!
      * @brief Default constructor.
@@ -84,21 +78,10 @@ public:
      */
     void update();
 
-#ifdef ONTOLOGY_MULTITHREADING
-    boost::asio::io_service& getIoService();
-#endif
-
-private:
+PRIVATE:
     std::unique_ptr<EntityManager>  m_EntityManager;
     std::unique_ptr<SystemManager>  m_SystemManager;
     float                           m_DeltaTime;
-
-    // threading
-#ifdef ONTOLOGY_MULTITHREADING
-    boost::asio::io_service         m_IoService;
-    boost::thread_group             m_ThreadPool;
-    boost::asio::io_service::work   m_Work;
-#endif // ONTOLOGY_MULTITHREADING
 };
 
 } // namespace Ontology

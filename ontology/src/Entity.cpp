@@ -20,6 +20,9 @@ Entity::Entity(const char* name, const EntityManagerInterface* creator) :
 // ----------------------------------------------------------------------------
 Entity::~Entity()
 {
+    // dispatch remove component events
+    for(const auto& it : m_ComponentMap)
+        m_Creator->informRemoveComponent(*this, it.second.get());
 }
 
 // ----------------------------------------------------------------------------

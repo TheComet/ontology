@@ -30,6 +30,12 @@ SystemManager::~SystemManager()
 }
 
 // ----------------------------------------------------------------------------
+void SystemManager::initSystem(System* system)
+{
+    system->setWorld(m_World);
+}
+
+// ----------------------------------------------------------------------------
 void SystemManager::initialise()
 {
     this->computeExecutionOrder();
@@ -41,15 +47,7 @@ void SystemManager::initialise()
 void SystemManager::update()
 {
     for(const auto& system : m_ExecutionList)
-    {
-#ifdef ONTOLOGY_MULTITHREADING
-        system->update(m_World->getIoService());
-        m_World->getIoService().poll(); // wait for current system to finish
-                                        // processing all of its entities
-#else
         system->update();
-#endif
-    }
 }
 
 // ----------------------------------------------------------------------------
@@ -148,24 +146,31 @@ bool SystemManager::isInExecutionList(const System* const system) const
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onAddComponent(Entity* entity, const Component* component)
+void SystemManager::onAddComponent(Entity& entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onRemoveComponent(Entity* entity, const Component* component)
+void SystemManager::onRemoveComponent(Entity& entity, const Component* component)
 {
     for(const auto& it : m_SystemList)
         it.second->informEntityUpdate(entity);
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onDestroyEntity(Entity* entity)
+void SystemManager::onDestroyEntity(Entity& entity)
 {
     for(const auto& it : m_SystemList)
         it.second->informDestroyedEntity(entity);
+}
+
+// ----------------------------------------------------------------------------
+void SystemManager::onEntitiesReallocated(std::vector<Entity>& entityList)
+{
+    for(const auto& it : m_SystemList)
+        it.second->informEntitiesReallocated(entityList);
 }
 
 } // namespace Ontology

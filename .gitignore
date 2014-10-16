@@ -33,3 +33,6 @@
 
 # temporary files
 *.swp
+
+# project files/folders
+*kdev4
