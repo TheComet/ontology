@@ -36,3 +36,6 @@
 
 # project files/folders
 *kdev4
+
+# OS X Finder Cache files
+.DS_Store
