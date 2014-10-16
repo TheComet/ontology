@@ -123,6 +123,7 @@ void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 }
 
 // ----------------------------------------------------------------------------
+#ifdef ONTOLOGY_MULTITHREADING
 void System::joinableThreadEntryPoint()
 {
     boost::unique_lock<boost::mutex> guard(m_Mutex);
@@ -144,6 +145,7 @@ void System::waitForNotify()
     boost::unique_lock<boost::mutex> guard(m_Mutex);
     m_ConditionVariable.wait(guard);
 }
+#endif
 
 // ----------------------------------------------------------------------------
 void System::update()
