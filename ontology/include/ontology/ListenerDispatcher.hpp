@@ -1,9 +1,6 @@
 // ----------------------------------------------------------------------------
-// ListenerDispatcher.hxx
+// ListenerDispatcher.hpp
 // ----------------------------------------------------------------------------
-
-#ifndef __ONTOLOGY_LISTENER_DISPATCHER__
-#define __ONTOLOGY_LISTENER_DISPATCHER__
 
 // ----------------------------------------------------------------------------
 // include files
@@ -136,5 +133,3 @@ bool ListenerDispatcher<LISTENER_CLASS>::
 }
 
 } // namespace Ontology
-
-#endif // __ONTOLOGY_LISTENER_DISPATCHER__

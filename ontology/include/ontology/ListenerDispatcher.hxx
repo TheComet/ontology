@@ -2,6 +2,9 @@
 // ListenerDispatcher.hpp
 // ----------------------------------------------------------------------------
 
+#ifndef __ONTOLOGY_LISTENER_DISPATCHER_HPP__
+#define __ONTOLOGY_LISTENER_DISPATCHER_HPP__
+
 // ----------------------------------------------------------------------------
 // include files
 
@@ -138,3 +141,5 @@ PRIVATE:
 };
 
 } // namespace Ontology
+
+#endif // __ONTOLOGY_LISTENER_DISPATCHER_HPP__

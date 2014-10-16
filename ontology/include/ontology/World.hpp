@@ -2,6 +2,9 @@
 // World.hpp
 // ----------------------------------------------------------------------------
 
+#ifndef __ONTOLOGY_WORLD_HPP__
+#define __ONTOLOGY_WORLD_HPP__
+
 // ----------------------------------------------------------------------------
 // include files
 
@@ -88,3 +91,5 @@ PRIVATE:
 };
 
 } // namespace Ontology
+
+#endif // __ONTOLOGY_WORLD_HPP__
