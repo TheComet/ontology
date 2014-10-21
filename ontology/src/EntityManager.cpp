@@ -53,19 +53,23 @@ void EntityManager::destroyEntity(Entity& entity)
 void EntityManager::destroyEntities(const char* name)
 {
     auto it = m_EntityList.begin();
+    bool requireReallocationEvent = false;
     while(it != m_EntityList.end())
     {
         if(!strcmp(it->getName(), name))
         {
             this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
             it = m_EntityList.erase(it);
+            requireReallocationEvent = true;
         }
         else
         {
             ++it;
         }
     }
-    this->handleEntityReallocation(true);
+    
+    if(requireReallocationEvent)
+        this->handleEntityReallocation(true);
 }
 
 // ----------------------------------------------------------------------------
