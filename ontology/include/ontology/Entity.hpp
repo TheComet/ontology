@@ -19,8 +19,9 @@ namespace Ontology {
 template<class T, class... Args>
 Entity& Entity::addComponent(Args&&... args)
 {
-    if(m_ComponentMap.find(&typeid(T)) != m_ComponentMap.end())
-        return *this;
+    ONTOLOGY_ASSERT(m_ComponentMap.find(&typeid(T)) == m_ComponentMap.end(), DuplicateComponentException, Entity::addComponent<T>,
+        std::string("Component of type \"") + typeid(T).name() + "\" already registered with this entity"
+    )
 
     Component* component = new T(args...);
     m_ComponentMap[&typeid(T)] = std::unique_ptr<Component>(component);
@@ -45,7 +46,7 @@ template<class T>
 T& Entity::getComponent()
 {
     const auto it = m_ComponentMap.find(&typeid(T));
-    ONTOLOGY_ASSERT(it == m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
+    ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
         std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
     );
     return *static_cast<T*>(it->second.get());
@@ -56,8 +57,8 @@ template<class T>
 const T& Entity::getComponent() const
 {
     const auto& it = m_ComponentMap.find(&typeid(T));
-    ONTOLOGY_ASSERT(it == m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
-        "The requested component does not exist in this entity"
+    ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
+        std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
     );
     return *static_cast<T*>(it->second.get());
 }

@@ -24,6 +24,7 @@ struct name : public Exception \
     name(const std::string& msg) : Exception(msg) {} \
 };
 
+DECLARE_EXCEPTION(DuplicateComponentException);
 DECLARE_EXCEPTION(InvalidComponentException);
 DECLARE_EXCEPTION(CircularDependencyException);
 DECLARE_EXCEPTION(DuplicateSystemException);
