@@ -124,7 +124,7 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
             // handle circular dependencies
             ONTOLOGY_ASSERT(resolving.find(edge) != resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
                 std::string("circular dependency detected with systems \"") + node->name() + "\" and \"" + edge->name() + "\""
-            );
+            )
             this->resolveDependencies(edge, systemLookup, resolving, unresolved);
         }
 #ifdef _DEBUG

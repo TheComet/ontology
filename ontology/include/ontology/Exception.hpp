@@ -24,11 +24,11 @@ struct name : public Exception \
     name(const std::string& msg) : Exception(msg) {} \
 };
 
-DECLARE_EXCEPTION(DuplicateComponentException);
-DECLARE_EXCEPTION(InvalidComponentException);
-DECLARE_EXCEPTION(CircularDependencyException);
-DECLARE_EXCEPTION(DuplicateSystemException);
-DECLARE_EXCEPTION(InvalidSystemException);
+DECLARE_EXCEPTION(DuplicateComponentException)
+DECLARE_EXCEPTION(InvalidComponentException)
+DECLARE_EXCEPTION(CircularDependencyException)
+DECLARE_EXCEPTION(DuplicateSystemException)
+DECLARE_EXCEPTION(InvalidSystemException)
 
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)

@@ -48,7 +48,7 @@ T& Entity::getComponent()
     const auto it = m_ComponentMap.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
         std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
-    );
+    )
     return *static_cast<T*>(it->second.get());
 }
 
@@ -59,7 +59,7 @@ const T& Entity::getComponent() const
     const auto& it = m_ComponentMap.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
         std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
-    );
+    )
     return *static_cast<T*>(it->second.get());
 }
 
