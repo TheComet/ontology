@@ -96,7 +96,7 @@ Entity& EntityManager::getEntity(Entity::ID entityID)
     std::stringstream ss;
     ss << "[EntityManager::getEntity] Error: Entity ID " << entityID
             << "is not registered with this manager";
-    throw std::runtime_error(ss.str());
+    ONTOLOGY_ASSERT(false, InvalidEntityException, EntityManager::getEntity, ss.str());
 }
 
 // ----------------------------------------------------------------------------

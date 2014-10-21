@@ -11,9 +11,9 @@
 #include <ontology/World.hpp>
 #include <stdexcept>
 
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
 #   include <boost/asio/io_service.hpp>
-#endif // ONTOLOGY_MULTITHREADING
+#endif // ONTOLOGY_THREAD
 
 namespace Ontology {
 

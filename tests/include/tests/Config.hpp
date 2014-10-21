@@ -1,0 +1,2 @@
+#define TESTS_WITH_EXCEPTIONS
+/* #undef TESTS_WITH_ASSERT */

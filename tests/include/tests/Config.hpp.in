@@ -1,0 +1,2 @@
+#cmakedefine TESTS_WITH_EXCEPTIONS
+#cmakedefine TESTS_WITH_ASSERT

@@ -11,7 +11,7 @@
 #include <ontology/Config.hpp>
 #include <ontology/TypeContainers.hpp>
 
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
 #   include <boost/thread/thread.hpp>
 #endif
 
@@ -171,7 +171,7 @@ PRIVATE:
     TypeSet         m_DependingSystems;
     EntityList      m_EntityList;
 
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
     void joinableThreadEntryPoint();
     void waitForNotify();
     boost::condition_variable m_ConditionVariable;

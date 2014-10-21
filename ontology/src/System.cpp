@@ -9,11 +9,11 @@
 #include <ontology/Entity.hpp>
 #include <ontology/System.hpp>
 
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
 #   include <boost/bind.hpp>
 #   include <boost/asio/io_service.hpp>
 #   include <boost/thread.hpp>
-#endif // ONTOLOGY_MULTITHREADING
+#endif // ONTOLOGY_THREAD
 
 namespace Ontology {
 
@@ -22,7 +22,7 @@ namespace Ontology {
  * @brief Gets the number of cores on this machine.
  * @note see http://www.cprogramming.com/snippets/source-code/find-the-number-of-cpu-cores-for-windows-mac-or-linux
  */
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
 #   if defined(ONTOLOGY_PLATFORM_WINDOWS)
 #       include <windows.h>
 #   elif defined(ONTOLOGY_PLATFORM_MAC)
@@ -123,7 +123,7 @@ void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 }
 
 // ----------------------------------------------------------------------------
-#ifdef ONTOLOGY_MULTITHREADING
+#ifdef ONTOLOGY_THREAD
 void System::joinableThreadEntryPoint()
 {
     boost::unique_lock<boost::mutex> guard(m_Mutex);

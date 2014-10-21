@@ -9,7 +9,9 @@
     // build settings
     // --------------------------------------------------------------
 
-    #cmakedefine ONTOLOGY_MULTITHREADING
+    #cmakedefine ONTOLOGY_WITH_THREAD
+    #cmakedefine ONTOLOGY_WITH_EXCEPTIONS
+    #cmakedefine ONTOLOGY_WITH_ASSERT
     #cmakedefine ONTOLOGY_SHARED
     #cmakedefine ONTOLOGY_STATIC
 
