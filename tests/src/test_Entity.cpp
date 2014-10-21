@@ -94,7 +94,7 @@ TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)
     MockEntityManager em;
     Entity entity("entity", &em);
 
-    // interesting calls
+    // Listeners should be informed by addComponent and removeComponent events
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::Pointee(TestComponent(2, 3))))
         .Times(1);
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::Pointee(TestComponent(12, 3))))
@@ -105,7 +105,7 @@ TEST(NAME, AddingAndRemovingComponentsInformsEntityManager)
     entity.removeComponent<TestComponent>();
 }
 
-TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
+TEST(NAME, AddingTwoComponentsOfTheSameTypeThrowsDuplicateComponentException)
 {
     MockEntityManager em;
     Entity entity("entity", &em);
@@ -113,16 +113,17 @@ TEST(NAME, AddingTwoComponentsOfTheSameTypeCausesDeath)
     // uninteresting calls
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
-    // interesting calls
+    // duplicate component should not be added, which means an addComponent event should not
+    // be triggered
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::Pointee(TestComponent(2, 3))))
         .Times(1);
 
     entity.addComponent<TestComponent>(2, 3);
 
-    ASSERT_DEATH(entity.addComponent<TestComponent>(3, 4), "");
+    ASSERT_THROW(entity.addComponent<TestComponent>(3, 4), DuplicateComponentException);
 }
 
-TEST(NAME, RemovingNonExistingComponentCausesDeath)
+TEST(NAME, RemovingNonExistingComponentDoesNothing)
 {
     MockEntityManager em;
     Entity entity("entity", &em);
@@ -131,10 +132,10 @@ TEST(NAME, RemovingNonExistingComponentCausesDeath)
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
-    ASSERT_DEATH(entity.removeComponent<NonExistingComponent>(), "");
+    entity.removeComponent<NonExistingComponent>();
 }
 
-TEST(NAME, GettingNonExistingComponentsCausesDeath)
+TEST(NAME, GettingNonExistingComponentsThrowsInvalidComponentException)
 {
     MockEntityManager em;
     Entity entity("entity", &em);
@@ -145,7 +146,7 @@ TEST(NAME, GettingNonExistingComponentsCausesDeath)
 
     entity.addComponent<TestComponent>(2, 3);
     ASSERT_EQ(TestComponent(2, 3), entity.getComponent<TestComponent>());
-    ASSERT_DEATH(entity.getComponent<NonExistingComponent>(), "");
+    ASSERT_THROW(entity.getComponent<NonExistingComponent>(), InvalidComponentException);
 }
 
 TEST(NAME, EntityDestructionInformsEntityManagerAboutComponentRemoval)
@@ -156,7 +157,7 @@ TEST(NAME, EntityDestructionInformsEntityManagerAboutComponentRemoval)
     // uninteresting calls
     EXPECT_CALL(em, informAddComponentHelper(testing::_, testing::_)).Times(testing::AtLeast(0));
 
-    // interesting calls
+    // listeners should be informed about component removal upon destruction
     EXPECT_CALL(em, informRemoveComponentHelper(testing::_, testing::Pointee(TestComponent(2, 4))))
         .Times(1);
 

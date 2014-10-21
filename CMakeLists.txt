@@ -19,7 +19,7 @@ project (ontology)
 ###############################################################################
 
 option (BUILD_SHARED "Whether to build a shared or static version of this library" ON)
-option (WITH_MULTITHREADING "Enables entities to be processed by systems in parallel" ON)
+option (WITH_MULTITHREADING "Enables entities to be processed by systems in parallel" OFF)
 option (BUILD_TESTS "Whether or not to build ontology's tests" OFF)
 
 ###############################################################################

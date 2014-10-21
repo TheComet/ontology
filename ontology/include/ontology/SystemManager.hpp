@@ -8,6 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
+#include <ontology/Exception.hpp>
 #include <ontology/SystemManager.hxx>
 #include <ontology/System.hpp>
 
@@ -17,7 +18,9 @@ namespace Ontology {
 template <class T, class... Args>
 T& SystemManager::addSystem(Args&&... args)
 {
-    assert(m_SystemList.find(&typeid(T)) == m_SystemList.end());
+    ONTOLOGY_ASSERT(m_SystemList.find(&typeid(T)) == m_SystemList.end(), DuplicateSystemException, "SystemManager::addSystem<T, Args...>",
+        std::string("System of type \"") + typeid(T).name() + "\" already registered with this manager"
+    )
 
     T* system = new T(args...);
     m_SystemList.emplace_back(
@@ -32,7 +35,11 @@ T& SystemManager::addSystem(Args&&... args)
 template <class T>
 SystemManager& SystemManager::removeSystem()
 {
-    m_SystemList.erase(m_SystemList.find(&typeid(T)));
+    const auto it = m_SystemList.find(&typeid(T));
+    if(it == m_SystemList.end())
+        return *this;
+    
+    m_SystemList.erase(it);
     this->computeExecutionOrder();
     return *this;
 }
@@ -41,7 +48,11 @@ SystemManager& SystemManager::removeSystem()
 template <class T>
 T& SystemManager::getSystem()
 {
-    return *static_cast<T*>(m_SystemList.find(&typeid(T))->second.get());
+    const auto it = m_SystemList.find(&typeid(T));
+    ONTOLOGY_ASSERT(it != m_SystemList.end(), InvalidSystemException, SystemManager::getSystem<T>,
+        std::string("System of type \"") + typeid(T).name() + "\" not registered with this manager"
+    )
+    return *static_cast<T*>(it->second.get());
 }
 
 } // namespace Ontology

@@ -6,6 +6,7 @@
 // include files
 
 #include <ontology/Config.hpp>
+#include <ontology/Exception.hpp>
 #include <ontology/SystemManager.hpp>
 #include <ontology/World.hpp>
 #include <stdexcept>
@@ -121,8 +122,9 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
         if(!this->isInExecutionList(edgeSystem))
         {
             // handle circular dependencies
-            if(resolving.find(edge) != resolving.end())
-                throw std::runtime_error(std::string("circular dependency detected with systems \"") + node->name() + "\" and \"" + edge->name() + "\"");
+            ONTOLOGY_ASSERT(resolving.find(edge) != resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
+                std::string("circular dependency detected with systems \"") + node->name() + "\" and \"" + edge->name() + "\""
+            );
             this->resolveDependencies(edge, systemLookup, resolving, unresolved);
         }
 #ifdef _DEBUG
