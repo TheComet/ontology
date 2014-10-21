@@ -15,7 +15,7 @@ namespace Ontology {
 class Exception : public std::runtime_error
 {
 public:
-    Exception(const std::string& message);
+    Exception(const std::string& msg);
 };
 
 #define DECLARE_EXCEPTION(name) \
@@ -24,15 +24,16 @@ struct name : public Exception \
     name(const std::string& msg) : Exception(msg) {} \
 };
 
-DECLARE_EXCEPTION(DuplicateComponentException);
 DECLARE_EXCEPTION(InvalidComponentException);
 DECLARE_EXCEPTION(CircularDependencyException);
+DECLARE_EXCEPTION(DuplicateSystemException);
+DECLARE_EXCEPTION(InvalidSystemException);
 
 #define STRINGIFY(x) #x
 #define TO_STRING(x) STRINGIFY(x)
 #define AT __FILE__ ":" TO_STRING(__LINE__)
-#define ONTOLOGY_ASSERT(class_method, except_type, should_be_true, message) \
-        if(! should_be_true) \
+#define ONTOLOGY_ASSERT(should_be_true, except_type, class_method, message) \
+        if(! (should_be_true)) \
                 throw except_type(std::string(AT) + " [" + TO_STRING(class_method) + "] Error: " + message);
 
 } // namespace Ontology
