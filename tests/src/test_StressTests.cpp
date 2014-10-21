@@ -27,7 +27,7 @@ struct Movement : public System
     void processEntity(Entity& e) override
     {
         for(volatile int i = 0; i != 100; ++i)
-            sqrt(953.245);
+            float f = sqrt(953.245);
         e.getComponent<Position>().x += 2;
         e.getComponent<Position>().y += 1;
     }
