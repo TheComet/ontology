@@ -99,6 +99,29 @@ public:
 };
 ```
 
+Polymorphic Systems
+-------------------
+Sometimes you may want to add a polymorphic system. This is just like adding a normal system, but using System::addPolymorphicSystem instead:
+``` cpp
+class BaseSystem : public OntologySystem
+{
+public:
+	virtual ~BaseSystem() {} // virtual destructor for destroying instances through base class pointer
+	virtual void initialise() { /* initialise system */ }
+	virtual void processEntity(Ontology::Entity& entity) { /* process entity */ }
+};
+
+class DerivedSystem : public BaseSystem
+{
+};
+```
+
+Then, when creating the system and adding it to the world, use:
+``` cpp
+world.getSystemManager().addPolymorphicSystem<BaseSystem, DerivedSystem>();
+
+**Important** When getting polymorphic systems, always use getSystemPtr<>() rather than getSystem<>().**
+
 Communication between systems
 -----------------------------
 (TODO)

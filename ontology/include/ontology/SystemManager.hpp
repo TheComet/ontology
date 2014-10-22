@@ -18,24 +18,24 @@ namespace Ontology {
 template <class T, class... Args>
 inline T& SystemManager::addSystem(Args&&... args)
 {
-    return *static_cast<T*>(this->addPolymorphicSystem<T, T>(args...));
+    return this->addPolymorphicSystem<T, T>(args...);
 }
 
 // ----------------------------------------------------------------------------
 template <class Base, class Derived, class... Args>
-Base* SystemManager::addPolymorphicSystem(Args&&... args)
+Derived& SystemManager::addPolymorphicSystem(Args&&... args)
 {
     ONTOLOGY_ASSERT(m_SystemList.find(&typeid(Base)) == m_SystemList.end(), DuplicateComponentException, "SystemManager::addPolymorphicSystem<Base, Derived, Args...>",
         std::string("System of type \"") + typeid(Base).name() + "\" already registered with this manager"
     )
     
-    Base* system = new Derived(args...);
+    Derived* system = new Derived(args...);
     m_SystemList.emplace_back(
         &typeid(Base),
         std::unique_ptr<Base>(system)
     );
     this->initSystem(system);
-    return system;
+    return *system;
 }
 
 // ----------------------------------------------------------------------------

@@ -102,7 +102,7 @@ PUBLIC:
      * @return Returns a reference to the newly added system.
      */
     template <class T, class... Args>
-    T& addSystem(Args&&... args);
+    inline T& addSystem(Args&&... args);
     
     /*!
      * @brief Adds a new polymorphic system to the world.
@@ -117,10 +117,10 @@ PUBLIC:
      * @note Systems are stored such that the order in which they are added
      * to the system manager is the order in which they are initialised.
      * Their destructors are called in reverse order when destroying the world.
-     * @return Returns a base type pointer to the newly added system.
+     * @return Returns a derived reference to the newly added system.
      */
     template <class Base, class Derived, class... Args>
-    inline Base* addPolymorphicSystem(Args&&... args);
+    Derived& addPolymorphicSystem(Args&&... args);
 
     /*!
      * @brief Removes the specified system from the world.
