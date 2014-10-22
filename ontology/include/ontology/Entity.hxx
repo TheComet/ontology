@@ -10,7 +10,6 @@
 
 #include <ontology/Config.hpp>
 #include <ontology/TypeContainers.hpp>
-#include <../../../openrump/cmake-dep/src/ontology_PROJECT/tests/gmock/fused-src/gmock/gmock.h>
 
 #include <map>
 #include <typeinfo>
@@ -100,14 +99,14 @@ PUBLIC:
      * @return A reference to the requested component.
      */
     template <class T>
-    inline T& getComponent();
+    inline T& getComponent() const;
     
     /*!
      * @brief Get a component from the entity.
      * @return A pointer to the requested component.
      */
     template <class T>
-    T* getComponentPtr();
+    T* getComponentPtr() const;
 
     /*!
      * @brief Returns true if this entity is supported by the specified system.

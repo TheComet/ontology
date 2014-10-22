@@ -46,13 +46,20 @@ SystemManager& SystemManager::removeSystem()
 
 // ----------------------------------------------------------------------------
 template <class T>
-T& SystemManager::getSystem()
+T* SystemManager::getSystemPtr()
 {
     const auto it = m_SystemList.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_SystemList.end(), InvalidSystemException, SystemManager::getSystem<T>,
         std::string("System of type \"") + typeid(T).name() + "\" not registered with this manager"
     )
-    return *static_cast<T*>(it->second.get());
+    return static_cast<T*>(it->second.get());
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+inline T& SystemManager::getSystem()
+{
+    return *this->getSystemPtr<T>();
 }
 
 } // namespace Ontology

@@ -117,16 +117,30 @@ PUBLIC:
      */
     template <class T>
     SystemManager& removeSystem();
+    
+    /*!
+     * @brief Gets the specified system.
+     * 
+     * Example:
+     * @code
+     * world.getSystemManager().getSystem<MovementSystem>()->doThings();
+     * @endcode
+     * @return A pointer to the specified System
+     */
+    template <class T>
+    T* getSystemPtr();
 
     /*!
      * @brief Gets the specified system.
-     *
+     * 
      * Example:
      * @code
      * world.getSystemManager().getSystem<MovementSystem>().doThings();
+     * @endcode
+     * @return A reference to the specified system.
      */
     template <class T>
-    T& getSystem();
+    inline T& getSystem();
 
     /*!
      * @brief Passes important data to a new System object so it functions correctly.

@@ -43,14 +43,14 @@ void Entity::removeComponent()
 
 //----------------------------------------------------------------------------
 template<class T>
-inline T& Entity::getComponent()
+inline T& Entity::getComponent() const
 {
-    return *this->getComponent();
+    return *this->getComponentPtr<T>();
 }
 
 //----------------------------------------------------------------------------
 template<class T>
-T* Entity::getComponentPtr()
+T* Entity::getComponentPtr() const
 {
     const auto it = m_ComponentMap.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
