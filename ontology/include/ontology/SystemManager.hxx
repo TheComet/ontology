@@ -89,21 +89,38 @@ PUBLIC:
     /*!
      * @brief Adds a new system to the world.
      *
-     * @param system The system to add. The type of system is passed as a
-     * template argument. If your system has a constructor that requires
-     * arguments, those can be directly supplied as arguments to this function.
+     * The type of system is passed as a template argument. If your system
+     * class has a constructor that requires arguments, those can be directly
+     * supplied as arguments to this function.
      * @code
-     * world.getSystemManager().addSystem<MySystem>(ConstructorArg1, ConstructorArg2);
+     * world.getSystemManager().addSystem<MySystem>(ConstructorArg1, ...);
      * @endcode
      * @note Systems are stored such that the order in which they are added
      * to the system manager is the order in which they are initialised.
-     * Their destructors are called in reverse order when destroying
-     * the world.
+     * Their destructors are called in reverse order when destroying the world.
      *
      * @return Returns a reference to the newly added system.
      */
     template <class T, class... Args>
     T& addSystem(Args&&... args);
+    
+    /*!
+     * @brief Adds a new polymorphic system to the world.
+     * 
+     * The base type of the system is passed as the first template argument,
+     * the derived type of the system is passed as the second template
+     * argument. If your system class has a constructor that requires
+     * arguments, those can be directly supplied as arguments to this function.
+     * @code
+     * world.getSystemManager().addSystem<BaseClass, DerivedClass>(ConstructorArg1, ...);
+     * @endcode
+     * @note Systems are stored such that the order in which they are added
+     * to the system manager is the order in which they are initialised.
+     * Their destructors are called in reverse order when destroying the world.
+     * @return Returns a base type pointer to the newly added system.
+     */
+    template <class Base, class Derived, class... Args>
+    inline Base* addPolymorphicSystem(Args&&... args);
 
     /*!
      * @brief Removes the specified system from the world.
