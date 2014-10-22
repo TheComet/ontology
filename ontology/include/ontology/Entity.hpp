@@ -43,24 +43,20 @@ void Entity::removeComponent()
 
 //----------------------------------------------------------------------------
 template<class T>
-T& Entity::getComponent()
+inline T& Entity::getComponent()
+{
+    return *this->getComponent();
+}
+
+//----------------------------------------------------------------------------
+template<class T>
+T* Entity::getComponentPtr()
 {
     const auto it = m_ComponentMap.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
         std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
     )
-    return *static_cast<T*>(it->second.get());
-}
-
-//----------------------------------------------------------------------------
-template<class T>
-const T& Entity::getComponent() const
-{
-    const auto& it = m_ComponentMap.find(&typeid(T));
-    ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
-        std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
-    )
-    return *static_cast<T*>(it->second.get());
+    return static_cast<T*>(it->second.get());
 }
 
 } // namespace Ontology

@@ -16,13 +16,11 @@ It is very simple to compile Ontology using CMake. Just follow these steps:
 2. Make sure you have cmake in your $PATH variable.
 3. Open a new terminal and go to ontology's folder.
 4. Execute the following commands:
-   ```
-   mkdir build
-   cd build
-   cmake ..
-   make
-   sudo make install.
-   ```
+   - ```mkdir build```
+   - ```cd build```
+   - ```cmake ..```
+   - ```make```
+   -```sudo make install```
 5. Enjoy.
 
 **Note:** You may need to use the ```-G``` option with CMake when generating project files. For a list of generators, type ```cmake --help```. Depending on what system you're on the required generator will vary. On linux for instance you'd use ```cmake -G "Unix Makefiles" ..```
