@@ -9,6 +9,7 @@
 #include <ontology/Exception.hpp>
 #include <ontology/SystemManager.hpp>
 #include <ontology/World.hpp>
+
 #include <stdexcept>
 
 #ifdef ONTOLOGY_THREAD
@@ -84,7 +85,7 @@ void SystemManager::computeExecutionOrder()
         for(auto m : systemLookup)
             if(it == m.second)
             {
-                std::cout << "  " << m.first->name() << std::endl;
+                std::cout << "  " << demangleTypeName(m.first->name()) << std::endl;
                 break;
             }
 #endif
@@ -99,7 +100,7 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
     // lookup system referred to by node
     System* system = systemLookup.find(node)->second;
 #ifdef _DEBUG
-    std::cout << "Processing dependencies of system " << node->name() << std::endl;
+    std::cout << "Processing dependencies of system " << demangleTypeName(node->name()) << std::endl;
 #endif
 
     // node is unresolved, mark as such
@@ -110,8 +111,13 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
     {
         // handle depending on a non-registered system type
         const auto& edgeSystemIt = systemLookup.find(edge);
-        if(edgeSystemIt == systemLookup.end())
-            throw std::runtime_error(std::string("System \"") + node->name() + "\" depends on system \"" + edge->name() + "\", but it isn't registered as a system");
+        ONTOLOGY_ASSERT(edgeSystemIt != systemLookup.end(), InvalidSystemException, SystemManager::resolveDependencies,
+            std::string("System \"") +
+            demangleTypeName(node->name()) +
+            "\" depends on system \"" +
+            demangleTypeName(edge->name()) +
+            "\", but it isn't registered as a system"
+        )
         const System* edgeSystem = edgeSystemIt->second;
 
 #ifdef _DEBUG
@@ -123,7 +129,10 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
         {
             // handle circular dependencies
             ONTOLOGY_ASSERT(resolving.find(edge) != resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
-                std::string("circular dependency detected with systems \"") + node->name() + "\" and \"" + edge->name() + "\""
+                std::string("circular dependency detected with systems \"") +
+                demangleTypeName(node->name()) +
+                "\" and \"" +
+                demangleTypeName(edge->name()) + "\""
             )
             this->resolveDependencies(edge, systemLookup, resolving, unresolved);
         }

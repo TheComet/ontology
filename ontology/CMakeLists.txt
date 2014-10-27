@@ -56,6 +56,8 @@ set (ontology_HEADERS
     "include/ontology/System.hxx"
     "include/ontology/SystemManager.hpp"
     "include/ontology/SystemManager.hxx"
+    "include/ontology/Type.hpp"
+    "include/ontology/Type.hxx"
     "include/ontology/TypeContainers.hpp"
     "include/ontology/World.hpp"
     "include/ontology/Ontology.hpp"
@@ -69,6 +71,7 @@ set (ontology_SOURCES
     "src/Exception.cpp"
     "src/System.cpp"
     "src/SystemManager.cpp"
+    "src/Type.cpp"
     "src/World.cpp"
 )
 

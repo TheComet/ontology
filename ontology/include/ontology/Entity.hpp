@@ -12,6 +12,7 @@
 #include <ontology/EntityManager.hpp>
 #include <ontology/Exception.hpp>
 #include <ontology/Component.hpp>
+#include <ontology/Type.hpp>
 
 namespace Ontology {
 
@@ -20,7 +21,7 @@ template<class T, class... Args>
 Entity& Entity::addComponent(Args&&... args)
 {
     ONTOLOGY_ASSERT(m_ComponentMap.find(&typeid(T)) == m_ComponentMap.end(), DuplicateComponentException, Entity::addComponent<T>,
-        std::string("Component of type \"") + typeid(T).name() + "\" already registered with this entity"
+        std::string("Component of type \"") + getTypeName<T>() + "\" already registered with this entity"
     )
 
     Component* component = new T(args...);
@@ -54,7 +55,7 @@ T* Entity::getComponentPtr() const
 {
     const auto it = m_ComponentMap.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_ComponentMap.end(), InvalidComponentException, Entity::getComponent<T>,
-        std::string("Component of type \"") + typeid(T).name() + "\" not registered with this entity"
+        std::string("Component of type \"") + getTypeName<T>() + "\" not registered with this entity"
     )
     return static_cast<T*>(it->second.get());
 }

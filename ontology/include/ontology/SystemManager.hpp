@@ -11,6 +11,7 @@
 #include <ontology/Exception.hpp>
 #include <ontology/SystemManager.hxx>
 #include <ontology/System.hpp>
+#include <ontology/Type.hpp>
 
 namespace Ontology {
 
@@ -26,7 +27,7 @@ template <class Base, class Derived, class... Args>
 Derived& SystemManager::addPolymorphicSystem(Args&&... args)
 {
     ONTOLOGY_ASSERT(m_SystemList.find(&typeid(Base)) == m_SystemList.end(), DuplicateComponentException, "SystemManager::addPolymorphicSystem<Base, Derived, Args...>",
-        std::string("System of type \"") + typeid(Base).name() + "\" already registered with this manager"
+        std::string("System of type \"") + getTypeName<Base>() + "\" already registered with this manager"
     )
     
     Derived* system = new Derived(args...);
@@ -57,7 +58,7 @@ T* SystemManager::getSystemPtr() const
 {
     const auto it = m_SystemList.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_SystemList.end(), InvalidSystemException, SystemManager::getSystem<T>,
-        std::string("System of type \"") + typeid(T).name() + "\" not registered with this manager"
+        std::string("System of type \"") + getTypeName<T>() + "\" not registered with this manager"
     )
     return static_cast<T*>(it->second.get());
 }

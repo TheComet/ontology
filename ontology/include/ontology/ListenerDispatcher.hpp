@@ -6,6 +6,7 @@
 // include files
 
 #include <ontology/ListenerDispatcher.hxx>
+#include <ontology/Type.hpp>
 
 #ifdef _DEBUG
 #   include <iostream>
@@ -26,7 +27,7 @@ ListenerDispatcher<LISTENER_CLASS>::~ListenerDispatcher()
 {
 #ifdef _DEBUG
     for(auto it : m_Listeners)
-        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+        std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
                 << ">::~ListenerDispatcher] Warning: Listener \"" << it.first
                 << "\" still registered, yet dispatcher is being destroyed!"
                 << std::endl;
@@ -40,7 +41,7 @@ void ListenerDispatcher<LISTENER_CLASS>::addListener(LISTENER_CLASS* listener, s
 #ifdef _DEBUG
     if(m_Listeners.find(listenerName) != m_Listeners.end())
     {
-        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+        std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
                   << ">::::addListener] Warning: listenerName \""
                   << listenerName << "\" already registered" << std::endl;
         return;
@@ -49,7 +50,7 @@ void ListenerDispatcher<LISTENER_CLASS>::addListener(LISTENER_CLASS* listener, s
     {
         if(it.second == listener)
         {
-            std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+            std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
                       << ">::addListener] Warning: listener pointer already registered"
                       << std::endl;
             return;
@@ -73,7 +74,7 @@ void ListenerDispatcher<LISTENER_CLASS>::removeListener(LISTENER_CLASS* listener
         }
     }
 #ifdef _DEBUG
-    std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+    std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
               << ">::removeListener] Warning: listener pointer not registered"
               << std::endl;
 #endif // _DEBUG
@@ -87,7 +88,7 @@ void ListenerDispatcher<LISTENER_CLASS>::removeListener(std::string listenerName
     if(it == m_Listeners.end())
     {
 #ifdef _DEBUG
-        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+        std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
                   << ">::removeListener] Warning: listener \"" << listenerName
                   << "\" not registered" << std::endl;
 #endif // _DEBUG
@@ -102,7 +103,7 @@ void ListenerDispatcher<LISTENER_CLASS>::removeAllListeners()
 {
 #ifdef _DEBUG
     for(auto it : m_Listeners)
-        std::cout << "[ListenerDispatcher<" << typeid(LISTENER_CLASS).name()
+        std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
                 << ">::removeAllListeners] Warning: Listener \"" << it.first
                 << "\" still registered" << std::endl;
 #endif // _DEBUG
