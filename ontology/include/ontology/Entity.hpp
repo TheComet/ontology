@@ -8,10 +8,12 @@
 //----------------------------------------------------------------------------
 // include files
 
+#include <ontology/Component.hpp>
 #include <ontology/Entity.hxx>
 #include <ontology/EntityManager.hpp>
 #include <ontology/Exception.hpp>
-#include <ontology/Component.hpp>
+#include <ontology/SystemManager.hpp>
+#include <ontology/World.hpp>
 #include <ontology/Type.hpp>
 
 namespace Ontology {
@@ -58,6 +60,18 @@ T* Entity::getComponentPtr() const
         std::string("Component of type \"") + getTypeName<T>() + "\" not registered with this entity"
     )
     return static_cast<T*>(it->second.get());
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+Entity& Entity::configure(std::string param)
+{
+    SystemManager& sm = m_Creator->world->getSystemManager();
+    ONTOLOGY_ASSERT(sm.hasSystem<T>(), InvalidSystemException, Entity::configure<T>,
+        std::string("System of type \"" + getTypeName<T>() + "\" was not found when trying to configure this entity")
+    )
+    sm.getSystem<T>().configureEntity(*this, param);
+    return *this;
 }
 
 } // namespace Ontology

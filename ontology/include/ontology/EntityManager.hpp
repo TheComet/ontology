@@ -42,9 +42,9 @@ PUBLIC:
     typedef std::vector<Entity> EntityList;
 
     /*!
-     * @brief Default constructor
+     * @brief Construct with world pointer.
      */
-    EntityManager();
+    EntityManager(World*);
 
     /*!
      * @brief Default destructor

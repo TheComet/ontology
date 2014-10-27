@@ -31,6 +31,7 @@ struct Movement : public System
         e.getComponent<Position>().x += 2;
         e.getComponent<Position>().y += 1;
     }
+    void configureEntity(Entity&, std::string param="") override {}
 };
 
 // ----------------------------------------------------------------------------

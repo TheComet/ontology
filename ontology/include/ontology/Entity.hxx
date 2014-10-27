@@ -107,6 +107,12 @@ PUBLIC:
      */
     template <class T>
     T* getComponentPtr() const;
+    
+    /*!
+     * @brief Tells the specified system to configure this entity.
+     */
+    template <class T>
+    Entity& configure(std::string param="");
 
     /*!
      * @brief Returns true if this entity is supported by the specified system.

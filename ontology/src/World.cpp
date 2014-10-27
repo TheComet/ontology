@@ -15,7 +15,7 @@ namespace Ontology {
 // ----------------------------------------------------------------------------
 
 World::World() :
-    m_EntityManager(new EntityManager),
+    m_EntityManager(new EntityManager(this)),
     m_SystemManager(new SystemManager(this)),
     m_DeltaTime(0.0)
 {

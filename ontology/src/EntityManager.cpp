@@ -16,7 +16,8 @@
 namespace Ontology {
 
 // ----------------------------------------------------------------------------
-EntityManager::EntityManager()
+EntityManager::EntityManager(World* world) :
+    EntityManagerInterface(world)
 {
     m_EntityListCapacity = m_EntityList.capacity();
 }

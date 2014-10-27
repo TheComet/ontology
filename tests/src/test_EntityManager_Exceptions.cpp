@@ -8,7 +8,8 @@
 
 TEST(NAME, GettingNonExistingEntityThrowsInvalidEntityException)
 {
-    EntityManager em;
+    World w;
+    EntityManager em(&w);
     ASSERT_THROW(em.getEntity(0), InvalidEntityException);
 }
 

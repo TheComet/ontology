@@ -4,10 +4,13 @@
 // tests
 // ----------------------------------------------------------------------------
 
+// TODO test if world was set correctly
+
 TEST(NAME, DispatchesCreateAndDestroyEntityEvents)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager* em = new EntityManager();
+    EntityManager* em = new EntityManager(&w);
     em->event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -29,8 +32,9 @@ TEST(NAME, DispatchesCreateAndDestroyEntityEvents)
 
 TEST(NAME, DispatchesDestroyEntityEventOnDestruction)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager* em = new EntityManager();
+    EntityManager* em = new EntityManager(&w);
     em->event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -49,8 +53,9 @@ TEST(NAME, DispatchesDestroyEntityEventOnDestruction)
 
 TEST(NAME, DestroyEntitiesByName)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager em;
+    EntityManager em(&w);
     em.event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -74,8 +79,9 @@ TEST(NAME, DestroyEntitiesByName)
 
 TEST(NAME, AddingAndRemovingComponentsDispatchesEvents)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager em;
+    EntityManager em(&w);
     em.event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -102,8 +108,9 @@ TEST(NAME, AddingAndRemovingComponentsDispatchesEvents)
 
 TEST(NAME, RemoveComponentEventDispatchesOnDestruction)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager* em = new EntityManager();
+    EntityManager* em = new EntityManager(&w);
     em->event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -127,8 +134,9 @@ TEST(NAME, RemoveComponentEventDispatchesOnDestruction)
 
 TEST(NAME, DestroyingEntitiesDispatchesReallocationEvent)
 {
+    World w;
     MockEntityManagerListener mock;
-    EntityManager* em = new EntityManager();
+    EntityManager* em = new EntityManager(&w);
     em->event.addListener(&mock, "mock");
 
     // uninteresting calls
@@ -155,7 +163,8 @@ TEST(NAME, DestroyingEntitiesDispatchesReallocationEvent)
 
 TEST(NAME, GetEntityByID)
 {
-    EntityManager em;
+    World w;
+    EntityManager em(&w);
     Entity::ID a = em.createEntity("entity1").getID();
     Entity::ID b = em.createEntity("entity2").getID();
     Entity::ID c = em.createEntity("entity3").getID();

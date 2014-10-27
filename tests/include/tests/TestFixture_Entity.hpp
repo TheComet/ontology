@@ -38,10 +38,11 @@ class MockEntityManagerHelper : public EntityManagerInterface
     Entity& createEntity(const char* name) override { return e; }
     Entity& getEntity(Entity::ID) override { return e; }
     
-    Entity e;
+    Entity e; // dummy entity
+    World w; // dummy world
 
 public:
-    MockEntityManagerHelper() : e("dont_call_this", this) {}
+    MockEntityManagerHelper() : EntityManagerInterface(&w), e("dont_call_this", this) {}
     
     virtual ~MockEntityManagerHelper() {}
     virtual void informAddComponentHelper(Entity&, const TestComponent*) const = 0;
@@ -61,4 +62,5 @@ struct TestSystem : public System
 {
     void initialise() override {}
     void processEntity(Entity&) override {}
+    MOCK_METHOD2(configureEntity, void(Entity&, std::string));
 };

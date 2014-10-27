@@ -66,16 +66,22 @@ PUBLIC:
      * @brief Allow destruction through base class pointer.
      */
     virtual ~System();
+    
+    /*!
+     * @brief Called when systems should initialise. Override this.
+     */
+    virtual void initialise() = 0;
 
     /*!
      * @brief Called when an entity requires processing. Override this.
      */
     virtual void processEntity(Entity&) = 0;
-
+    
     /*!
-     * @brief Called when systems should initialise. Override this.
+     * @brief Called when an entity wishes to be configured by this system.
+     * Override this.
      */
-    virtual void initialise() = 0;
+    virtual void configureEntity(Entity&, std::string param="") = 0;
 
     /*!
      * @brief Declare which components your system will support.

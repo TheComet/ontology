@@ -93,3 +93,20 @@ TEST(NAME, CheckForSupportedSystemsUpdatesWhenComponentsAreAddedOrRemoved)
     ASSERT_EQ(true, !entity.supportsSystem(supported));
     ASSERT_EQ(true, !entity.supportsSystem(unsupported));
 }
+
+TEST(NAME, ConfiguringEntityCallsSystem)
+{
+    World w;
+    w.getSystemManager().addSystem<TestSystem>();
+    Entity& entity = w.getEntityManager().createEntity("entity");
+    TestSystem& s = w.getSystemManager().getSystem<TestSystem>();
+    
+    // should be called when the entity tries to configure itself
+    EXPECT_CALL(s, configureEntity(testing::_, testing::_))
+        .Times(1);
+    EXPECT_CALL(s, configureEntity(testing::_, std::string("hello")))
+        .Times(1);
+    
+    entity.configure<TestSystem>();
+    entity.configure<TestSystem>("hello");
+}

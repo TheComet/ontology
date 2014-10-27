@@ -11,8 +11,9 @@ using namespace Ontology;
 
 struct MockSystem : public System
 {
-    MOCK_METHOD1(processEntity, void(Entity&));
     MOCK_METHOD0(initialise, void());
+    MOCK_METHOD1(processEntity, void(Entity&));
+    MOCK_METHOD2(configureEntity, void(Entity&, std::string));
 };
 
 class TestEntityManager : public EntityManagerInterface
@@ -24,6 +25,8 @@ class TestEntityManager : public EntityManagerInterface
     Entity& getEntity(Entity::ID) override { return e; }
     Entity e;
     
+    World w; // dummy world
+    
     // uninteresting, implement abstracts
     void destroyEntity(Entity&) override {}
     void destroyEntities(const char*) override {}
@@ -31,7 +34,7 @@ class TestEntityManager : public EntityManagerInterface
     void informAddComponent(Entity&, const Component*) const override {}
     void informRemoveComponent(Entity&, const Component*) const override {}
 public:
-    TestEntityManager() : e("dont_call_this", this) {}
+    TestEntityManager() : EntityManagerInterface(&w), e("dont_call_this", this) {}
 };
 
 #define OVERRIDE_NECESSARY void processEntity(Entity&) override {} void initialise() override {} 
