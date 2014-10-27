@@ -53,47 +53,47 @@ typedef std::vector<const std::type_info*> TypeVector;
 
 /// A pair of std::type_info pointers (&typeid(T)) and a templated type.
 template <class T>
-using TypePair = typename std::pair<const std::type_info*, T>;
+using TypePair = std::pair<const std::type_info*, T>;
 
 /// A vector of templated TypePairs.
 template <class T>
-using TypeVectorPair = typename std::vector< TypePair<T> >;
+using TypeVectorPair = std::vector< TypePair<T> >;
+
+/// A TypeVectorPair wrapping a templated smart pointer type
+template <class SmartPtr>
+struct TypeVectorPairSmartPtr : public TypeVectorPair<SmartPtr>
+{
+    typedef typename TypeVectorPair<SmartPtr>::iterator iterator;
+    typedef typename TypeVectorPair<SmartPtr>::const_iterator const_iterator;
+
+    /// Searches the vector for the specified type. (linear search)
+    iterator find(const std::type_info* key)
+    {
+        iterator it = this->begin();
+        for(; it != this->end(); ++it)
+            if(it->first == key)
+                return it;
+        return it;
+    }
+    
+    /// Searches the vector for the specified type. (linear search)
+    const_iterator find(const std::type_info* key) const
+    {
+        const_iterator it = this->begin();
+        for(; it != this->end(); ++it)
+            if(it->first == key)
+                return it;
+        return it;
+    }
+};
 
 /// A TypeVectorPair with the second pair type being a unique_ptr of a templated type.
 template <class T>
-class TypeVectorPairUniquePtr : public TypeVectorPair< std::unique_ptr<T> >
-{
-public:
-    typedef typename TypeVectorPair< std::unique_ptr<T> >::iterator iterator;
-
-    /// Searches the vector for the specified type. (linear search)
-    iterator find(const std::type_info* key)
-    {
-        iterator it = this->begin();
-        for(; it != this->end(); ++it)
-            if(it->first == key)
-                return it;
-        return it;
-    }
-};
+using TypeVectorPairUniquePtr = TypeVectorPairSmartPtr< std::unique_ptr<T> >;
 
 /// A TypeVectorPair with the second pair type being a shared_ptr of a templated type.
 template <class T>
-class TypeVectorPairSharedPtr : public TypeVectorPair< std::shared_ptr<T> >
-{
-public:
-    typedef typename TypeVectorPair< std::shared_ptr<T> >::iterator iterator;
-
-    /// Searches the vector for the specified type. (linear search)
-    iterator find(const std::type_info* key)
-    {
-        iterator it = this->begin();
-        for(; it != this->end(); ++it)
-            if(it->first == key)
-                return it;
-        return it;
-    }
-};
+using TypeVectorPairSharedPtr = TypeVectorPairSmartPtr< std::shared_ptr<T> >;
 
 } // namespace Ontology
 

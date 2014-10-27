@@ -145,7 +145,7 @@ PUBLIC:
      * @return A pointer to the specified System
      */
     template <class T>
-    T* getSystemPtr();
+    T* getSystemPtr() const;
 
     /*!
      * @brief Gets the specified system.
@@ -157,7 +157,7 @@ PUBLIC:
      * @return A reference to the specified system.
      */
     template <class T>
-    inline T& getSystem();
+    inline T& getSystem() const;
     
     /*!
      * @brief Check to see if a system exists.

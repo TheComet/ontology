@@ -53,7 +53,7 @@ SystemManager& SystemManager::removeSystem()
 
 // ----------------------------------------------------------------------------
 template <class T>
-T* SystemManager::getSystemPtr()
+T* SystemManager::getSystemPtr() const
 {
     const auto it = m_SystemList.find(&typeid(T));
     ONTOLOGY_ASSERT(it != m_SystemList.end(), InvalidSystemException, SystemManager::getSystem<T>,
@@ -64,14 +64,14 @@ T* SystemManager::getSystemPtr()
 
 // ----------------------------------------------------------------------------
 template <class T>
-inline T& SystemManager::getSystem()
+inline T& SystemManager::getSystem() const
 {
     return *this->getSystemPtr<T>();
 }
 
 // ----------------------------------------------------------------------------
 template <class T>
-bool SystemManager::hasSystem()
+bool SystemManager::hasSystem() const
 {
     if(m_SystemList.find(&typeid(T)) == m_SystemList.end())
         return false;
