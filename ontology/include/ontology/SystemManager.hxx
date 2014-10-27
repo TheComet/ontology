@@ -158,9 +158,26 @@ PUBLIC:
      */
     template <class T>
     inline T& getSystem();
+    
+    /*!
+     * @brief Check to see if a system exists.
+     * 
+     * The system type to check for is passed as a template parameter.
+     * @code
+     * if(world.getSystemManager().hasSystem<MySystem>())
+     * {
+     *     // do stuff...
+     * }
+     * @endcode
+     * @return Returns true if the specified system exists, otherwise false is
+     * returned.
+     */
+    template <class T>
+    bool hasSystem() const;
 
     /*!
      * @brief Passes important data to a new System object so it functions correctly.
+     * @note Should not be called by the user. This is an internal function.
      */
     ONTOLOGY_LOCAL_API void configureSystem();
 

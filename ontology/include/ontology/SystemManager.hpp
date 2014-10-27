@@ -69,6 +69,15 @@ inline T& SystemManager::getSystem()
     return *this->getSystemPtr<T>();
 }
 
+// ----------------------------------------------------------------------------
+template <class T>
+bool SystemManager::hasSystem()
+{
+    if(m_SystemList.find(&typeid(T)) == m_SystemList.end())
+        return false;
+    return true;
+}
+
 } // namespace Ontology
 
 #endif // __ONTOLOGY_SYSTEM_MANAGER_HPP__
