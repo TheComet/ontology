@@ -21,14 +21,15 @@ inline TypeSet TypeSetGenerator()
 
 // ----------------------------------------------------------------------------
 template <class... T>
-inline void System::supportsComponents()
+inline System& System::supportsComponents()
 {
     m_SupportedComponents = TypeSetGenerator<T...>();
+    return *this;
 }
 
 // ----------------------------------------------------------------------------
 template <class... T>
-inline void System::executesAfter()
+inline System& System::executesAfter()
 {
     m_DependingSystems = TypeSetGenerator<T...>();
 }

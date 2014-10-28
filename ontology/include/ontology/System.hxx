@@ -102,7 +102,7 @@ PUBLIC:
      * least a Position2D and a Velocity2D component.
      */
     template <class... T>
-    inline void supportsComponents();
+    inline System& supportsComponents();
 
     /*!
      * @brief Gets the typeset of supported components.
@@ -128,7 +128,7 @@ PUBLIC:
      * @endcode
      */
     template <class... T>
-    inline void executesAfter();
+    inline System& executesAfter();
 
     /*!
      * @brief Gets the typeset of depending systems.
