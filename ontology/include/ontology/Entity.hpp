@@ -70,7 +70,7 @@ Entity& Entity::configure(std::string param)
     ONTOLOGY_ASSERT(sm.hasSystem<T>(), InvalidSystemException, Entity::configure<T>,
         std::string("System of type \"" + getTypeName<T>() + "\" was not found when trying to configure this entity")
     )
-    sm.getSystem<T>().configureEntity(*this, param);
+    static_cast<System*>(sm.getSystemPtr<T>())->configureEntity(*this, param);
     return *this;
 }
 
