@@ -32,6 +32,7 @@ template <class... T>
 inline System& System::executesAfter()
 {
     m_DependingSystems = TypeSetGenerator<T...>();
+    return *this;
 }
 
 } // namespace Ontology
