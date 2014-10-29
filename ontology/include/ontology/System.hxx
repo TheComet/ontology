@@ -82,6 +82,16 @@ PUBLIC:
      * Override this.
      */
     virtual void configureEntity(Entity&, std::string param="") = 0;
+    
+    /*!
+     * @brief Checks if this system is initialised.
+     */
+    bool isInitialised() const;
+    
+    /*!
+     * @brief Call this as many times as you wish, the system will only initialise once.
+     */
+    ONTOLOGY_LOCAL_API void initialiseGuard(std::string systemName);
 
     /*!
      * @brief Declare which components your system will support.
@@ -176,6 +186,7 @@ PRIVATE:
     TypeSet         m_SupportedComponents;
     TypeSet         m_DependingSystems;
     EntityList      m_EntityList;
+    bool            m_Initialised;
 
 #ifdef ONTOLOGY_THREAD
     void joinableThreadEntryPoint();

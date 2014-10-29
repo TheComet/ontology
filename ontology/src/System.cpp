@@ -59,13 +59,29 @@ int getNumberOfCores() {
 
 // ----------------------------------------------------------------------------
 System::System() :
-    world(nullptr)
+    world(nullptr),
+    m_Initialised(false)
 {
 }
 
 // ----------------------------------------------------------------------------
 System::~System()
 {
+}
+
+// ----------------------------------------------------------------------------
+bool System::isInitialised() const
+{
+    return m_Initialised;
+}
+
+// ----------------------------------------------------------------------------
+void System::initialiseGuard(std::string systemName)
+{
+    if(m_Initialised)
+        return;
+    std::cout << "[" << systemName << "] initialising..." << std::endl;
+    this->initialise();
 }
 
 // ----------------------------------------------------------------------------

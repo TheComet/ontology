@@ -9,6 +9,7 @@
 #include <ontology/Exception.hpp>
 #include <ontology/SystemManager.hpp>
 #include <ontology/World.hpp>
+#include <ontology/Type.hpp>
 
 #include <stdexcept>
 
@@ -42,7 +43,7 @@ void SystemManager::initialise()
 {
     this->computeExecutionOrder();
     for(const auto& it : m_SystemList)
-        it.second->initialise();
+        it.second->initialiseGuard(demangleTypeName(it.first->name()));
 }
 
 // ----------------------------------------------------------------------------
