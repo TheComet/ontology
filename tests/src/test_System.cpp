@@ -9,6 +9,8 @@ using namespace Ontology;
 // test fixture
 // ----------------------------------------------------------------------------
 
+// TODO system initialises only once
+
 struct MockSystem : public System
 {
     MOCK_METHOD0(initialise, void());
