@@ -19,3 +19,4 @@ using namespace Ontology;
 // TODO test execution order with explicit dependencies
 // TODO test for circular dependencies
 // TODO test for exdeptions
+// TODO test what happens to execution order when removing a system

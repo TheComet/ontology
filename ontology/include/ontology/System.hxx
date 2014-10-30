@@ -11,6 +11,8 @@
 #include <ontology/Config.hpp>
 #include <ontology/TypeContainers.hpp>
 
+#include <string>
+
 #ifdef ONTOLOGY_THREAD
 #   include <boost/thread/thread.hpp>
 #endif
