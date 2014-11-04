@@ -29,7 +29,7 @@ Example
 =======
 Top Level View
 --------------
-Ontology tries to make it easy to tie different components and systems in a program together. The following demonstrates what a 2D game might look like:
+Ontology tries to make it easy to tie different components and systems in a program together. It allows you to declare what components a system supports as well as execution dependencies. The following demonstrates what a 2D game might look like:
 ``` cpp
 int main()
 {
@@ -66,6 +66,12 @@ int main()
 }
 ```
 A unique feature of Ontology is the ability to filter which entities are processed by which systems. When creating a system, one simply has to declare which components the system supports. That system will then only receive entities that actually have all of the required components. Declaring nothing, such as with the InputSystem in the example above, means that the system will receive **all** entities. If a system shouldn't receive any at all, one must declare Ontology::None.
+
+In the above case, the "Player" entity we created would be processed by the following systems:
+ - MovementSystem, since MovementSystem requires Position and Velocity and "Player" has them both.
+ - RenderSystem, since RenderSystem requires Position and Sprite and "Player" has them both.
+ - InputSystem, since by default a system will process all entities.
+ - **NOT** MainLoop, since it Ontology::None was specified.
 
 Components
 ----------
@@ -119,9 +125,10 @@ class DerivedSystem : public BaseSystem
 Then, when creating the system and adding it to the world, use:
 ``` cpp
 world.getSystemManager().addPolymorphicSystem<BaseSystem, DerivedSystem>();
-
-**Important** When getting polymorphic systems, always use getSystemPtr<>() rather than getSystem<>().**
+```
 
 Communication between systems
 -----------------------------
-(TODO)
+Here you are pretty flexible. Ontology provides a class for implementing the observer pattern if that your slice of cake, but you could also go with something like Boost.Signals2 (I personally recommend this).
+
+To learn more about the provided observer pattern, an example is provided in the comments section on the file *ontology/ListenerDispatcher.hxx".
