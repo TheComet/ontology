@@ -129,6 +129,6 @@ world.getSystemManager().addPolymorphicSystem<BaseSystem, DerivedSystem>();
 
 Communication between systems
 -----------------------------
-Here you are pretty flexible. Ontology provides a class for implementing the observer pattern if that your slice of cake, but you could also go with something like Boost.Signals2 (I personally recommend this).
+Here you are pretty flexible. Ontology provides a class for implementing the observer pattern if that's your slice of cake, but you could also go with something like Boost.Signals2 (I personally recommend this).
 
-To learn more about the provided observer pattern, an example is provided in the comments section on the file *ontology/ListenerDispatcher.hxx".
+To learn more about the provided observer pattern, an example is provided in the comments section on the file *ontology/ListenerDispatcher.hxx*.
