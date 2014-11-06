@@ -64,6 +64,16 @@ T* Entity::getComponentPtr() const
 
 //----------------------------------------------------------------------------
 template <class T>
+bool Entity::hasComponent() const
+{
+    const auto it = m_ComponentMap.find(&typeid(T));
+    if(it == m_ComponentMap.end())
+        return false;
+    return true;
+}
+
+//----------------------------------------------------------------------------
+template <class T>
 Entity& Entity::configure(std::string param)
 {
     SystemManager& sm = m_Creator->world->getSystemManager();

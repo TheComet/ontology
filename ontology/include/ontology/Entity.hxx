@@ -109,6 +109,13 @@ PUBLIC:
     T* getComponentPtr() const;
     
     /*!
+     * @brief Checks if the specified component exists.
+     * @return True if the entity has the specified component, false if otherwise.
+     */
+    template <class T>
+    bool hasComponent() const;
+    
+    /*!
      * @brief Tells the specified system to configure this entity.
      */
     template <class T>
