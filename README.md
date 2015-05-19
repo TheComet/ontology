@@ -65,7 +65,7 @@ int main()
 	return 0;
 }
 ```
-A unique feature of Ontology is the ability to filter which entities are processed by which systems. When creating a system, one simply has to declare which components the system supports. That system will then only receive entities that actually have all of the required components. Declaring nothing, such as with the InputSystem in the example above, means that the system will receive **all** entities. If a system shouldn't receive any at all, one must declare Ontology::None.
+A unique feature of Ontology is the ability to filter which entities are processed by which systems **once only**, namely when they are added to the world. When creating a system, one simply has to declare which components the system supports. That system will then only receive entities that actually have all of the required components. Declaring nothing, such as with the InputSystem in the example above, means that the system will receive **all** entities. If a system shouldn't receive any at all, one must declare Ontology::None.
 
 In the above case, the "Player" entity we created would be processed by the following systems:
  - MovementSystem, since MovementSystem requires Position and Velocity and "Player" has them both.
