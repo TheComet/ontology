@@ -8,7 +8,8 @@ Compiling/Installing
 
 CMake
 -----
-CMake is a cross-platform, open source build system. You can find more information about CMake [here](http://www.cmake.org/).
+CMake is a cross-platform, open source build system. You can find more
+information about CMake [here](http://www.cmake.org/).
 
 It is very simple to compile Ontology using CMake. Just follow these steps:
 
@@ -29,7 +30,10 @@ Example
 =======
 Top Level View
 --------------
-Ontology tries to make it easy to tie different components and systems in a program together. It allows you to declare what components a system supports as well as execution dependencies. The following demonstrates what a 2D game might look like:
+Ontology tries to make it easy to tie different components and systems in a
+program together. It allows you to declare what components a system supports
+as well as execution dependencies. The following demonstrates what a 2D game
+might look like:
 ``` cpp
 int main()
 {
@@ -65,7 +69,13 @@ int main()
 	return 0;
 }
 ```
-A unique feature of Ontology is the ability to filter which entities are processed by which systems. When creating a system, one simply has to declare which components the system supports. That system will then only receive entities that actually have all of the required components. Declaring nothing, such as with the InputSystem in the example above, means that the system will receive **all** entities. If a system shouldn't receive any at all, one must declare Ontology::None.
+A unique feature of Ontology is the ability to filter which entities are
+processed by which systems. When creating a system, one simply has to declare
+which components the system supports. That system will then only receive
+entities that actually have all of the required components. Declaring nothing,
+such as with the InputSystem in the example above, means that the system will
+receive **all** entities. If a system shouldn't receive any at all, one must
+declare Ontology::None.
 
 In the above case, the "Player" entity we created would be processed by the following systems:
  - MovementSystem, since MovementSystem requires Position and Velocity and "Player" has them both.
@@ -75,7 +85,8 @@ In the above case, the "Player" entity we created would be processed by the foll
 
 Components
 ----------
-Components hold data and can be added to entities. To create components one must inherit from Ontology::Component:
+Components hold data and can be added to entities. To create components one
+must inherit from Ontology::Component:
 ``` cpp
 struct Position : public Ontology::Component
 {
@@ -87,7 +98,8 @@ struct Position : public Ontology::Component
 
 Systems
 -------
-Systems manipulate entities and their components. To create a system one must inherit from Ontology::System:
+Systems manipulate entities and their components. To create a system one must
+inherit from Ontology::System:
 ``` cpp
 class MovementSystem : public Ontology::System
 {
@@ -107,7 +119,8 @@ public:
 
 Polymorphic Systems
 -------------------
-Sometimes you may want to add a polymorphic system. This is just like adding a normal system, but using System::addPolymorphicSystem instead:
+Sometimes you may want to add a polymorphic system. This is just like adding a
+normal system, but using System::addPolymorphicSystem instead:
 ``` cpp
 class BaseSystem : public OntologySystem
 {
@@ -127,8 +140,24 @@ Then, when creating the system and adding it to the world, use:
 world.getSystemManager().addPolymorphicSystem<BaseSystem, DerivedSystem>();
 ```
 
+Execution Order of Systems
+--------------------------
+Sometimes you may want a specific system to update its entities *after* another
+system has completed its update. This can be achieved by using
+System::executesAfter:
+``` cpp
+    world.getSystemManager().addSystem<InputSystem>();
+    world.getSystemManager().addSystem<MovementSystem>()
+        .executesAfter<InputSystem>()
+        ;
+```
+The above code forces MovementSystem to be executed after InputSystem.
+
 Communication between systems
 -----------------------------
-Here you are pretty flexible. Ontology provides a class for implementing the observer pattern if that's your slice of cake, but you could also go with something like Boost.Signals2 (I personally recommend this).
+Here you are pretty flexible. Ontology provides a class for implementing the
+observer pattern if that's your slice of cake, but you could also go with
+something like Boost.Signals2 (I personally recommend this).
 
-To learn more about the provided observer pattern, an example is provided in the comments section on the file *ontology/ListenerDispatcher.hxx*.
+To learn more about the provided observer pattern, an example is provided in
+the comments section on the file *ontology/ListenerDispatcher.hxx*.
