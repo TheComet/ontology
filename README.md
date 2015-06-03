@@ -153,6 +153,19 @@ System::executesAfter:
 ```
 The above code forces MovementSystem to be executed after InputSystem.
 
+Like almost all member functions, executesAfter() returns the same System again
+allowing for chaining:
+``` cpp
+    world.getSystemManager().addSystem<MovementSystem>()
+        .supportsComponents<
+            Position,
+            Velocity>()
+        .executesAfter<
+            InputSystem,
+            RenderSystem>()
+        ;
+```
+
 Communication between systems
 -----------------------------
 Here you are pretty flexible. Ontology provides a class for implementing the
