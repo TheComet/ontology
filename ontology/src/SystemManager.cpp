@@ -129,7 +129,7 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
         if(!this->isInExecutionList(edgeSystem))
         {
             // handle circular dependencies
-            ONTOLOGY_ASSERT(resolving.find(edge) != resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
+            ONTOLOGY_ASSERT(resolving.find(edge) == resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
                 std::string("circular dependency detected with systems \"") +
                 demangleTypeName(node->name()) +
                 "\" and \"" +
