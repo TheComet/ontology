@@ -22,10 +22,7 @@ else ()
 endif ()
 
 # generate config file
-configure_file (
-    "${CMAKE_CURRENT_LIST_DIR}/include/ontology/Config.hpp.in"
-    "${CMAKE_CURRENT_LIST_DIR}/include/ontology/Config.hpp"
-)
+configure_file ("include/ontology/Config.hpp.in" "include/ontology/Config.hpp")
 
 ###############################################################################
 # defines

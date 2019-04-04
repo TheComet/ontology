@@ -63,7 +63,7 @@ namespace Ontology {
 template <class LISTENER_CLASS>
 class ONTOLOGY_PUBLIC_API ListenerDispatcher
 {
-PUBLIC:
+public:
 
     /*!
      * @brief Default constructor
@@ -135,7 +135,7 @@ PUBLIC:
     template <class... ARGS, class... PARAMS>
     bool dispatchAndFindFalse(bool (LISTENER_CLASS::*func)(ARGS...), PARAMS&&... params) const;
 
-PRIVATE:
+private:
 
     std::map<std::string, LISTENER_CLASS*> m_Listeners;
 };

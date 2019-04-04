@@ -72,7 +72,7 @@ namespace Ontology {
 class ONTOLOGY_PUBLIC_API SystemManager :
     public EntityManagerListener
 {
-PUBLIC:
+public:
 
     /*!
      * @brief Default constructor.
@@ -202,7 +202,7 @@ PUBLIC:
      */
     void update();
 
-PRIVATE:
+private:
 
     // EntityManagerListener methods
     void onDestroyEntity(Entity&) override;

@@ -43,7 +43,7 @@ namespace Ontology {
  */
 class ONTOLOGY_PUBLIC_API World
 {
-PUBLIC:
+public:
 
     /*!
      * @brief Default constructor.
@@ -84,7 +84,7 @@ PUBLIC:
      */
     void update();
 
-PRIVATE:
+private:
     std::unique_ptr<EntityManager>  m_EntityManager;
     std::unique_ptr<SystemManager>  m_SystemManager;
     float                           m_DeltaTime;

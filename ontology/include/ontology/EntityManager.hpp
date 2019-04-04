@@ -37,7 +37,7 @@ namespace Ontology {
  */
 class ONTOLOGY_PUBLIC_API EntityManager : public EntityManagerInterface
 {
-PUBLIC:
+public:
 
     typedef std::vector<Entity> EntityList;
 
@@ -108,7 +108,7 @@ PUBLIC:
      */
     ListenerDispatcher<EntityManagerListener> event;
 
-PRIVATE:
+private:
 
     /*!
      * @brief Called by entities when they add a new component.

@@ -55,9 +55,9 @@ struct None {};
  */
 class ONTOLOGY_PUBLIC_API System
 {
-PRIVATE:
+private:
     typedef std::vector< std::reference_wrapper<Entity> > EntityList;
-PUBLIC:
+public:
 
     /*!
      * @brief Default constructor.
@@ -176,14 +176,14 @@ PUBLIC:
      */
     ONTOLOGY_LOCAL_API void update();
 
-PROTECTED:
+protected:
 
     /*!
      * @brief Access the world the system belongs to with this.
      */
     World* world;
 
-PRIVATE:
+private:
 
     TypeSet         m_SupportedComponents;
     TypeSet         m_DependingSystems;

@@ -32,14 +32,14 @@ namespace Ontology {
 
 class ONTOLOGY_PUBLIC_API Component
 {
-PUBLIC:
+public:
 
     /*!
      * @brief Allow destruction through base class pointer.
      */
     virtual ~Component();
 
-PROTECTED:
+protected:
 
     /*!
      * @brief Disallow construction without inheritance.

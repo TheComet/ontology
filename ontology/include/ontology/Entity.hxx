@@ -52,7 +52,7 @@ namespace Ontology{
  */
 class Entity
 {
-PUBLIC:
+public:
 
     typedef std::size_t ID;
 
@@ -142,7 +142,7 @@ PUBLIC:
      */
     ID getID() const;
 
-PRIVATE:
+private:
 
     static ID                       GUIDCounter;
     ID                              m_ID;
