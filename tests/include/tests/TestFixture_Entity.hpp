@@ -1,9 +1,10 @@
 #include <tests/Config.hpp>
 #include <gmock/gmock.h>
 #include <ontology/Ontology.hpp>
+
 #define NAME Entity
 
-using namespace Ontology;
+using namespace ontology;
 
 // ----------------------------------------------------------------------------
 // test fixtures
@@ -27,26 +28,26 @@ struct NonExistingComponent : public Component
 // to TestComponent. This is so they can be tested.
 class MockEntityManagerHelper : public EntityManagerInterface
 {
-    void informAddComponent(Entity& e, const Component* c) const override
-    { this->informAddComponentHelper(e, static_cast<const TestComponent*>(c)); }
-    void informRemoveComponent(Entity& e, const Component* c) const override
-    { this->informRemoveComponentHelper(e, static_cast<const TestComponent*>(c)); }
+    void notifyAddComponent(Entity& e, const Component* c) const override
+    { this->notifyAddComponentHelper(e, static_cast<const TestComponent*>(c)); }
+    void notifyRemoveComponent(Entity& e, const Component* c) const override
+    { this->notifyRemoveComponentHelper(e, static_cast<const TestComponent*>(c)); }
 
     // WARNING: DO NOT CALL THIS FUNCTION - It is required to be implemented
     // by the base class (abstract function) but doesn't do what it is intended
     // to. This is only here to make the compiler happy.
-    Entity& createEntity(const char* name) override { return e; }
+    Entity& createEntity(std::string name) override { return e; }
     Entity& getEntity(Entity::ID) override { return e; }
-    
+
     Entity e; // dummy entity
     World w; // dummy world
 
 public:
     MockEntityManagerHelper() : EntityManagerInterface(&w), e("dont_call_this", this) {}
-    
+
     virtual ~MockEntityManagerHelper() {}
-    virtual void informAddComponentHelper(Entity&, const TestComponent*) const = 0;
-    virtual void informRemoveComponentHelper(Entity&, const TestComponent*) const = 0;
+    virtual void notifyAddComponentHelper(Entity&, const TestComponent*) const = 0;
+    virtual void notifyRemoveComponentHelper(Entity&, const TestComponent*) const = 0;
 };
 
 struct MockEntityManager : public MockEntityManagerHelper
@@ -54,8 +55,8 @@ struct MockEntityManager : public MockEntityManagerHelper
     MOCK_METHOD1(destroyEntity, void(Entity&));
     MOCK_METHOD1(destroyEntities, void(const char*));
     MOCK_METHOD0(destroyAllEntities, void());
-    MOCK_CONST_METHOD2(informAddComponentHelper, void(Entity&, const TestComponent*));
-    MOCK_CONST_METHOD2(informRemoveComponentHelper, void(Entity&, const TestComponent*));
+    MOCK_CONST_METHOD2(notifyAddComponentHelper, void(Entity&, const TestComponent*));
+    MOCK_CONST_METHOD2(notifyRemoveComponentHelper, void(Entity&, const TestComponent*));
 };
 
 struct TestSystem : public System

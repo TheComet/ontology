@@ -10,21 +10,21 @@
 
 #include <ontology/Config.hpp>
 
-#ifdef ONTOLOGY_WITH_EXCEPTIONS
+#ifdef ONTOLOGY_EXCEPTIONS
 #   include <stdexcept>
 #endif
 
-#ifdef ONTOLOGY_WITH_ASSERT
+#ifdef ONTOLOGY_ASSERT
 #   include <cassert>
 #endif
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 // exception support
 // ----------------------------------------------------------------------------
 
-#if defined(ONTOLOGY_WITH_EXCEPTIONS)
+#if defined(ONTOLOGY_EXCEPTIONS)
 
 class Exception : public std::runtime_error
 {
@@ -38,12 +38,14 @@ struct name : public Exception \
     name(const std::string& msg) : Exception(msg) {} \
 };
 
-DECLARE_EXCEPTION(DuplicateComponentException)
-DECLARE_EXCEPTION(InvalidComponentException)
 DECLARE_EXCEPTION(CircularDependencyException)
+DECLARE_EXCEPTION(DuplicateComponentException)
 DECLARE_EXCEPTION(DuplicateSystemException)
+DECLARE_EXCEPTION(DuplicatePrototypeException)
+DECLARE_EXCEPTION(InvalidComponentException)
 DECLARE_EXCEPTION(InvalidSystemException)
 DECLARE_EXCEPTION(InvalidEntityException)
+DECLARE_EXCEPTION(InvalidPrototypeException)
 
 #   define STRINGIFY(x) #x
 #   define TO_STRING(x) STRINGIFY(x)
@@ -56,7 +58,7 @@ DECLARE_EXCEPTION(InvalidEntityException)
 // assertion support
 // ----------------------------------------------------------------------------
 
-#elif defined(ONTOLOGY_WITH_ASSERT)
+#elif defined(ONTOLOGY_ASSERT)
 #   define ONTOLOGY_ASSERT(should_be_true, except_type, class_method, message) \
         assert(should_be_true);
 
@@ -68,6 +70,6 @@ DECLARE_EXCEPTION(InvalidEntityException)
 #   define ONTOLOGY_ASSERT(should_be_true, except_type, class_method, message)
 #endif
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif //__ONTOLOGY_EXCEPTION_HPP__

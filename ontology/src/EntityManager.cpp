@@ -8,123 +8,160 @@
 #include <ontology/Entity.hpp>
 #include <ontology/EntityManager.hpp>
 #include <ontology/EntityManagerListener.hpp>
+#include "ontology/Type.hpp"
+#include "ontology/Exception.hpp"
 
 #include <sstream>
 #include <stdexcept>
 #include <string.h>
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 EntityManager::EntityManager(World* world) :
-    EntityManagerInterface(world)
+    world_(world)
 {
-    m_EntityListCapacity = m_EntityList.capacity();
 }
 
 // ----------------------------------------------------------------------------
 EntityManager::~EntityManager()
 {
-    this->destroyAllEntities();
+    destroyAllEntities();
 }
 
 // ----------------------------------------------------------------------------
-Entity& EntityManager::createEntity(const char* name)
+EntityPrototype& EntityManager::addPrototype(std::string name)
 {
-    m_EntityList.emplace_back(name, this);
-    this->event.dispatch(&EntityManagerListener::onCreateEntity, m_EntityList.back());
-    this->handleEntityReallocation();
-    return m_EntityList.back();
+    auto result = prototypeMap_.emplace(name, EntityPrototype(this));
+
+    ONTOLOGY_ASSERT(result.second, DuplicatePrototypeException, EntityManager::addPrototype,
+        "Entity prototype \"" + name + "\" already registered with this entity"
+    );
+
+    return result.first->second;
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyEntity(Entity& entity)
+EntityManager& EntityManager::removePrototype(std::string name)
 {
-    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
+    prototypeMap_.erase(name);
+    return *this;
+}
+
+// ----------------------------------------------------------------------------
+Entity& EntityManager::createEntity(std::string prototypeName)
+{
+    ID newID = world_->generateGUID();
+    Index newIndex = entityList_.size();
+    std::unordered_map<std::string, EntityPrototype>::const_iterator prototype;
+
+    if (prototypeName.size() > 0)
     {
-        if(&(*it) == &entity)
+        prototype = prototypeMap_.find(prototypeName);
+        ONTOLOGY_ASSERT(prototype != prototypeMap_.end(), InvalidPrototypeException, EntityManager::createEntity,
+            "Entity prototype \"" + prototypeName + "\" isn't registered. Cannot instantiate."
+        );
+    }
+
+    entityList_.emplace_back(newID, this);
+    entityIndexMap_.emplace(newID, newIndex);  // Map entity's ID to the index in the entity list for faster lookup later
+    Entity& entity = entityList_.back();
+
+    if (prototypeName.size() > 0)
+    {
+        for (const auto& component : prototype->second.components_)
         {
-            this->event.dispatch(&EntityManagerListener::onDestroyEntity, entity);
-            m_EntityList.erase(it);
-            this->handleEntityReallocation(true);
-            return;
+            // TODO
         }
     }
+
+    return entity;
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyEntities(const char* name)
+EntityManager& EntityManager::destroyEntity(Entity& entity)
 {
-    auto it = m_EntityList.begin();
-    bool requireReallocationEvent = false;
-    while(it != m_EntityList.end())
-    {
-        if(!strcmp(it->getName(), name))
-        {
-            this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
-            it = m_EntityList.erase(it);
-            requireReallocationEvent = true;
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    
-    if(requireReallocationEvent)
-        this->handleEntityReallocation(true);
+    return destroyEntity(entity.getID());
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::destroyAllEntities()
+EntityManager& EntityManager::destroyEntity(ID entityID)
 {
-    auto it = m_EntityList.begin();
-    while(it != m_EntityList.end())
-    {
-        this->event.dispatch(&EntityManagerListener::onDestroyEntity, *it);
-        it = m_EntityList.erase(it);
-    }
-    this->handleEntityReallocation(true);
+    auto it = entityIndexMap_.find(entityID);
+    ONTOLOGY_ASSERT(it != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
+        "Entity with ID " + entityID.to_string() + " not found"
+    );
+
+    auto listIt = entityList_.begin() + it->second;
+    entityList_.erase(listIt);
+    entityIndexMap_.erase(it);
+
+    return *this;
 }
 
 // ----------------------------------------------------------------------------
-Entity& EntityManager::getEntity(Entity::ID entityID)
+EntityManager& EntityManager::destroyAllEntities()
 {
-    for(auto& it : m_EntityList)
-        if(it.getID() == entityID)
-            return it;
-    
-    std::stringstream ss;
-    ss << "[EntityManager::getEntity] Error: Entity ID " << entityID
-            << "is not registered with this manager";
-    ONTOLOGY_ASSERT(false, InvalidEntityException, EntityManager::getEntity, ss.str());
+    entityIndexMap_.clear();
+    entityList_.clear();
+
+    return *this;
 }
 
 // ----------------------------------------------------------------------------
-const EntityManager::EntityList& EntityManager::getEntityList() const
+Entity& EntityManager::getEntity(ID entityID)
 {
-    return m_EntityList;
+    auto it = entityIndexMap_.find(entityID);
+    ONTOLOGY_ASSERT(it != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
+        "Entity with ID " + entityID.to_string() + " is not registered with this manager"
+    );
+
+    return entityList_[it->second];
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informAddComponent(Entity& entity, const Component* component) const
+Entity& EntityManager::getEntity(Index entityIdx)
 {
-    this->event.dispatch(&EntityManagerListener::onAddComponent, entity, component);
+    return entityList_[entityIdx];
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::informRemoveComponent(Entity& entity, const Component* component) const
+void EntityManager::unregisterComponentFactory(const TypeID& type)
 {
-    this->event.dispatch(&EntityManagerListener::onRemoveComponent, entity, component);
+    auto it = componentFactories_.find(type);
+    ONTOLOGY_ASSERT(it != componentFactories_.end(), InvalidComponentException, EntityManager::unregisterComponentFactory,
+        "Component of type " + type.getTypeName() + "not registered!"
+    );
+
+    if (it->second->subRef())
+        componentFactories_.erase(it);
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::handleEntityReallocation(bool force)
+std::vector<Entity>& EntityManager::getEntityList()
 {
-    if(m_EntityListCapacity == m_EntityList.capacity() && !force)
-        return;
-    this->event.dispatch(&EntityManagerListener::onEntitiesReallocated, m_EntityList);
-    m_EntityListCapacity = m_EntityList.capacity();
+    return entityList_;
 }
 
-} // namespace Ontology
+// ============================================================================
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+EntityManager::ComponentFactoryInterface::ComponentFactoryInterface(EntityManager& entityManager) :
+    entityManager_(entityManager)
+{
+}
+
+// ----------------------------------------------------------------------------
+void EntityManager::ComponentFactoryInterface::addRef()
+{
+    refcount++;
+}
+
+// ----------------------------------------------------------------------------
+bool EntityManager::ComponentFactoryInterface::subRef()
+{
+    return (--refcount) == 0;
+}
+
+} // namespace ontology

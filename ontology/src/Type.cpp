@@ -5,30 +5,34 @@
 // ----------------------------------------------------------------------------
 // include files
 
-#include "ontology/Type.hxx"
+#include "ontology/Type.hpp"
 
-#ifdef __GNUG__
+namespace ontology {
+
+#if defined(__GNUG__)
 #   include <cstdlib>
 #   include <memory>
 #   include <cxxabi.h>
 
-std::string demangleTypeName(const char* name) {
+std::string TypeID::getTypeName() const {
 
     int status = -4; // some arbitrary value to eliminate the compiler warning
 
     std::unique_ptr<char, void(*)(void*)> res {
-        abi::__cxa_demangle(name, NULL, NULL, &status),
+        abi::__cxa_demangle(ti->name(), NULL, NULL, &status),
         std::free
     };
 
-    return (status==0) ? res.get() : name ;
+    return (status==0) ? res.get() : ti->name();
 }
 
 #else
 
 // does nothing if not g++
-std::string demangleTypeName(const char* name) {
-    return name;
+std::string TypeID::getTypeName() const {
+    return ti->name();
 }
 
 #endif
+
+}

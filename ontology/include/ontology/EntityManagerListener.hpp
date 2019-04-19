@@ -15,12 +15,11 @@
 // ----------------------------------------------------------------------------
 // forward declarations
 
-namespace Ontology {
-    class Component;
+namespace ontology {
     class Entity;
 }
 
-namespace Ontology {
+namespace ontology {
 
 /*!
  * @brief Listener interface for classes that want to listen to EntityManager events.
@@ -40,27 +39,8 @@ public:
      * @param entity The entity being destroyed.
      */
     virtual void onDestroyEntity(Entity& entity);
-
-    /*!
-     * @brief Called when an entity adds a new component.
-     * @param entity The entity adding a new component.
-     * @param component The new component being added.
-     */
-    virtual void onAddComponent(Entity& entity, const Component* component);
-
-    /*!
-     * @brief Called when an entity removes a component.
-     * @param entity The entity removing the component.
-     * @param component The component being removed.
-     */
-    virtual void onRemoveComponent(Entity& entity, const Component* component);
-
-    /*!
-     * @brief Called when EntityManager has re-allocated the memory for its entities
-     */
-    virtual void onEntitiesReallocated(std::vector<Entity>& entityList);
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_ENTITY_MANAGER_LISTENER_HPP__

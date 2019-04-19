@@ -8,45 +8,60 @@
 #include <ontology/Entity.hpp>
 #include <ontology/System.hpp>
 
-namespace Ontology {
-
-Entity::ID Entity::GUIDCounter = 0;
+namespace ontology {
 
 // ----------------------------------------------------------------------------
-Entity::Entity(const char* name, const EntityManagerInterface* creator) :
-    m_Name(name),
-    m_Creator(creator),
-    m_ID(GUIDCounter++)
+Entity::Entity() :
+    id_(ID::invalid()),
+    entityManager_(nullptr)
+{
+}
+
+// ----------------------------------------------------------------------------
+Entity::Entity(ID id, EntityManager* const entityManager) :
+    id_(id),
+    entityManager_(entityManager)
 {
 }
 
 // ----------------------------------------------------------------------------
 Entity::~Entity()
 {
-    // dispatch remove component events
-    for(const auto& it : m_ComponentMap)
-        m_Creator->informRemoveComponent(*this, it.second.get());
+}
+
+// ----------------------------------------------------------------------------
+Entity::Entity(Entity&& other) :
+    Entity()
+{
+    swap(*this, other);
+}
+
+// ----------------------------------------------------------------------------
+Entity& Entity::operator=(Entity&& other)
+{
+    swap(*this, other);
+    return *this;
 }
 
 // ----------------------------------------------------------------------------
 bool Entity::supportsSystem(const System& system) const
-{
+{/*
     for(const auto& it : system.getSupportedComponents())
         if(m_ComponentMap.find(it) == m_ComponentMap.end())
-            return false;
+            return false;*/
     return true;
 }
 
 // ----------------------------------------------------------------------------
-const char* Entity::getName() const
+ID Entity::getID() const
 {
-    return m_Name;
+    return id_;
 }
 
-// ----------------------------------------------------------------------------
-Entity::ID Entity::getID() const
+//----------------------------------------------------------------------------
+EntityPrototype::EntityPrototype(EntityManager* const EntityManager) :
+    entityManager_(EntityManager)
 {
-    return m_ID;
 }
 
-} // namespace Ontology
+} // namespace ontology

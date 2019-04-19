@@ -1,25 +1,22 @@
-project (tests)
+project ("ontology tests")
 
-if (WITH_EXCEPTIONS)
-    set (TESTS_WITH_EXCEPTIONS 1)
-elseif (WITH_ASSERT AND CMAKE_BUILD_TYPE MATCHES Debug)
-    set (TESTS_WITH_ASSERT 1)
-endif ()
-configure_file (
-    "${CMAKE_CURRENT_LIST_DIR}/include/tests/Config.hpp.in"
-    "${CMAKE_CURRENT_LIST_DIR}/include/tests/Config.hpp"
-)
+add_subdirectory ("googletest")
 
-add_subdirectory ("gmock")
-include_directories ("gmock/include")
-include_directories ("gmock/gtest/include")
-include_directories ("include")
+set (tests_HEADERS
+    "")
+set (tests_SOURCES
+    "src/test_allocators_Instancer.cpp"
+    "src/test_Entity_AddAndRemoveComponents.cpp"
+    "src/test_Entity_ComponentMemoryOrganization.cpp")
+add_executable (ontology_tests
+    ${tests_HEADERS}
+    ${tests_SOURCES})
 
-file (GLOB tests_HEADERS "include/tests/*.hpp")
-file (GLOB tests_SOURCES "src/*.cpp")
-add_executable (tests ${tests_HEADERS} ${tests_SOURCES})
-target_link_libraries (tests
-    ontology
-    gmock
-    gmock_main
-)
+target_include_directories (ontology_tests
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+
+target_link_libraries (ontology_tests PRIVATE ontology)
+target_link_libraries (ontology_tests PRIVATE gmock)
+target_link_libraries (ontology_tests PRIVATE gmock_main)

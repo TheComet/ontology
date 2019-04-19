@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 // include files
 
-namespace Ontology {
+namespace ontology {
 
 class EntityListener
 {
@@ -27,6 +27,6 @@ public:
     {}
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_ENTITY_LISTENER_HPP__

@@ -13,7 +13,7 @@
 #   include <typeinfo>
 #endif // _DEBUG
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 template <class LISTENER_CLASS>
@@ -82,23 +82,6 @@ void ListenerDispatcher<LISTENER_CLASS>::removeListener(LISTENER_CLASS* listener
 
 // ----------------------------------------------------------------------------
 template <class LISTENER_CLASS>
-void ListenerDispatcher<LISTENER_CLASS>::removeListener(std::string listenerName)
-{
-    auto it = m_Listeners.find(listenerName);
-    if(it == m_Listeners.end())
-    {
-#ifdef _DEBUG
-        std::cout << "[ListenerDispatcher<" << getTypeName<LISTENER_CLASS>()
-                  << ">::removeListener] Warning: listener \"" << listenerName
-                  << "\" not registered" << std::endl;
-#endif // _DEBUG
-        return;
-    }
-    m_Listeners.erase(it);
-}
-
-// ----------------------------------------------------------------------------
-template <class LISTENER_CLASS>
 void ListenerDispatcher<LISTENER_CLASS>::removeAllListeners()
 {
 #ifdef _DEBUG
@@ -133,4 +116,4 @@ bool ListenerDispatcher<LISTENER_CLASS>::
     return true;
 }
 
-} // namespace Ontology
+} // namespace ontology

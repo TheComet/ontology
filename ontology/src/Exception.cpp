@@ -7,14 +7,14 @@
 
 #include <ontology/Exception.hpp>
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
-#ifdef ONTOLOGY_WITH_EXCEPTIONS
+#if defined(ONTOLOGY_EXCEPTIONS)
 Exception::Exception(const std::string& msg) :
     runtime_error(msg)
 {
 }
 #endif
 
-} // namespace Ontology
+} // namespace ontology

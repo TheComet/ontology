@@ -2,13 +2,13 @@
 // World.hpp
 // ----------------------------------------------------------------------------
 
-#ifndef __ONTOLOGY_WORLD_HPP__
-#define __ONTOLOGY_WORLD_HPP__
+#pragma once
 
 // ----------------------------------------------------------------------------
 // include files
 
-#include <ontology/Config.hpp>
+#include "ontology/Config.hpp"
+#include "ontology/Type.hpp"
 
 #include <vector>
 #include <memory>
@@ -16,12 +16,12 @@
 // ----------------------------------------------------------------------------
 // forward declarations
 
-namespace Ontology {
+namespace ontology {
     class EntityManager;
     class SystemManager;
 }
 
-namespace Ontology {
+namespace ontology {
 
 /*!
  * @brief The world is the entry point to the framework.
@@ -34,7 +34,7 @@ namespace Ontology {
  * World has two main parts. It has an EntityManager and a SystemManager. These
  * are responsible for adding and removing entities, components and systems to
  * your world.
- * 
+ *
  * World has a method, World::update(), which will udpate all registered
  * systems.
  *
@@ -65,19 +65,7 @@ public:
      */
     SystemManager& getSystemManager() const;
 
-    /*!
-     * @brief Sets the world's delta time.
-     *
-     * The delta time is usually used by systems via World::getDeltaTime().
-     * when processing entities.
-     * @param delta Delta time to set.
-     */
-    void setDeltaTime(float delta);
-
-    /*!
-     * @brief Gets the world's delta time.
-     */
-    float getDeltaTime() const;
+    ID generateGUID();
 
     /*!
      * @brief Update all systems.
@@ -87,9 +75,6 @@ public:
 private:
     std::unique_ptr<EntityManager>  m_EntityManager;
     std::unique_ptr<SystemManager>  m_SystemManager;
-    float                           m_DeltaTime;
 };
 
-} // namespace Ontology
-
-#endif // __ONTOLOGY_WORLD_HPP__
+} // namespace ontology

@@ -9,7 +9,7 @@
 // include files
 
 #include <ontology/Config.hpp>
-#include <ontology/TypeContainers.hpp>
+#include <ontology/Type.hpp>
 
 #include <string>
 
@@ -20,15 +20,15 @@
 // ----------------------------------------------------------------------------
 // forward declarations
 
-namespace Ontology {
+namespace ontology {
     class Entity;
     class World;
 }
 
-namespace Ontology {
+namespace ontology {
 
 template <class... T>
-inline TypeSet TypeSetGenerator();
+inline TypeInfoSet TypeSetGenerator();
 
 /*!
  * @brief Used to declare that a system should not receive any entities.
@@ -56,7 +56,7 @@ struct None {};
 class ONTOLOGY_PUBLIC_API System
 {
 private:
-    typedef std::vector< std::reference_wrapper<Entity> > EntityList;
+    typedef std::vector< Entity* > EntityRefs;
 public:
 
     /*!
@@ -68,7 +68,7 @@ public:
      * @brief Allow destruction through base class pointer.
      */
     virtual ~System();
-    
+
     /*!
      * @brief Called when systems should initialise. Override this.
      */
@@ -78,31 +78,31 @@ public:
      * @brief Called when an entity requires processing. Override this.
      */
     virtual void processEntity(Entity&) = 0;
-    
+
     /*!
      * @brief Called when an entity wishes to be configured by this system.
      * Override this.
      */
     virtual void configureEntity(Entity&, std::string param="") = 0;
-    
+
     /*!
      * @brief Checks if this system is initialised.
      */
     bool isInitialised() const;
-    
+
     /*!
      * @brief Call this as many times as you wish, the system will only initialise once.
      */
-    ONTOLOGY_LOCAL_API void initialiseGuard(std::string systemName);
+    ONTOLOGY_PRIVATE_API void initialiseGuard(std::string systemName);
 
     /*!
      * @brief Declare which components your system will support.
-     * 
+     *
      * This causes only those entities that actually have all of the
      * components a system requires to be passed to the system's process loop.
      * If you don't specify anything, the system will receive all entities
      * registered to the world.
-     * 
+     *
      * Supported components are supplied via a list of template
      * arguments. E.g.
      * @code
@@ -119,18 +119,18 @@ public:
     /*!
      * @brief Gets the typeset of supported components.
      */
-    ONTOLOGY_LOCAL_API const TypeSet& getSupportedComponents() const;
+    ONTOLOGY_PRIVATE_API const TypeInfoSet& getSupportedComponents() const;
 
     /*!
      * @brief Declare which systems are required to be executed before this one.
-     * 
+     *
      * This allows you to constrain the execution order of systems.
-     * 
+     *
      * If nothing is specified, the default setting is to execute after the
      * last system that was added. This means that if no system declares
      * execution dependencies, all systems will be executed linearly, one after
      * another.
-     * 
+     *
      * The Systems are passed as a list of template arguments. Sometimes, you'll
      * want MovementSystem to execute before CollisionSystem, in which case you
      * would write:
@@ -145,7 +145,7 @@ public:
     /*!
      * @brief Gets the typeset of depending systems.
      */
-    ONTOLOGY_LOCAL_API const TypeSet& getDependingSystems() const;
+    ONTOLOGY_PRIVATE_API const TypeInfoSet& getDependingSystems() const;
 
     /*!
      * @brief Called by the SystemManager when it receives an update event from an entity.
@@ -154,7 +154,7 @@ public:
      * entity in question. If it can, it will add the entity to its internal
      * list of supported entities.
      */
-    ONTOLOGY_LOCAL_API void informEntityUpdate(Entity&);
+    ONTOLOGY_PRIVATE_API void informEntityUpdate(Entity*);
 
     /*!
      * @brief Called by the SystemManager when it receives an entity destroyed event.
@@ -162,19 +162,19 @@ public:
      * This causes the system to remove the entity from its internal list of
      * supported entities, if it exists.
      */
-    ONTOLOGY_LOCAL_API void informDestroyedEntity(const Entity&);
+    ONTOLOGY_PRIVATE_API void informDestroyedEntity(Entity*);
 
-    ONTOLOGY_LOCAL_API void informEntitiesReallocated(std::vector<Entity>&);
+    ONTOLOGY_PRIVATE_API void informEntitiesReallocated(std::vector<Entity>&);
 
     /*!
      * @brief Informs the system of the world it is part of.
      */
-    ONTOLOGY_LOCAL_API void setWorld(World*);
+    ONTOLOGY_PRIVATE_API void setWorld(World*);
 
     /*!
      * @brief Called when the system should update all of its entities.
      */
-    ONTOLOGY_LOCAL_API void update();
+    ONTOLOGY_PRIVATE_API void update();
 
 protected:
 
@@ -185,9 +185,9 @@ protected:
 
 private:
 
-    TypeSet         m_SupportedComponents;
-    TypeSet         m_DependingSystems;
-    EntityList      m_EntityList;
+    TypeInfoSet     m_SupportedComponents;
+    TypeInfoSet     m_DependingSystems;
+    EntityRefs      m_EntityRefs;
     bool            m_Initialised;
 
 #ifdef ONTOLOGY_THREAD
@@ -199,6 +199,6 @@ private:
 #endif
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_SYSTEM_HXX__

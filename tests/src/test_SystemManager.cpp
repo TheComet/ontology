@@ -3,7 +3,7 @@
 
 #define NAME SystemManager
 
-using namespace Ontology;
+using namespace ontology;
 
 // ----------------------------------------------------------------------------
 // test fixture

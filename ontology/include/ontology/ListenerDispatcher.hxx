@@ -13,7 +13,7 @@
 #include <map>
 #include <string>
 
-namespace Ontology {
+namespace ontology {
 
 /*!
  * @brief Generic class for handling dispatching messages to listeners.
@@ -95,14 +95,6 @@ public:
     void removeListener(LISTENER_CLASS* listener);
 
     /*!
-     * @brief Unregisters a listener by name
-     * @note If the listener is not registered to begin with, this method will
-     * silently fail.
-     * @param listenerName A unique string identifying the listener.
-     */
-    void removeListener(std::string listenerName);
-
-    /*!
      * @brief Removes all listeners
      */
     void removeAllListeners();
@@ -140,6 +132,6 @@ private:
     std::map<std::string, LISTENER_CLASS*> m_Listeners;
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_LISTENER_DISPATCHER_HPP__

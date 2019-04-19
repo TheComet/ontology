@@ -2,31 +2,28 @@
 //Entity.hxx
 //----------------------------------------------------------------------------
 
-#ifndef ONTOLOGY_ENTITY_HXX
-#define ONTOLOGY_ENTITY_HXX
+#pragma once
 
 //----------------------------------------------------------------------------
 //include files
 
 #include <ontology/Config.hpp>
-#include <ontology/TypeContainers.hpp>
+#include <ontology/Type.hpp>
 
 #include <map>
 #include <typeinfo>
 #include <string>
 #include <cassert>
-#include <memory>
 
 //----------------------------------------------------------------------------
 //forward declarations
 
-namespace Ontology{
-    class Component;
-    struct EntityManagerInterface;
+namespace ontology {
+    class EntityManager;
     class System;
 }
 
-namespace Ontology{
+namespace ontology {
 
 /*!
  * @brief An entity is used to bind components together.
@@ -52,19 +49,35 @@ namespace Ontology{
  */
 class Entity
 {
+    /// Required for move constructor
+    Entity();
+
 public:
-
-    typedef std::size_t ID;
-
     /*!
      * @brief Construct an entity with a name.
      */
-    Entity(const char* name, const EntityManagerInterface* creator);
+    Entity(ID id, EntityManager* const entityManager);
 
     /*!
      * @brief Allow destruction through base class pointer.
      */
     virtual ~Entity();
+
+    /// Don't allow copying. Each entity must have a unique ID
+    Entity(const Entity& other) = delete;
+
+    /// Enable move constructing and move assigning so std::vector works
+    Entity(Entity&& other);
+
+    Entity& operator=(Entity&& other);
+
+    friend void swap(Entity& a, Entity& b)
+    {
+        using std::swap;
+        swap(a.id_, b.id_);
+        swap(a.componentIndices_, b.componentIndices_);
+        swap(a.entityManager_, b.entityManager_);
+    }
 
     /*!
      * @brief Add a component to this entity.
@@ -92,7 +105,7 @@ public:
      * @endcode
      */
     template<class T>
-    void removeComponent();
+    Entity& removeComponent();
 
     /*!
      * @brief Get a component from the entity.
@@ -102,24 +115,11 @@ public:
     inline T& getComponent() const;
 
     /*!
-     * @brief Get a component from the entity.
-     * @return A pointer to the requested component.
-     */
-    template <class T>
-    T* getComponentPtr() const;
-
-    /*!
      * @brief Checks if the specified component exists.
      * @return True if the entity has the specified component, false if otherwise.
      */
     template <class T>
     bool hasComponent() const;
-
-    /*!
-     * @brief Tells the specified system to configure this entity.
-     */
-    template <class T>
-    Entity& configure(std::string param="");
 
     /*!
      * @brief Returns true if this entity is supported by the specified system.
@@ -132,25 +132,61 @@ public:
     bool supportsSystem(const System&) const;
 
     /*!
-     * @brief Gets the name of the entity.
-     * @return A const char pointer to the entity's name string.
-     */
-    const char* getName() const;
-
-    /*!
      * @brief Gets this entity's globally unique Identifier.
      */
     ID getID() const;
 
-private:
+    /*!
+     * @brief Searches the entity's list of components for the templated type
+     * and returns the index of that component so it can be retrieved from the
+     * entity manager.
+     */
+    template <class T>
+    ONTOLOGY_PRIVATE_API Index mapComponentTypeToIndex() const;
 
-    static ID                       GUIDCounter;
-    ID                              m_ID;
-    TypeMapSharedPtr<Component>     m_ComponentMap;
-    const char*                     m_Name;
-    const EntityManagerInterface*   m_Creator;
+    template <class T>
+    ONTOLOGY_PRIVATE_API Index* getComponentIndexPtr();
+
+private:
+    // Globally unique identifier
+    ID id_;
+
+    /*
+     * The EntityManager acts as a container for all components, to ensure that
+     * components of a particular type are always contiguous in memory. The
+     * entity stores the index into that container for every component it has.
+     *
+     * This is a vector instead of a hashmap because entities don't usually
+     * have many components attached to it. Searching small datasets is faster.
+     */
+    std::vector<std::pair<TypeID, Index>> componentIndices_;
+
+    // A weak ref to the entity manager that owns this entity.
+    EntityManager* entityManager_;
 };
 
-} // namespace Ontology
+class EntityPrototype
+{
+public:
+    EntityPrototype(EntityManager* const entityManager);
 
-#endif // ONTOLOGY_ENTITY_HXX
+    template<class T, class... Args>
+    EntityPrototype& addComponent(Args...);
+
+    template<class T>
+    EntityPrototype& removeComponent();
+
+    template <class T>
+    inline T& getComponent() const;
+
+    template <class T>
+    bool hasComponent() const;
+
+private:
+    friend class EntityManager;
+
+    EntityManager* const                entityManager_;
+    std::vector<const std::type_info*>  components_;
+};
+
+} // namespace ontology

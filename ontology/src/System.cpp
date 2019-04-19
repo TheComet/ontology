@@ -15,7 +15,7 @@
 #   include <boost/thread.hpp>
 #endif // ONTOLOGY_THREAD
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 /*!
@@ -85,13 +85,13 @@ void System::initialiseGuard(std::string systemName)
 }
 
 // ----------------------------------------------------------------------------
-const TypeSet& System::getSupportedComponents() const
+const TypeInfoSet& System::getSupportedComponents() const
 {
     return m_SupportedComponents;
 }
 
 // ----------------------------------------------------------------------------
-const TypeSet& System::getDependingSystems() const
+const TypeInfoSet& System::getDependingSystems() const
 {
     return m_DependingSystems;
 }
@@ -103,29 +103,29 @@ void System::setWorld(World* world)
 }
 
 // ----------------------------------------------------------------------------
-void System::informEntityUpdate(Entity& entity)
+void System::informEntityUpdate(Entity* entity)
 {
-    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(&it->get() == &entity)
+    for(auto it = m_EntityRefs.begin(); it != m_EntityRefs.end(); ++it)
+        if(*it == entity)
         {
-            if(entity.supportsSystem(*this))
+            if(entity->supportsSystem(*this))
                 return;
             // entity is no longer supported by this system
-            m_EntityList.erase(it);
+            m_EntityRefs.erase(it);
             return;
         }
 
-    if(entity.supportsSystem(*this))
-        m_EntityList.push_back(entity);
+    if(entity->supportsSystem(*this))
+        m_EntityRefs.push_back(entity);
 }
 
 // ----------------------------------------------------------------------------
-void System::informDestroyedEntity(const Entity& entity)
+void System::informDestroyedEntity(Entity* entity)
 {
-    for(auto it = m_EntityList.begin(); it != m_EntityList.end(); ++it)
-        if(&it->get() == &entity)
+    for(auto it = m_EntityRefs.begin(); it != m_EntityRefs.end(); ++it)
+        if(*it == entity)
         {
-            m_EntityList.erase(it);
+            m_EntityRefs.erase(it);
             return;
         }
 }
@@ -133,9 +133,9 @@ void System::informDestroyedEntity(const Entity& entity)
 // ----------------------------------------------------------------------------
 void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 {
-    m_EntityList.clear();
-    for(auto& it : entityList)
-        this->informEntityUpdate(it);
+    m_EntityRefs.clear();
+    for(auto& entity : entityList)
+        this->informEntityUpdate(&entity);
 }
 
 // ----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ void System::informEntitiesReallocated(std::vector<Entity>& entityList)
 void System::joinableThreadEntryPoint()
 {
     boost::unique_lock<boost::mutex> guard(m_Mutex);
-    while(m_ThreadedEntityIterator != m_EntityList.end())
+    while(m_ThreadedEntityIterator != m_EntityRefs.end())
     {
         auto& entity = *m_ThreadedEntityIterator;  // while locked, get reference to current entity
         ++m_ThreadedEntityIterator;                // increment so other threads don't process this entity.
@@ -166,14 +166,13 @@ void System::waitForNotify()
 // ----------------------------------------------------------------------------
 void System::update()
 {
-    #pragma omp parallel for
-    for(auto it = m_EntityList.begin(); it < m_EntityList.end(); ++it)
-        this->processEntity(*it);
-    return;
+    for(auto& entity : m_EntityRefs)
+        processEntity(*entity);
+
 /* TODO get this reviewed
     // restart iterator, threads will increment this whenever they pick up
     // a new entity to process until the end is reached.
-    m_ThreadedEntityIterator = m_EntityList.begin();
+    m_ThreadedEntityIterator = m_EntityRefs.begin();
 
     // create as many threads as there are cores. Threads will automatically
     // begin processing entities.
@@ -187,4 +186,4 @@ void System::update()
     threads.join_all();*/
 }
 
-} // namespace Ontology
+} // namespace ontology

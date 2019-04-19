@@ -2,137 +2,199 @@
 // EntityManager.hpp
 // ----------------------------------------------------------------------------
 
-#ifndef __ONTOLOGY_ENTITY_MANAGER_HPP__
-#define __ONTOLOGY_ENTITY_MANAGER_HPP__
+#pragma once
+
+#include "ontology/EntityManager.hxx"
+#include "ontology/Exception.hpp"
+#include "ontology/allocators/Instancer.hpp"
+#include "ontology/allocators/Mallocator.hpp"
+#include "ontology/Type.hpp"
+#include <tuple>
+#include <utility>
+
+namespace ontology {
 
 // ----------------------------------------------------------------------------
-// include files
+template <class T, class... DefaultArgs>
+void EntityManager::registerComponentFactory(DefaultArgs&&... args)
+{
+    /* We expect the same number of calls to registerComponentFactory as to
+     * unregisterComponentFactory. It's possible that different entity prototypes
+     * register the same component types, so we have to keep track of how many
+     * times the same type is registered so we know when to properly delete it
+     * again.
+     */
 
-#include <ontology/Config.hpp>
-#include <ontology/EntityManagerInterface.hpp>
-#include <ontology/ListenerDispatcher.hpp>
+    // Emplace with nullptr. Create factory if insertion succeeded to avoid unnecessary new/delete calls.
+    auto result = componentFactories_.emplace(TypeID::from<T>(), nullptr);
 
-#include <vector>
-#include <memory>
-
-// ----------------------------------------------------------------------------
-// forward declarations
-
-namespace Ontology {
-    class Component;
-    class Entity;
-    class EntityManagerListener;
+    if (result.second)
+        result.first->second.reset(new DefaultComponentFactory<T, DefaultArgs...>(*this, std::forward<DefaultArgs>(args)...));
+    else
+        result.first->second->addRef();  // Factory already exists, increase refcount
 }
 
-namespace Ontology {
-
-/*!
- * @brief Manages the creation and destruction of entities.
- *
- * This class is used to create and destroy entities. When you create a World,
- * you can access this class with World::getEntityManager().
- *
- * @see Entity
- * @see World
- */
-class ONTOLOGY_PUBLIC_API EntityManager : public EntityManagerInterface
+// ----------------------------------------------------------------------------
+template <class T>
+void EntityManager::unregisterComponentFactory()
 {
-public:
+    unregisterComponentFactory(TypeID::from<T>());
+}
 
-    typedef std::vector<Entity> EntityList;
-
-    /*!
-     * @brief Construct with world pointer.
+// ----------------------------------------------------------------------------
+template <class T, class... Args>
+Index EntityManager::createComponentForEntity(const Entity& entity, Args&&... args)
+{
+    /*
+     * It's possible the component factory does not exist yet. If so, create
+     * one without default component arguments.
      */
-    EntityManager(World*);
+    auto result = componentFactories_.emplace(TypeID::from<T>(), nullptr);
+    if (result.second)
+        result.first->second.reset(new ComponentFactory<T>(*this));
 
-    /*!
-     * @brief Default destructor
-     */
-    ~EntityManager();
+    ComponentFactory<T>* factory = static_cast<ComponentFactory<T>*>(result.first->second.get());
+    return factory->createComponentForEntityWithCustomArgs(entity, std::forward<Args>(args)...);
+}
 
-    /*!
-     * @brief Creates a new entity and adds it to the world.
-     *
-     * @param name The name to give the new entity. Doesn't have to be globally
-     * unique.
-     * @return Returns a reference to the created entity for chaining purposes.
-     * @warning The returned reference may become invalidated if you add
-     * another entity. Behind the scenes, entities are stored in contiguous
-     * memory for optimisation, and adding an entity could cause a re-allocation.
-     * 
-     * If you want to hold on to the created entity for future use, then call
-     * Entity::getID() and store its globally unique identifier. When you need
-     * to access the entity again, use EntityManager::getEntity() to get the
-     * Entity assigned to that ID.
-     */
-    Entity& createEntity(const char* name="") override;
+// ----------------------------------------------------------------------------
+template <class T>
+void EntityManager::destroyComponentForEntity(const Entity& entity)
+{
+    ComponentFactory<T>* factory = findComponentFactory<T>();
+    factory->destroyComponentForEntity(entity);
+}
 
-    /*!
-     * @brief Destroys the specified entity.
-     * @param entity The entity to destroy.
-     */
-    void destroyEntity(Entity& entity) override;
+// ----------------------------------------------------------------------------
+template <class T>
+T& EntityManager::getComponentForEntity(const Entity& entity)
+{
+    ComponentFactory<T>* factory = findComponentFactory<T>();
+    return factory->getComponentForEntity(entity);
+}
 
-    /*!
-     * @brief Destroys all entities sharing the specified name.
-     * @param name The name to search for.
-     */
-    void destroyEntities(const char* name) override;
+// ----------------------------------------------------------------------------
+template <class T>
+EntityManager::ComponentFactory<T>* EntityManager::findComponentFactory() const
+{
+    auto result = componentFactories_.find(TypeID::from<T>());
+    ONTOLOGY_ASSERT(result != componentFactories_.end(), InvalidComponentException, EntityManager::findComponentFactory<T>, "");
 
-    /*!
-     * @brief Destroys all entities. Everything.
-     */
-    void destroyAllEntities() override;
-    
-    /*!
-     * @brief Gets a reference to the entity object.
-     * @warning The returned reference may become invalidated if you add
-     * another entity. Behind the scenes, entities are stored in contiguous
-     * memory for optimisation, and adding an entity could cause a re-allocation.
-     * @param entityID The identifier of the entity you wish to get the
-     * reference of.
-     * @return The reference to the entity.
-     */
-    Entity& getEntity(Entity::ID entityID) override;
+    return static_cast<ComponentFactory<T>*>(result->second.get());
+}
 
-    /*!
-     * @brief Gets a list of entities of type EntityManager::EntityList.
-     *
-     * You can iterate over the list using standard iterators.
-     */
-    const EntityList& getEntityList() const;
+// ============================================================================
+// ============================================================================
 
-    /*!
-     * @brief Register as an EntityManagerListener to listen to EntityManager events.
-     */
-    ListenerDispatcher<EntityManagerListener> event;
+// ----------------------------------------------------------------------------
+template <class T>
+EntityManager::ComponentFactory<T>::ComponentFactory(EntityManager& entityManager) :
+    ComponentFactoryInterface(entityManager)
+{
+}
 
-private:
+// ----------------------------------------------------------------------------
+template <class T>
+template <class... Args>
+Index EntityManager::ComponentFactory<T>::createComponentForEntityWithCustomArgs(const Entity& entity, Args&&... args)
+{
+    Index insertIndex;
+    std::vector<Entity>& el = entityManager_.getEntityList();
 
-    /*!
-     * @brief Called by entities when they add a new component.
-     * @param entity The entity adding a new component.
-     * @param component The component being added.
-     */
-    void informAddComponent(Entity& entity, const Component* component) const override;
+    // Assume we are inserting last
+    insertIndex = components_.size();
 
-    /*!
-     * @brief Called by entities when they remove a component.
-     * @param entity The entity removing a component.
-     * @param component The component being removed.
-     */
-    void informRemoveComponent(Entity& entity, const Component* component) const override;
+    // We are not the most recently created entity
+    if (&entity != &el.back())
+    {
 
-    /*!
-     * @brief Dispatches a reallocation event if the capacity has changed.
-     */
-    void handleEntityReallocation(bool force=false);
+        // Probe forwards in list of entities and find the next entity that has
+        // the component type we want to create. This will be the index in which
+        // to insert the component, if found. If not found, then we insert last.
+        for (Index entityIdx = &entity - el.data() + 1; entityIdx != el.size(); ++entityIdx)
+        {
+            const Entity& nextEntity = el[entityIdx];
+            Index componentIndex = nextEntity.mapComponentTypeToIndex<T>();
+            if (componentIndex != InvalidIndex)
+            {
+                insertIndex = componentIndex;
+                break;
+            }
+        }
+    }
 
-    EntityList m_EntityList;
-    std::size_t m_EntityListCapacity;
-};
+    components_.emplace(components_.begin() + insertIndex, std::forward<Args>(args)...);
 
-} // namespace Ontology
+    // Indices of all entities that have components above the insertion index
+    // have changed due to insertion. Need to fix those.
+    if (insertIndex != components_.size() - 1)
+    {
+        for (auto& e : el)
+        {
+            Index* componentIndex = e.getComponentIndexPtr<T>();
+            if (componentIndex == nullptr)
+                continue;
+            if (*componentIndex >= insertIndex)
+                (*componentIndex)++;
+        }
+    }
 
-#endif // __ONTOLOGY_ENTITY_MANAGER_HPP__
+    return insertIndex;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+Index EntityManager::ComponentFactory<T>::createComponentForEntityWithDefaultArgs(const Entity& entity)
+{
+    assert(false);
+    return InvalidIndex;
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+void EntityManager::ComponentFactory<T>::destroyComponentForEntity(const Entity& e)
+{
+    Index componentIndex = e.mapComponentTypeToIndex<T>();
+    ONTOLOGY_ASSERT(componentIndex != InvalidIndex, InvalidComponentException, destroyComponentForEntity<U>, "");
+    components_.erase(components_.begin() + componentIndex);
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+T& EntityManager::ComponentFactory<T>::getComponent(Index componentIndex)
+{
+    return components_[componentIndex];
+}
+
+// ----------------------------------------------------------------------------
+template <class T>
+T& EntityManager::ComponentFactory<T>::getComponentForEntity(const Entity& e)
+{
+    Index componentIndex = e.mapComponentTypeToIndex<T>();
+    ONTOLOGY_ASSERT(componentIndex != InvalidIndex, InvalidComponentException, EntityManager::ComponentFactory<T>::getComponentForEntity<T>, "");
+    return getComponent(componentIndex);
+}
+
+// ============================================================================
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+template <class T, class... DefaultArgs>
+EntityManager::DefaultComponentFactory<T, DefaultArgs...>::DefaultComponentFactory(EntityManager& entityManager, DefaultArgs&&... args) :
+    ComponentFactory<T>(entityManager),
+    defaultArgs_(std::forward<DefaultArgs>(args)...)
+{
+}
+
+// ----------------------------------------------------------------------------
+template <class T, class... DefaultArgs>
+Index EntityManager::DefaultComponentFactory<T, DefaultArgs...>::createComponentForEntityWithDefaultArgs(const Entity& entity)
+{
+    Index insertIndex = ComponentFactory<T>::components_.size();
+    std::apply([this](DefaultArgs... args){
+        ComponentFactory<T>::components_.emplace_back(args...);
+    }, defaultArgs_);
+    return insertIndex;
+}
+
+} // namespace ontology

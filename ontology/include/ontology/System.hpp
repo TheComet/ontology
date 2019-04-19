@@ -10,13 +10,13 @@
 
 #include <ontology/System.hxx>
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 template <class... T>
-inline TypeSet TypeSetGenerator()
+inline TypeInfoSet TypeSetGenerator()
 {
-    return TypeSet({&typeid(T)...});
+    return TypeInfoSet({TypeID::from<T>()...});
 }
 
 // ----------------------------------------------------------------------------
@@ -35,6 +35,6 @@ inline System& System::executesAfter()
     return *this;
 }
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_SYSTEM_HPP__

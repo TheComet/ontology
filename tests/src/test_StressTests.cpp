@@ -5,7 +5,7 @@
 
 #define NAME Stress
 
-using namespace Ontology;
+using namespace ontology;
 
 // ----------------------------------------------------------------------------
 // test fixture

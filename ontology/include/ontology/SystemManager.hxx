@@ -10,7 +10,7 @@
 
 #include <ontology/Config.hpp>
 #include <ontology/EntityManagerListener.hpp>
-#include <ontology/TypeContainers.hpp>
+#include <ontology/Type.hpp>
 
 #include <iostream>
 #include <set>
@@ -19,12 +19,12 @@
 // ----------------------------------------------------------------------------
 // forward declarations
 
-namespace Ontology {
+namespace ontology {
     class System;
     class World;
 }
 
-namespace Ontology {
+namespace ontology {
 
 /*!
  * @brief Manages the creation and deletion of systems.
@@ -54,7 +54,7 @@ namespace Ontology {
  * world.getSystemManager().addSystem<CollisionSystem>()
  *     .supportsComponents<
  *             Position>());
- * 
+ *
  * // initialises all systems
  * world.getSystemManager().initialise();
  * @endcode
@@ -103,10 +103,10 @@ public:
      */
     template <class T, class... Args>
     inline T& addSystem(Args&&... args);
-    
+
     /*!
      * @brief Adds a new polymorphic system to the world.
-     * 
+     *
      * The base type of the system is passed as the first template argument,
      * the derived type of the system is passed as the second template
      * argument. If your system class has a constructor that requires
@@ -134,10 +134,10 @@ public:
      */
     template <class T>
     SystemManager& removeSystem();
-    
+
     /*!
      * @brief Gets the specified system.
-     * 
+     *
      * Example:
      * @code
      * world.getSystemManager().getSystem<MovementSystem>()->doThings();
@@ -149,7 +149,7 @@ public:
 
     /*!
      * @brief Gets the specified system.
-     * 
+     *
      * Example:
      * @code
      * world.getSystemManager().getSystem<MovementSystem>().doThings();
@@ -158,10 +158,10 @@ public:
      */
     template <class T>
     inline T& getSystem() const;
-    
+
     /*!
      * @brief Check to see if a system exists.
-     * 
+     *
      * The system type to check for is passed as a template parameter.
      * @code
      * if(world.getSystemManager().hasSystem<MySystem>())
@@ -179,7 +179,7 @@ public:
      * @brief Passes important data to a new System object so it functions correctly.
      * @note Should not be called by the user. This is an internal function.
      */
-    ONTOLOGY_LOCAL_API void configureSystem();
+    ONTOLOGY_PRIVATE_API void configureSystem();
 
     /*!
      * @brief Passes required information to the specified system so it is functional.
@@ -206,9 +206,6 @@ private:
 
     // EntityManagerListener methods
     void onDestroyEntity(Entity&) override;
-    void onAddComponent(Entity&, const Component*) override;
-    void onRemoveComponent(Entity&, const Component*) override;
-    void onEntitiesReallocated(std::vector<Entity>&) override;
 
     /*!
      * @brief Triggers dependency resolution of the system execution order.
@@ -222,10 +219,10 @@ private:
     /*!
      * @brief Resolves system dependencies.
      */
-    TypeSet::iterator resolveDependencies(const std::type_info* node,
-                             const TypeMap<System*>& systemLookup,
-                             TypeSet& resolving,
-                             TypeSet& unresolved);
+    TypeInfoSet::iterator resolveDependencies(const TypeID& type,
+                             const TypeInfoMap<System*>& systemLookup,
+                                          TypeInfoSet& resolving,
+                                          TypeInfoSet& unresolved);
 
     /*!
      * @brief Returns true if the specified system is part of the execution list.
@@ -237,6 +234,6 @@ private:
     World*                          m_World;
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_SYSTEM_MANAGER_HXX__

@@ -13,7 +13,7 @@
 #include <ontology/System.hpp>
 #include <ontology/Type.hpp>
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 template <class T, class... Args>
@@ -26,10 +26,10 @@ inline T& SystemManager::addSystem(Args&&... args)
 template <class Base, class Derived, class... Args>
 Derived& SystemManager::addPolymorphicSystem(Args&&... args)
 {
-    ONTOLOGY_ASSERT(m_SystemList.find(&typeid(Base)) == m_SystemList.end(), DuplicateComponentException, "SystemManager::addPolymorphicSystem<Base, Derived, Args...>",
-        std::string("System of type \"") + getTypeName<Base>() + "\" already registered with this manager"
+    ONTOLOGY_ASSERT(m_SystemList.find(&typeid(Base)) == m_SystemList.end(), DuplicateComponentException, SystemManager::addPolymorphicSystem,
+        std::string("System of type \"") + TypeID::from<Base>().getTypeName() + "\" already registered with this manager"
     )
-    
+
     Derived* system = new Derived(args...);
     m_SystemList.emplace_back(
         &typeid(Base),
@@ -43,10 +43,10 @@ Derived& SystemManager::addPolymorphicSystem(Args&&... args)
 template <class T>
 SystemManager& SystemManager::removeSystem()
 {
-    const auto it = m_SystemList.find(&typeid(T));
+    const auto it = m_SystemList.find(TypeID::from<T>());
     if(it == m_SystemList.end())
         return *this;
-    
+
     m_SystemList.erase(it);
     this->computeExecutionOrder();
     return *this;
@@ -56,9 +56,9 @@ SystemManager& SystemManager::removeSystem()
 template <class T>
 T* SystemManager::getSystemPtr() const
 {
-    const auto it = m_SystemList.find(&typeid(T));
+    const auto it = m_SystemList.find(TypeID::from<T>());
     ONTOLOGY_ASSERT(it != m_SystemList.end(), InvalidSystemException, SystemManager::getSystem<T>,
-        std::string("System of type \"") + getTypeName<T>() + "\" not registered with this manager"
+        std::string("System of type \"") + TypeID::from<T>().getTypeName() + "\" not registered with this manager"
     )
     return static_cast<T*>(it->second.get());
 }
@@ -74,11 +74,11 @@ inline T& SystemManager::getSystem() const
 template <class T>
 bool SystemManager::hasSystem() const
 {
-    if(m_SystemList.find(&typeid(T)) == m_SystemList.end())
+    if(m_SystemList.find(TypeID::from<T>()) == m_SystemList.end())
         return false;
     return true;
 }
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // __ONTOLOGY_SYSTEM_MANAGER_HPP__

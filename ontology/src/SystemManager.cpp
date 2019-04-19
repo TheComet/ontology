@@ -17,7 +17,7 @@
 #   include <boost/asio/io_service.hpp>
 #endif // ONTOLOGY_THREAD
 
-namespace Ontology {
+namespace ontology {
 
 // ----------------------------------------------------------------------------
 SystemManager::SystemManager(World* world) :
@@ -43,7 +43,7 @@ void SystemManager::initialise()
 {
     this->computeExecutionOrder();
     for(const auto& it : m_SystemList)
-        it.second->initialiseGuard(demangleTypeName(it.first->name()));
+        it.second->initialiseGuard(it.first.getTypeName());
 }
 
 // ----------------------------------------------------------------------------
@@ -62,8 +62,8 @@ void SystemManager::computeExecutionOrder()
 
     // create temporary lists holding pointers to all systems so lookup time
     // is faster
-    TypeMap<System*> systemLookup;
-    TypeSet unresolved;
+    TypeInfoMap<System*> systemLookup;
+    TypeInfoSet unresolved;
     for(const auto& it : m_SystemList)
     {
         systemLookup[it.first] = it.second.get();
@@ -73,8 +73,8 @@ void SystemManager::computeExecutionOrder()
     // dependency resolution
     // see http://www.electricmonk.nl/log/2008/08/07/dependency-resolving-algorithm/
     // make sure starting point has dependencies
-    TypeSet resolving;
-    TypeSet::const_iterator systemIt = unresolved.begin();
+    TypeInfoSet resolving;
+    TypeInfoSet::const_iterator systemIt = unresolved.begin();
     while(systemIt != unresolved.end())
     {
         systemIt = this->resolveDependencies(*systemIt, systemLookup, resolving, unresolved);
@@ -93,15 +93,15 @@ void SystemManager::computeExecutionOrder()
 }
 
 // ----------------------------------------------------------------------------
-TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
-                                        const TypeMap<System*>& systemLookup,
-                                        TypeSet& resolving,
-                                        TypeSet& unresolved)
+TypeInfoSet::iterator SystemManager::resolveDependencies(const TypeID& node,
+                                        const TypeInfoMap<System*>& systemLookup,
+                                        TypeInfoSet& resolving,
+                                        TypeInfoSet& unresolved)
 {
     // lookup system referred to by node
     System* system = systemLookup.find(node)->second;
 #ifdef _DEBUG
-    std::cout << "Processing dependencies of system " << demangleTypeName(node->name()) << std::endl;
+    std::cout << "Processing dependencies of system " << demangleTypeName(node.getTypeName()) << std::endl;
 #endif
 
     // node is unresolved, mark as such
@@ -114,9 +114,9 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
         const auto& edgeSystemIt = systemLookup.find(edge);
         ONTOLOGY_ASSERT(edgeSystemIt != systemLookup.end(), InvalidSystemException, SystemManager::resolveDependencies,
             std::string("System \"") +
-            demangleTypeName(node->name()) +
+            node.getTypeName() +
             "\" depends on system \"" +
-            demangleTypeName(edge->name()) +
+            edge.getTypeName() +
             "\", but it isn't registered as a system"
         )
         const System* edgeSystem = edgeSystemIt->second;
@@ -131,9 +131,9 @@ TypeSet::iterator SystemManager::resolveDependencies(const std::type_info* node,
             // handle circular dependencies
             ONTOLOGY_ASSERT(resolving.find(edge) == resolving.end(), CircularDependencyException, SystemManager::resolveDependencies,
                 std::string("circular dependency detected with systems \"") +
-                demangleTypeName(node->name()) +
+                node.getTypeName() +
                 "\" and \"" +
-                demangleTypeName(edge->name()) + "\""
+                edge.getTypeName() + "\""
             )
             this->resolveDependencies(edge, systemLookup, resolving, unresolved);
         }
@@ -158,31 +158,10 @@ bool SystemManager::isInExecutionList(const System* const system) const
 }
 
 // ----------------------------------------------------------------------------
-void SystemManager::onAddComponent(Entity& entity, const Component* component)
-{
-    for(const auto& it : m_SystemList)
-        it.second->informEntityUpdate(entity);
-}
-
-// ----------------------------------------------------------------------------
-void SystemManager::onRemoveComponent(Entity& entity, const Component* component)
-{
-    for(const auto& it : m_SystemList)
-        it.second->informEntityUpdate(entity);
-}
-
-// ----------------------------------------------------------------------------
 void SystemManager::onDestroyEntity(Entity& entity)
 {
     for(const auto& it : m_SystemList)
-        it.second->informDestroyedEntity(entity);
+        it.second->informDestroyedEntity(&entity);
 }
 
-// ----------------------------------------------------------------------------
-void SystemManager::onEntitiesReallocated(std::vector<Entity>& entityList)
-{
-    for(const auto& it : m_SystemList)
-        it.second->informEntitiesReallocated(entityList);
-}
-
-} // namespace Ontology
+} // namespace ontology

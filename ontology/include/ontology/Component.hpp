@@ -9,8 +9,10 @@
 // include files
 
 #include <ontology/Config.hpp>
+#include <ontology/allocators/Instancer.hpp>
+#include <ontology/allocators/Mallocator.hpp>
 
-namespace Ontology {
+namespace ontology {
 
 /*!
  * @brief A component represents data.
@@ -29,24 +31,12 @@ namespace Ontology {
  * };
  * @endcode
  */
-
-class ONTOLOGY_PUBLIC_API Component
+class Component
 {
 public:
-
-    /*!
-     * @brief Allow destruction through base class pointer.
-     */
-    virtual ~Component();
-
-protected:
-
-    /*!
-     * @brief Disallow construction without inheritance.
-     */
-    Component();
+    virtual ~Component() {}
 };
 
-} // namespace Ontology
+} // namespace ontology
 
 #endif // ONTOLOGY_COMPONENT_HPP

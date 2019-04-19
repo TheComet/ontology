@@ -10,14 +10,14 @@
 #include <ontology/SystemManager.hpp>
 #include <ontology/Entity.hpp>
 
-namespace Ontology {
+namespace ontology {
+
+static ID GUIDCounter = ID(0);
 
 // ----------------------------------------------------------------------------
-
 World::World() :
     m_EntityManager(new EntityManager(this)),
-    m_SystemManager(new SystemManager(this)),
-    m_DeltaTime(0.0)
+    m_SystemManager(new SystemManager(this))
 {
     m_EntityManager->event.addListener(m_SystemManager.get(), "SystemManager");
 }
@@ -25,7 +25,7 @@ World::World() :
 // ----------------------------------------------------------------------------
 World::~World()
 {
-    m_EntityManager->event.removeListener("SystemManager");
+    m_EntityManager->event.removeListener(m_SystemManager.get());
 }
 
 // ----------------------------------------------------------------------------
@@ -41,15 +41,9 @@ SystemManager& World::getSystemManager() const
 }
 
 // ----------------------------------------------------------------------------
-void World::setDeltaTime(float deltaTime)
+ID World::generateGUID()
 {
-    m_DeltaTime = deltaTime;
-}
-
-// ----------------------------------------------------------------------------
-float World::getDeltaTime() const
-{
-    return m_DeltaTime;
+    return ID(GUIDCounter.value++);
 }
 
 // ----------------------------------------------------------------------------
@@ -58,4 +52,4 @@ void World::update()
     m_SystemManager->update();
 }
 
-} // namespace Ontology
+} // namespace ontology

@@ -38,7 +38,7 @@ set (ontology_HEADERS
     "ontology/include/ontology/Entity.hpp"
     "ontology/include/ontology/Entity.hxx"
     "ontology/include/ontology/EntityManager.hpp"
-    "ontology/include/ontology/EntityManagerInterface.hpp"
+    #"ontology/include/ontology/EntityManager.hxx"
     "ontology/include/ontology/EntityManagerListener.hpp"
     "ontology/include/ontology/Exception.hpp"
     "ontology/include/ontology/ListenerDispatcher.hpp"
@@ -48,13 +48,9 @@ set (ontology_HEADERS
     "ontology/include/ontology/SystemManager.hpp"
     "ontology/include/ontology/SystemManager.hxx"
     "ontology/include/ontology/Type.hpp"
-    "ontology/include/ontology/Type.hxx"
-    "ontology/include/ontology/TypeContainers.hpp"
-    "ontology/include/ontology/World.hpp"
-    "ontology/include/ontology/Ontology.hpp")
+    "ontology/include/ontology/World.hpp")
 
 set (ontology_SOURCES
-    "ontology/src/Component.cpp"
     "ontology/src/Entity.cpp"
     "ontology/src/EntityManager.cpp"
     "ontology/src/EntityManagerListener.cpp"
@@ -62,7 +58,10 @@ set (ontology_SOURCES
     "ontology/src/System.cpp"
     "ontology/src/SystemManager.cpp"
     "ontology/src/Type.cpp"
-    "ontology/src/World.cpp")
+    "ontology/src/World.cpp"
+    "ontology/src/allocators/Instancer.cpp"
+    "ontology/src/allocators/NullAllocator.cpp"
+    "ontology/src/allocators/Mallocator.cpp")
 
 ###############################################################################
 # create target
@@ -84,7 +83,7 @@ target_compile_options (ontology
 
 target_compile_features (ontology
     PUBLIC
-        cxx_std_11)
+        cxx_std_17)
 
 target_compile_definitions (ontology
     PRIVATE
