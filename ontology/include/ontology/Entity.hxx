@@ -2,8 +2,8 @@
 //Entity.hxx
 //----------------------------------------------------------------------------
 
-#ifndef __ONTOLOGY_ENTITY_HXX__
-#define __ONTOLOGY_ENTITY_HXX__
+#ifndef ONTOLOGY_ENTITY_HXX
+#define ONTOLOGY_ENTITY_HXX
 
 //----------------------------------------------------------------------------
 //include files
@@ -85,7 +85,7 @@ public:
 
     /*!
      * @brief Remove a component from this entity.
-     * 
+     *
      * The component to be removed is passed as a template argument. E.g.
      * @code
      * myEntity.removeComponent<Position2D>();
@@ -100,21 +100,21 @@ public:
      */
     template <class T>
     inline T& getComponent() const;
-    
+
     /*!
      * @brief Get a component from the entity.
      * @return A pointer to the requested component.
      */
     template <class T>
     T* getComponentPtr() const;
-    
+
     /*!
      * @brief Checks if the specified component exists.
      * @return True if the entity has the specified component, false if otherwise.
      */
     template <class T>
     bool hasComponent() const;
-    
+
     /*!
      * @brief Tells the specified system to configure this entity.
      */
@@ -136,7 +136,7 @@ public:
      * @return A const char pointer to the entity's name string.
      */
     const char* getName() const;
-    
+
     /*!
      * @brief Gets this entity's globally unique Identifier.
      */
@@ -153,4 +153,4 @@ private:
 
 } // namespace Ontology
 
-#endif // __ONTOLOGY_ENTITY_HXX__
+#endif // ONTOLOGY_ENTITY_HXX

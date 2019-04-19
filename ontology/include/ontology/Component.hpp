@@ -2,8 +2,8 @@
 // Component.hpp
 // ----------------------------------------------------------------------------
 
-#ifndef __ONTOLOGY_COMPONENT_HPP__
-#define __ONTOLOGY_COMPONENT_HPP__
+#ifndef ONTOLOGY_COMPONENT_HPP
+#define ONTOLOGY_COMPONENT_HPP
 
 // ----------------------------------------------------------------------------
 // include files
@@ -49,4 +49,4 @@ protected:
 
 } // namespace Ontology
 
-#endif // __ONTOLOGY_COMPONENT_HPP__
+#endif // ONTOLOGY_COMPONENT_HPP

@@ -2,8 +2,8 @@
 // Configures prerequisits for this library
 // --------------------------------------------------------------
 
-#ifndef __ONTOLOGY_CONFIG_HPP__
-#   define __ONTOLOGY_CONFIG_HPP__
+#ifndef ONTOLOGY_CONFIG_HPP
+#   define ONTOLOGY_CONFIG_HPP
 
     // --------------------------------------------------------------
     // build settings
@@ -16,65 +16,18 @@
 #   define ONTOLOGY_${LIB_TYPE}
 
     // --------------------------------------------------------------
-    // Identify the operating system
-    // --------------------------------------------------------------
-
-#   if defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
-#       define ONTOLOGY_PLATFORM_WINDOWS
-#   elif defined(linux) || defined(__linux)
-#       define ONTOLOGY_PLATFORM_LINUX
-#   elif defined(__APPLE__) || defined(MACOSX) || defined(macintosh) || defined(Macintosh)
-#       define ONTOLOGY_PLATFORM_MAC
-#   else
-#       error This operating system is not supported
-#   endif
-
-    // --------------------------------------------------------------
     // define visibility macros
     // --------------------------------------------------------------
 
     // define platform dependent and build dependent visibility macro helpers
-#   if defined(ONTOLOGY_SHARED)
-#       if defined(ONTOLOGY_PLATFORM_WINDOWS)
-#           if defined(__GNUC__)
-                // cygwin visbibility
-#               define ONTOLOGY_HELPER_API_EXPORT __attribute__ ((dllexport))
-#               define ONTOLOGY_HELPER_API_IMPORT __attribute__ ((dllimport)
-#           else
-                // msvc visibility
-#               define ONTOLOGY_HELPER_API_EXPORT __declspec(dllexport)
-#               define ONTOLOGY_HELPER_API_IMPORT __declspec(dllimport)
-#           endif
-#           define ONTOLOGY_HELPER_API_LOCAL
-#       else
-#           if __GNUC__ >= 4
-                // gcc 4+ visibility
-#               define ONTOLOGY_HELPER_API_EXPORT __attribute__ ((visibility ("default")))
-#               define ONTOLOGY_HELPER_API_IMPORT __attribute__ ((visibility ("default")))
-#               define ONTOLOGY_HELPER_API_LOCAL  __attribute__ ((visibility ("hidden")))
-#           else
-                // gcc lower than 4 doesn't have any explicit visibility, everything is exported
-#               define ONTOLOGY_HELPER_API_EXPORT
-#               define ONTOLOGY_HELPER_API_IMPORT
-#               define ONTOLOGY_HELPER_API_LOCAL
-#           endif
-#       endif
-#   elif defined(ONTOLOGY_STATIC)
-        // static build
-#       define ONTOLOGY_HELPER_API_EXPORT
-#       define ONTOLOGY_HELPER_API_IMPORT
-#       define ONTOLOGY_HELPER_API_LOCAL
-#   else
-#       error Please define ONTOLOGY_SHARED or ONTOLOGY_STATIC
-#   endif
-
-    // define public API macro, depending on whether the library is being
-    // built or being linked against.
-#   if defined(ONTOLOGY_BUILDING) // defined by CMake when library is being compiled
+#   define ONTOLOGY_HELPER_API_EXPORT ${ONTOLOGY_HELPER_API_EXPORT}
+#   define ONTOLOGY_HELPER_API_IMPORT ${ONTOLOGY_HELPER_API_IMPORT}
+#   define ONTOLOGY_HELPER_API_LOCAL  ${ONTOLOGY_HELPER_API_LOCAL}
+#   if defined (ONTOLOGY_BUILDING)  // defined only when the library is being compiled using a command line option, e.g. -DONTOLOGY_BUILDING
 #       define ONTOLOGY_PUBLIC_API ONTOLOGY_HELPER_API_EXPORT
 #   else
 #       define ONTOLOGY_PUBLIC_API ONTOLOGY_HELPER_API_IMPORT
 #   endif
-#   define ONTOLOGY_LOCAL_API ONTOLOGY_HELPER_API_LOCAL
+#   define ONTOLOGY_PRIVATE_API ONTOLOGY_HELPER_API_LOCAL
 
-#endif // __ONTOLOGY_CONFIG_HPP__
+#endif // ONTOLOGY_CONFIG_HPP
