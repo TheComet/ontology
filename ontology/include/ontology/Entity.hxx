@@ -19,6 +19,8 @@
 //forward declarations
 
 namespace ontology {
+    template <class T> class ComponentFactory;
+    class ComponentFactoryInterface;
     class EntityManager;
     class System;
 }
@@ -56,7 +58,7 @@ public:
     /*!
      * @brief Construct an entity with a name.
      */
-    Entity(ID id, EntityManager* const entityManager);
+    Entity(ID id, EntityManager* entityManager);
 
     /*!
      * @brief Allow destruction through base class pointer.
@@ -107,6 +109,8 @@ public:
     template<class T>
     Entity& removeComponent();
 
+    Entity& removeAllComponents();
+
     /*!
      * @brief Get a component from the entity.
      * @return A reference to the requested component.
@@ -146,6 +150,11 @@ public:
 
     template <class T>
     ONTOLOGY_PRIVATE_API Index* getComponentIndexPtr();
+
+    template <class T>
+    ComponentFactory<T>& getComponentFactory() const;
+
+    ComponentFactoryInterface& getComponentFactory(TypeID componentType) const;
 
 private:
     // Globally unique identifier

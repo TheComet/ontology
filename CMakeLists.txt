@@ -51,6 +51,7 @@ set (ontology_HEADERS
     "ontology/include/ontology/World.hpp")
 
 set (ontology_SOURCES
+    "ontology/src/ComponentFactory.cpp"
     "ontology/src/Entity.cpp"
     "ontology/src/EntityManager.cpp"
     "ontology/src/EntityManagerListener.cpp"

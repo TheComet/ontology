@@ -87,14 +87,24 @@ EntityManager& EntityManager::destroyEntity(Entity& entity)
 // ----------------------------------------------------------------------------
 EntityManager& EntityManager::destroyEntity(ID entityID)
 {
-    auto it = entityIndexMap_.find(entityID);
-    ONTOLOGY_ASSERT(it != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
+    auto entityIndexIt = entityIndexMap_.find(entityID);
+    ONTOLOGY_ASSERT(entityIndexIt != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
         "Entity with ID " + entityID.to_string() + " not found"
     );
 
-    auto listIt = entityList_.begin() + it->second;
-    entityList_.erase(listIt);
-    entityIndexMap_.erase(it);
+    Index entityIndex = entityIndexIt->second;
+    auto entityIt = entityList_.begin() + entityIndex;
+
+    entityIt->removeAllComponents();
+
+    entityList_.erase(entityIt);
+    entityIndexMap_.erase(entityIndexIt);
+
+    // Index map (maps entity IDs to indices in the vector) needs to be updated,
+    // as all entities above the one deleted have shifted down by one.
+    for (auto& entry : entityIndexMap_)
+        if (entry.second > entityIndex)
+            entry.second--;
 
     return *this;
 }
@@ -102,6 +112,8 @@ EntityManager& EntityManager::destroyEntity(ID entityID)
 // ----------------------------------------------------------------------------
 EntityManager& EntityManager::destroyAllEntities()
 {
+    // TODO Destroy components
+
     entityIndexMap_.clear();
     entityList_.clear();
 
@@ -111,12 +123,7 @@ EntityManager& EntityManager::destroyAllEntities()
 // ----------------------------------------------------------------------------
 Entity& EntityManager::getEntity(ID entityID)
 {
-    auto it = entityIndexMap_.find(entityID);
-    ONTOLOGY_ASSERT(it != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
-        "Entity with ID " + entityID.to_string() + " is not registered with this manager"
-    );
-
-    return entityList_[it->second];
+    return entityList_[entityIDToIndex(entityID)];
 }
 
 // ----------------------------------------------------------------------------
@@ -126,15 +133,14 @@ Entity& EntityManager::getEntity(Index entityIdx)
 }
 
 // ----------------------------------------------------------------------------
-void EntityManager::unregisterComponentFactory(const TypeID& type)
+Index EntityManager::entityIDToIndex(ID entityID)
 {
-    auto it = componentFactories_.find(type);
-    ONTOLOGY_ASSERT(it != componentFactories_.end(), InvalidComponentException, EntityManager::unregisterComponentFactory,
-        "Component of type " + type.getTypeName() + "not registered!"
+    auto it = entityIndexMap_.find(entityID);
+    ONTOLOGY_ASSERT(it != entityIndexMap_.end(), InvalidEntityException, EntityManager::destroyEntity,
+        "Entity with ID " + entityID.to_string() + " is not registered with this manager"
     );
 
-    if (it->second->subRef())
-        componentFactories_.erase(it);
+    return it->second;
 }
 
 // ----------------------------------------------------------------------------
@@ -143,25 +149,10 @@ std::vector<Entity>& EntityManager::getEntityList()
     return entityList_;
 }
 
-// ============================================================================
-// ============================================================================
-
 // ----------------------------------------------------------------------------
-EntityManager::ComponentFactoryInterface::ComponentFactoryInterface(EntityManager& entityManager) :
-    entityManager_(entityManager)
+EntityManager::ComponentFactoryCollection& EntityManager::getComponentFactories()
 {
-}
-
-// ----------------------------------------------------------------------------
-void EntityManager::ComponentFactoryInterface::addRef()
-{
-    refcount++;
-}
-
-// ----------------------------------------------------------------------------
-bool EntityManager::ComponentFactoryInterface::subRef()
-{
-    return (--refcount) == 0;
+    return componentFactories_;
 }
 
 } // namespace ontology

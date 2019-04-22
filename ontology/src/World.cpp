@@ -19,13 +19,11 @@ World::World() :
     m_EntityManager(new EntityManager(this)),
     m_SystemManager(new SystemManager(this))
 {
-    m_EntityManager->event.addListener(m_SystemManager.get(), "SystemManager");
 }
 
 // ----------------------------------------------------------------------------
 World::~World()
 {
-    m_EntityManager->event.removeListener(m_SystemManager.get());
 }
 
 // ----------------------------------------------------------------------------

@@ -9,19 +9,14 @@
 
 #include "ontology/Config.hpp"
 #include "ontology/Entity.hxx"
-#include "ontology/ListenerDispatcher.hpp"
-
-#include <unordered_map>
-#include <memory>
-#include <string>
-#include <functional>
-#include <cassert>
 
 // ----------------------------------------------------------------------------
 // forward declarations
 
 namespace ontology {
     class Component;
+    class ComponentFactoryInterface;
+    template <class T> class ComponentFactory;
     class EntityManagerListener;
     class World;
 }
@@ -100,87 +95,18 @@ public:
 
     Entity& getEntity(Index entityIdx);
 
-    /*!
-     * @brief Register as an EntityManagerListener to listen to EntityManager events.
-     */
-    ListenerDispatcher<EntityManagerListener> event;
+    Index entityIDToIndex(ID entityID);
 
-private:
-    friend class Entity;
-
-    class ComponentFactoryInterface
-    {
-    public:
-        ComponentFactoryInterface(EntityManager& entityManager);
-        virtual ~ComponentFactoryInterface() {}
-        void addRef();
-        bool subRef();
-
-    protected:
-        EntityManager& entityManager_;
-
-    private:
-        virtual Index createComponentForEntityWithDefaultArgs(const Entity& entity) = 0;
-        virtual void destroyComponentForEntity(const Entity& e) = 0;
-        uint32_t refcount = 1;
-    };
-
-    template <class T>
-    class ComponentFactory : public ComponentFactoryInterface
-    {
-    public:
-        ComponentFactory(EntityManager& entityManager);
-
-        template <class... Args>
-        Index createComponentForEntityWithCustomArgs(const Entity& entity, Args&&... args);
-        Index createComponentForEntityWithDefaultArgs(const Entity& entity) override;
-        void destroyComponentForEntity(const Entity& e) override;
-
-        T& getComponentForEntity(const Entity& e);
-        T& getComponent(Index componentIndex);
-
-    protected:
-        std::vector<T> components_;
-    };
-
-    template <class T, class... DefaultArgs>
-    class DefaultComponentFactory : public ComponentFactory<T>
-    {
-    public:
-        DefaultComponentFactory(EntityManager& entityManager, DefaultArgs&&... args);
-        Index createComponentForEntityWithDefaultArgs(const Entity& entity) override final;
-
-    private:
-        std::tuple<DefaultArgs...> defaultArgs_;
-    };
-
-    template <class T, class... DefaultArgs>
-    ONTOLOGY_PRIVATE_API void registerComponentFactory(DefaultArgs&&...);
-
-    template <class T>
-    ONTOLOGY_PRIVATE_API void unregisterComponentFactory();
-    ONTOLOGY_PRIVATE_API void unregisterComponentFactory(const TypeID&);
-
-    template <class T, class... Args>
-    ONTOLOGY_PRIVATE_API Index createComponentForEntity(const Entity& entity, Args&&...);
-
-    template <class T>
-    ONTOLOGY_PRIVATE_API void destroyComponentForEntity(const Entity& entity);
-
-    template <class T>
-    ONTOLOGY_PRIVATE_API T& getComponentForEntity(const Entity& entity);
+    typedef std::unordered_map<TypeID, std::unique_ptr<ComponentFactoryInterface>> ComponentFactoryCollection;
+    ONTOLOGY_PRIVATE_API ComponentFactoryCollection& getComponentFactories();
 
     ONTOLOGY_PRIVATE_API std::vector<Entity>& getEntityList();
-
-public: // public due to unit tests
-    template <class T>
-    ONTOLOGY_PRIVATE_API ComponentFactory<T>* findComponentFactory() const;
 
 private:
     std::vector<Entity>                                    entityList_;
     std::unordered_map<ID, Index>                          entityIndexMap_;
     std::unordered_map<std::string, EntityPrototype>       prototypeMap_;
-    std::unordered_map<TypeID, std::unique_ptr<ComponentFactoryInterface>>  componentFactories_;
+    ComponentFactoryCollection                             componentFactories_;
     World*                                                 world_;
 };
 

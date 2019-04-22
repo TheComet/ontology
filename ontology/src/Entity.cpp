@@ -44,18 +44,43 @@ Entity& Entity::operator=(Entity&& other)
 }
 
 // ----------------------------------------------------------------------------
+Entity& Entity::removeAllComponents()
+{
+    for (const auto& pair : componentIndices_)
+    {
+        ComponentFactoryInterface& factory = getComponentFactory(pair.first);
+        factory.destroyComponentForEntity(*this);
+    }
+
+    componentIndices_.clear();
+
+    return *this;
+}
+
+// ----------------------------------------------------------------------------
 bool Entity::supportsSystem(const System& system) const
 {/*
     for(const auto& it : system.getSupportedComponents())
         if(m_ComponentMap.find(it) == m_ComponentMap.end())
             return false;*/
-    return true;
+    return false;
 }
 
 // ----------------------------------------------------------------------------
 ID Entity::getID() const
 {
     return id_;
+}
+
+// ----------------------------------------------------------------------------
+ComponentFactoryInterface& Entity::getComponentFactory(TypeID componentType) const
+{
+    EntityManager::ComponentFactoryCollection& factories = entityManager_->getComponentFactories();
+    auto result = factories.find(componentType);
+    ONTOLOGY_ASSERT(result != factories.end(), InvalidComponentException, Entity::getComponentFactory<T>,
+        "Factory for component type \"" + componentType.getTypeName() + "\" not registered with entity manager"
+    )
+    return *result->second.get();
 }
 
 //----------------------------------------------------------------------------
